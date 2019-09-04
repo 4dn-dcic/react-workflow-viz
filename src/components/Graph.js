@@ -74,10 +74,10 @@ export default class Graph extends React.Component {
     static defaultProps = {
         'height'        : null, // Unused, should be set to nodes count in highest column * rowSpacing + innerMargins.
         'width'         : null,
-        'columnSpacing' : 56,
+        'columnSpacing' : 100,
         'columnWidth'   : 150,
         'rowSpacing'    : 80,
-        'rowSpacingType': 'wide',
+        'rowSpacingType': 'compact',
         'pathArrows'    : true,
         'renderDetailPane' : function(selectedNode, props){
             return <DefaultDetailPane {...props} selectedNode={selectedNode} />;
@@ -89,8 +89,8 @@ export default class Graph extends React.Component {
         'innerMargin'   : {
             'top' : 80,
             'bottom' : 80,
-            'left' : 30,
-            'right' : 20
+            'left' : 40,
+            'right' : 40
         },
         'minimumHeight' : 75,
         'edgeStyle' : 'bezier',

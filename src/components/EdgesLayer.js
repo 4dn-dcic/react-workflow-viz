@@ -135,7 +135,7 @@ export function traceEdges(
                             (v[1] > currSegmentY && prevV[1] < prevYCoord) ||
                             (v[1] < currSegmentY && prevV[1] > prevYCoord)
                         ) {
-                            if (intersections === 0) intersections += 4;
+                            if (intersections === 0) intersections += 2;
                             intersections++;
                         }
                         return v;
