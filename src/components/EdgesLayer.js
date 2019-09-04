@@ -181,7 +181,8 @@ export function traceEdges(
             return 0;
         });
 
-        return originalEdgesSortedByLength.map(function(edge, edgeIdx){
+        const resultEdges = [];
+        originalEdgesSortedByLength.forEach(function(edge){
             const { source, target } = edge;
             const { column: sourceCol, x: sourceX, y: sourceY } = source;
             const { column: targetCol, x: targetX, y: targetY } = target;
@@ -189,10 +190,12 @@ export function traceEdges(
             if (columnDiff <= 0){
                 // Shouldn't happen I don't think except if file is re-used/generated or some other unexpected condition.
                 console.error("Target column is greater than source column", source, target);
-                return edge; // Skip tracing it.
+                resultEdges.push(edge);
+                return; // Skip tracing it.
             }
             if (columnDiff === 1){
-                return edge; // Doesn't need to go around obstacles, skip.
+                resultEdges.push(edge);
+                return; // Doesn't need to go around obstacles, skip.
             }
 
             const vertices = [[ sourceX + columnWidth, sourceY ]];
@@ -205,7 +208,7 @@ export function traceEdges(
                     colIdx,
                     prevY,
                     targetY,
-                    originalEdgesSortedByLength.slice(0, edgeIdx)
+                    resultEdges
                 );
                 if (!bestSegment){
                     throw new Error("Could not find viable path for edge");
@@ -219,9 +222,10 @@ export function traceEdges(
 
             // console.log("EDGE", edge);
 
-            return _.extend({ vertices }, edge);
+            resultEdges.push({ ...edge, vertices })
         });
 
+        return resultEdges;
     }
 
     let res;
