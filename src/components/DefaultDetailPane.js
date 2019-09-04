@@ -15,18 +15,14 @@ export function DefaultDetailPane(props){
         type = node.ioType || node.nodeType;
     }
 
-    const textContent = JSON.stringify(node.meta);
+    const textContent = JSON.stringify(node.meta, null, 4);
 
     return (
         <div className="detail-pane">
-            <h5 className="text-500">
-                { type }
-            </h5>
-            <h4 className="text-300">
-                <span>{ node.name }</span>
-            </h4>
+            <h4>Create your own detail pane component and pass in a <code>renderDetailPane</code> prop (function) which returns it.</h4>
+            <h5>Could add <code>display: flex</code> & related CSS styling to visualization container & pane to have detail pane show at left or right, if desired.</h5>
             <div className="detail-pane-body">
-                <textarea style={{ fontFamily : "monospace" }}>{ textContent }</textarea>
+                <pre style={{ fontFamily : "monospace", whiteSpace: "pre-wrap" }}>{ textContent }</pre>
             </div>
         </div>
     );

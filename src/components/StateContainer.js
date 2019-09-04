@@ -20,7 +20,7 @@ export default class StateContainer extends React.PureComponent {
 
     static getDerivedStateFromProps(props, state){
         if (state.selectedNode){
-            var foundNode = memoizedFindNode(
+            const foundNode = memoizedFindNode(
                 props.nodes,
                 state.selectedNode.name,
                 state.selectedNode.nodeType,
