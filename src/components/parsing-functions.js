@@ -136,10 +136,12 @@ export const DEFAULT_PARSING_OPTIONS = {
  * Workflow graph component.
  *
  * @param {Step[]} analysis_steps                       List of steps from the back-end to generate nodes & edges from.
- * @param {ParsingOptions} [parsingOptions]             Options for parsing and post-processing.
+ * @param {ParsingOptions} [parsingOptions]                Options for parsing and post-processing.
  * @returns {{ 'nodes' : Node[], 'edges' : Edge[] }}    Container object for the two lists.
  */
-export const parseAnalysisSteps = memoize(function(analysis_steps, parsingOptions = DEFAULT_PARSING_OPTIONS){
+export const parseAnalysisSteps = memoize(function(analysis_steps, parsingOptions = {}){
+
+    const parsingOpts = { ...DEFAULT_PARSING_OPTIONS, ...parsingOptions };
 
     /*************
      ** Outputs **
@@ -761,7 +763,7 @@ export const parseAnalysisSteps = memoize(function(analysis_steps, parsingOption
 
     function findNextStepsFromIONode(ioNodes){
 
-        var targetPropertyName = parsingOptions.direction === 'output' ? '_target' : '_source';
+        var targetPropertyName = parsingOpts.direction === 'output' ? '_target' : '_source';
         var nextSteps = new Set();
 
         _.forEach(ioNodes, function(n){
@@ -789,7 +791,7 @@ export const parseAnalysisSteps = memoize(function(analysis_steps, parsingOption
     function processStepInPath(step, level = 0){
         var stepNode = generateStepNode(step, (level + 1) * 2 - 1);
 
-        if (parsingOptions.direction === 'output'){
+        if (parsingOpts.direction === 'output'){
 
             var inputNodes = generateIONodesFromStep(step, (level + 1) * 2 - 2, stepNode, 'input');
             var outputNodes = generateIONodesFromStep(step, (level + 1) * 2, stepNode, 'output');
@@ -866,22 +868,22 @@ export const parseAnalysisSteps = memoize(function(analysis_steps, parsingOption
 
     var graphData = { nodes, edges };
 
-    if (!parsingOptions.showParameters){
+    if (!parsingOpts.showParameters){
         graphData = filterOutParametersFromGraphData(graphData);
     }
 
-    if (!parsingOptions.showReferenceFiles){
+    if (!parsingOpts.showReferenceFiles){
         graphData = filterOutReferenceFilesFromGraphData(graphData);
     }
 
-    if (!parsingOptions.showIndirectFiles){
+    if (!parsingOpts.showIndirectFiles){
         graphData = filterOutIndirectFilesFromGraphData(graphData);
     }
 
     var sortedNodes = _.sortBy(graphData.nodes, 'column');
 
-    if (typeof parsingOptions.nodesPreSortFxn === 'function'){
-        sortedNodes = parsingOptions.nodesPreSortFxn(sortedNodes);
+    if (typeof parsingOpts.nodesPreSortFxn === 'function'){
+        sortedNodes = parsingOpts.nodesPreSortFxn(sortedNodes);
     }
 
     // Arrange into lists of columns
@@ -896,21 +898,21 @@ export const parseAnalysisSteps = memoize(function(analysis_steps, parsingOption
     });
 
     // Sort nodes within columns.
-    if (typeof parsingOptions.nodesInColumnSortFxn === 'function'){
+    if (typeof parsingOpts.nodesInColumnSortFxn === 'function'){
         nodesByColumnPairs = _.map(nodesByColumnPairs, function([columnGroupIdx, columnGroupNodes]){
             var nodesInColumn;
             // Sort
-            if (Array.isArray(parsingOptions.skipSortOnColumns) && parsingOptions.skipSortOnColumns.indexOf(columnGroupIdx) > -1){
+            if (Array.isArray(parsingOpts.skipSortOnColumns) && parsingOpts.skipSortOnColumns.indexOf(columnGroupIdx) > -1){
                 nodesInColumn = columnGroupNodes.slice(0);
             } else {
-                nodesInColumn = columnGroupNodes.sort(parsingOptions.nodesInColumnSortFxn);
+                nodesInColumn = columnGroupNodes.sort(parsingOpts.nodesInColumnSortFxn);
             }
 
             _.forEach(nodesInColumn, function(n, i){ n.indexInColumn = i; }); // Update w/ new index in column
 
             // Run post-sort fxn, e.g. to manually re-arrange nodes within columns. If avail.
-            if (typeof parsingOptions.nodesInColumnPostSortFxn === 'function'){
-                nodesInColumn = parsingOptions.nodesInColumnPostSortFxn(nodesInColumn, columnGroupIdx);
+            if (typeof parsingOpts.nodesInColumnPostSortFxn === 'function'){
+                nodesInColumn = parsingOpts.nodesInColumnPostSortFxn(nodesInColumn, columnGroupIdx);
                 _.forEach(nodesInColumn, function(n, i){ n.indexInColumn = i; }); // Update w/ new index in column
             }
 

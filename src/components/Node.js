@@ -86,7 +86,7 @@ export class DefaultNodeElement extends React.PureComponent {
 }
 
 
-export default class Node extends React.PureComponent {
+export default class Node extends React.Component {
 
     /**
      * @param {Object} currentNode - Current node, e.g. node calling this function

@@ -437,15 +437,25 @@ $workflow-node-color-type-global-context:           #ffb3b3 !default;
 
     /** Transitions **/
 
-    opacity: 0;
-
-    &.workflow-node-transition-entering,
+    &.workflow-node-transition,
     &.workflow-node-transition-enter {
+        opacity: 0;
+    }
+
+    &.workflow-node-transition-enter-active {
         opacity: 0;
     }
 
     &.workflow-node-transition-enter-done {
         opacity: 1;
+    }
+
+    &.workflow-node-transition-exit-active {
+        opacity: 0;
+    }
+
+    &.workflow-node-transition-exit-done {
+        opacity: 0;
     }
 
 }

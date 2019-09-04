@@ -10,9 +10,18 @@ import Node from './Node';
 
 export default class NodesLayer extends React.PureComponent {
 
-    static sortedNodes = memoize(function(nodes){
-        return _.sortBy(_.sortBy(nodes.slice(0), 'name'), 'nodeType'); // Sort nodes so on updates, they stay in same(-ish) order and can transition.
-    });
+    static sortedNodes(nodes){
+        // Sort nodes so on updates, they stay in same(-ish) order and can transition.
+        return _.sortBy(nodes.slice(0), 'id');
+    }
+
+    static countInActiveContext(nodes){
+        return _.reduce(nodes, function(m,n){ return ( n.isCurrentContext ? ++m : m ); }, 0);
+    }
+
+    static lastActiveContextNode(nodes){
+        return _.sortBy(_.filter(nodes, function(n){ return n.isCurrentContext; }), 'column' ).reverse()[0];
+    }
 
     static defaultProps = {
         'onNodeMouseEnter' : null,
@@ -20,14 +29,23 @@ export default class NodesLayer extends React.PureComponent {
         'onNodeClick' : null
     };
 
+    constructor(props){
+        super(props);
+        this.memoized = {
+            sortedNodes: memoize(NodesLayer.sortedNodes),
+            countInActiveContext: memoize(NodesLayer.countInActiveContext),
+            lastActiveContextNode: memoize(NodesLayer.lastActiveContextNode)
+        };
+    }
+
     renderNodeElements(){
         if (!this.props.scrollContainerWrapperMounted){
             return null;
         }
         const { nodes, onNodeMouseEnter, onNodeMouseLeave, onNodeClick, nodeClassName } = this.props;
-        const sortedNodes = NodesLayer.sortedNodes(nodes);
-        const countInActiveContext = _.reduce(sortedNodes, function(m,n){ return ( n.isCurrentContext ? ++m : m ); }, 0);
-        const lastActiveContextNode = countInActiveContext === 0 ? null : _.sortBy(_.filter(sortedNodes, function(n){ return n.isCurrentContext; }), 'column' ).reverse()[0];
+        const sortedNodes = this.memoized.sortedNodes(nodes);
+        const countInActiveContext = this.memoized.countInActiveContext(sortedNodes);
+        const lastActiveContextNode = countInActiveContext === 0 ? null : this.memoized.lastActiveContextNode(sortedNodes);
 
         return _.map(sortedNodes, (node, nodeIndex) => {
             const nodeProps = _.extend(

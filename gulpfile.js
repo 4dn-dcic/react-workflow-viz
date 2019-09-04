@@ -4,8 +4,8 @@ const log = require('fancy-log');
 const webpack = require('webpack');
 const sass = require('node-sass');
 const fs = require('fs');
-const webpackConfig = require('./webpack.config.js');
-const demoWebpackConfig = require('./demo.webpack.config.js');
+const webpackConfig = require('./webpack.config.workflow-viz');
+const demoWebpackConfig = require('./webpack.config.demo');
 
 
 
@@ -45,14 +45,22 @@ function watchDemo(){
 };
 
 
-function doSassBuild (done, options = {}){
-    const cssOutputLocation = './dist/react-workflow-viz.min.css';
-    sass.render({
+function performSassBuild(done, options = {}){
+    const {
+        action = 'render',
+        cssOutputLocation = './dist/react-workflow-viz.min.css',
+        ...otherOpts
+    } = options;
+
+    const useOpts = { // Defaults, overriden by otherOpts
         file: './src/styles.scss',
         outFile: './dist/react-workflow-viz.map.css', // sourceMap location
-        outputStyle: options.outputStyle || 'compressed',
-        sourceMap: true
-    }, function(error, result) { // node-style callback from v3.0.0 onwards
+        outputStyle: 'compressed',
+        sourceMap: true,
+        ...otherOpts
+    };
+
+    sass.render(useOpts, function(error, result) { // node-style callback from v3.0.0 onwards
         if (error) {
             console.error("Error", error.status, error.file, error.line + ':' + error.column);
             console.log(error.message);
@@ -74,6 +82,11 @@ function doSassBuild (done, options = {}){
     });
 };
 
+function doBuildScss(done){
+    performSassBuild(done, {});
+}
+
+
 gulp.task('build', doWebpack);
 //gulp.task('build-publish',  gulp.series(setProduction, doWebpack));
 //gulp.task('watch', gulp.series(doWebpack, watch));
@@ -81,12 +94,13 @@ gulp.task('watch',
     gulp.series(
         doWebpack,
         doDemoWebpack,
-        (done) => doSassBuild(done, {}),
+        doBuildScss,
         gulp.parallel(
             watch,
             watchDemo,
+            // todo watch scss
         )
     )
 );
-//gulp.task('watch-quick',    gulp.series(setQuick, doWebpack, watch));
-gulp.task('build-scss', function(done){ doSassBuild(done, {}) });
+
+gulp.task('build-scss', doBuildScss);
