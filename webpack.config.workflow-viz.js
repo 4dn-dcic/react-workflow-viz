@@ -81,21 +81,19 @@ webPlugins.push(new webpack.DefinePlugin({
     'BUILDTYPE' : JSON.stringify(env)
 }));
 
-
-module.exports = [{
+const primaryConf = {
     mode: mode,
     entry: {
         "react-workflow-viz" : path.resolve(__dirname, 'src')
     },
-    target: minify ? "web" : "node",
+    target: "web",
     output: {
         path: path.resolve(__dirname, 'dist'),
-        publicPath: "/dist/",
-        filename: minify ? '[name].min.js' : '[name].js',
+        filename: '[name].min.js',
         chunkFilename: chunkFilename,
 
         libraryTarget: "umd",
-        library: "[name]",
+        library: "react-workflow-viz",
         umdNamedDefine: true
     },
     // https://github.com/hapijs/joi/issues/665
@@ -128,5 +126,21 @@ module.exports = [{
     //resolveLoader : resolve,
     devtool: devTool,
     plugins: webPlugins
-}];
+};
+
+module.exports = [primaryConf];
+
+if (mode === "production"){
+    // Create another build that can be used as module.
+    // TODO - see how to compile into sep. files for more performant imports from parent apps.
+    const secondaryConf = { ...primaryConf };
+    secondaryConf.target = "node";
+    secondaryConf.output = {
+        ...secondaryConf.output,
+        filename : "[name].node.js"
+    };
+    secondaryConf.optimization = { minimize: false };
+
+    module.exports.push(secondaryConf);
+}
 

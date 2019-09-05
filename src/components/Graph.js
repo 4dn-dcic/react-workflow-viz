@@ -321,3 +321,10 @@ export default class Graph extends React.Component {
     }
 
 }
+
+
+// TODO: implement
+export const GraphParser = React.memo(function GraphParser(props){
+    const { steps } = props;
+});
+

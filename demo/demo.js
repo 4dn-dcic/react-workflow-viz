@@ -5,9 +5,16 @@ import memoize from 'memoize-one';
 import Graph, { parseAnalysisSteps, parseBasicIOAnalysisSteps, DEFAULT_PARSING_OPTIONS } from 'react-workflow-viz';
 
 
+import { STEPS as testWorkflowBedToBedDB } from './testdata/workflow-bedtobeddb';
+import { STEPS as testWorkflowAtacSeq } from './testdata/workflow-atac-seq';
 import { STEPS as testFileProcessed4DNFI9WF1Y8W } from './testdata/provenance-file-processed-4DNFI9WF1Y8W';
 //import { STEPS as testExpSet4DNESXZ4FW4T } from './testdata/provenance-expset-4DNESXZ4FW4T';
 
+
+const workflowOpts = {
+    //"showReferenceFiles": true,
+    "showIndirectFiles": true
+};
 
 class DemoApp extends Component {
 
@@ -17,6 +24,18 @@ class DemoApp extends Component {
                 "title" : "File Processed - 4DNFI9WF1Y8W",
                 "description" : null,
                 "steps" : testFileProcessed4DNFI9WF1Y8W
+            },
+            {
+                "title" : "CWL Workflow - ATAC-SEQ",
+                "description" : null,
+                "steps" : testWorkflowAtacSeq,
+                "opts" : workflowOpts
+            },
+            {
+                "title" : "CWL Workflow - BED to BEDDB",
+                "description" : null,
+                "steps" : testWorkflowBedToBedDB,
+                "opts" : workflowOpts
             }
         ]
     };
@@ -27,10 +46,10 @@ class DemoApp extends Component {
         this.handleRowSpacingTypeChange = this.handleRowSpacingTypeChange.bind(this);
         this.handleChangeBasicIO = this.handleChangeBasicIO.bind(this);
         this.state = {
-            currentDemoIdx: 0,
+            currentDemoIdx: 1,
             parsingOptions: {
                 showReferenceFiles: true,
-                showParameters: true,
+                showParameters: false,
                 showIndirectFiles: false
             },
             rowSpacingType: "compact",
@@ -72,13 +91,19 @@ class DemoApp extends Component {
     render(){
         const { testData } = this.props;
         const { currentDemoIdx, parsingOptions, rowSpacingType, showBasicIO } = this.state;
-        const { title, description, steps } = testData[currentDemoIdx];
-        const parseMethod = showBasicIO ? this.memoized.parseBasicIOAnalysisSteps : this.memoized.parseAnalysisSteps;
-        const { nodes, edges } = parseMethod(steps, parsingOptions);
+        const { title, description, steps, opts } = testData[currentDemoIdx];
+        const fullParseOpts = { ...parsingOptions, ...opts };
+        let graphData;
+        if (showBasicIO){
+            graphData = this.memoized.parseBasicIOAnalysisSteps(steps, { name: title }, fullParseOpts);
+        } else {
+            graphData = this.memoized.parseAnalysisSteps(steps, fullParseOpts);
+        }
+        const { nodes, edges } = graphData;
 
         return (
             <div className="demo-app-container">
-                <ParsingOptsCheckboxes {...parsingOptions} showBasicIO={showBasicIO}
+                <ParsingOptsCheckboxes {...parsingOptions} dataOpts={opts} showBasicIO={showBasicIO}
                     onChange={this.handleParsingOptChange} onChangeBasicIO={this.handleChangeBasicIO} />
                 <RowSpacingTypeSelect rowSpacingType={rowSpacingType} onChange={this.handleRowSpacingTypeChange} />
                 <Graph {...{ nodes, edges, rowSpacingType }} />
@@ -110,24 +135,36 @@ function RowSpacingTypeSelect(props){
 }
 
 function ParsingOptsCheckboxes(props){
-    const { showReferenceFiles, showParameters, showIndirectFiles, showBasicIO, onChange, onChangeBasicIO } = props;
+    const { showReferenceFiles, showParameters, showIndirectFiles, showBasicIO, onChange, onChangeBasicIO, dataOpts } = props;
     return (
         <div className="parsing-options-container options-container">
             <h5>Parsing Options</h5>
             <label>
-                <input type="checkbox" name="showReferenceFiles" checked={showReferenceFiles} onChange={onChange} />
+                <input type="checkbox" name="showReferenceFiles"
+                    checked={dataOpts['showReferenceFiles'] || showReferenceFiles}
+                    onChange={onChange}
+                    disabled={typeof dataOpts['showReferenceFiles'] !== 'undefined'} />
                 Show Reference Files
             </label>
             <label>
-                <input type="checkbox" name="showParameters" checked={showParameters} onChange={onChange} />
+                <input type="checkbox" name="showParameters"
+                    checked={dataOpts['showParameters'] || showParameters}
+                    onChange={onChange}
+                    disabled={typeof dataOpts['showParameters'] !== 'undefined'} />
                 Show Parameters
             </label>
             <label>
-                <input type="checkbox" name="showIndirectFiles" checked={showIndirectFiles} onChange={onChange} />
+                <input type="checkbox" name="showIndirectFiles"
+                    checked={dataOpts['showIndirectFiles'] || showIndirectFiles}
+                    onChange={onChange}
+                    disabled={typeof dataOpts['showIndirectFiles'] !== 'undefined'} />
                 Show Indirect Files
             </label>
             <label>
-                <input type="checkbox" name="showBasicIO" checked={showBasicIO} onChange={onChangeBasicIO} />
+                <input type="checkbox" name="showBasicIO"
+                    checked={dataOpts['showBasicIO'] || showBasicIO}
+                    onChange={onChangeBasicIO}
+                    disabled={typeof dataOpts['showBasicIO'] !== 'undefined'} />
                 Show Terminal I/O
             </label>
         </div>

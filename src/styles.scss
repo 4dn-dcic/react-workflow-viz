@@ -512,7 +512,6 @@ $workflow-node-color-type-global-context:           #ffb3b3 !default;
 
     .workflow-chart-inner-container {
         position: relative;
-        height: 100%;
         width: 100%;
         overflow-y: hidden;
         overflow-x: visible;
@@ -532,11 +531,14 @@ $workflow-node-color-type-global-context:           #ffb3b3 !default;
             .scroll-container-wrapper {
                 overflow-x: auto;
                 overflow-y: visible;
+
+                display: flex;
+                justify-content: center;
+
             }
 
             .scroll-container {
 
-                overflow: hidden;
                 position: relative;
                 transition: height .5s ease-out;
 
