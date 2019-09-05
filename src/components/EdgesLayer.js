@@ -125,10 +125,8 @@ export function traceEdges(
                     }
 
                     prevVs.reduce(function(prevV, v){
-                        if (!prevV){
-                            return v;
-                        }
-                        if (!(prevV[0] <= startXForCol && v[0] >= startXForCol)){
+                        if (!prevV) return v; // First V
+                        if (!(prevV[0] + nodeEdgeLedgeWidths[0] < startXForCol && v[0] >= startXForCol)){
                             return v;
                         }
                         if (
@@ -137,13 +135,20 @@ export function traceEdges(
                         ) {
                             if (intersections === 0) intersections += 2;
                             intersections++;
+                            //if (startXForCol> 1400 && startXForCol < 1600){
+                            //    console.log('X', v[0], v[1], '<-', prevV[0], prevV[1]);
+                            //}
                         }
                         return v;
                     }, null);
 
                 }
 
-                currDiff += (intersections * (rowSpacing * 0.75));
+                currDiff += (intersections * (rowSpacing * 0.8));
+
+                //if (startXForCol> 1400 && startXForCol < 1600){
+                //    console.log('INT', currDiff, currSegmentY, intersections, prevYCoord);
+                //}
 
                 if (closestSegmentDiff > currDiff){
                     closestSegmentDiff = currDiff;
