@@ -87,7 +87,7 @@ module.exports = [{
     entry: {
         "react-workflow-viz" : path.resolve(__dirname, 'src')
     },
-    target: "web",
+    target: minify ? "web" : "node",
     output: {
         path: path.resolve(__dirname, 'dist'),
         publicPath: "/dist/",
