@@ -39,6 +39,7 @@ export default class StateContainer extends React.PureComponent {
         super(props);
         this.defaultOnNodeClick = this.defaultOnNodeClick.bind(this);
         this.handleNodeClick = this.handleNodeClick.bind(this);
+        this.deselectNode = this.deselectNode.bind(this);
         this.state = {
             'selectedNode' : null
         };
@@ -64,16 +65,19 @@ export default class StateContainer extends React.PureComponent {
         }
     }
 
-    detailPane(){
-        if (typeof this.props.renderDetailPane === 'function'){
-            return this.props.renderDetailPane(this.state.selectedNode, this.props);
-        }
-        return null;
+    deselectNode(){
+        this.setState({ selectedNode: null });
     }
 
     render(){
-        const { children, ...passProps } = this.props;
+        const { children, renderDetailPane, ...passProps } = this.props;
         const { selectedNode } = this.state;
+        let detailPane = null;
+        if (typeof renderDetailPane === 'function'){
+            detailPane = renderDetailPane(selectedNode, {
+                ...this.props, deselectNode: this.deselectNode
+            });
+        }
         return (
             <div className="state-container" data-is-node-selected={!!(selectedNode)}>
                 {
@@ -81,7 +85,7 @@ export default class StateContainer extends React.PureComponent {
                         React.cloneElement(child, { ...passProps, ...this.state, onNodeClick : this.handleNodeClick })
                     )
                 }
-                { this.detailPane() }
+                { detailPane }
             </div>
         );
     }

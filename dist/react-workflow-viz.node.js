@@ -21443,6 +21443,7 @@ var StateContainer_StateContainer = function (_React$PureComponent) {
     _this = _possibleConstructorReturn(this, _getPrototypeOf(StateContainer).call(this, props));
     _this.defaultOnNodeClick = _this.defaultOnNodeClick.bind(_assertThisInitialized(_this));
     _this.handleNodeClick = _this.handleNodeClick.bind(_assertThisInitialized(_this));
+    _this.deselectNode = _this.deselectNode.bind(_assertThisInitialized(_this));
     _this.state = {
       'selectedNode': null
     };
@@ -21477,13 +21478,11 @@ var StateContainer_StateContainer = function (_React$PureComponent) {
       }
     }
   }, {
-    key: "detailPane",
-    value: function detailPane() {
-      if (typeof this.props.renderDetailPane === 'function') {
-        return this.props.renderDetailPane(this.state.selectedNode, this.props);
-      }
-
-      return null;
+    key: "deselectNode",
+    value: function deselectNode() {
+      this.setState({
+        selectedNode: null
+      });
     }
   }, {
     key: "render",
@@ -21492,9 +21491,18 @@ var StateContainer_StateContainer = function (_React$PureComponent) {
 
       var _this$props = this.props,
           children = _this$props.children,
-          passProps = _objectWithoutProperties(_this$props, ["children"]);
+          renderDetailPane = _this$props.renderDetailPane,
+          passProps = _objectWithoutProperties(_this$props, ["children", "renderDetailPane"]);
 
       var selectedNode = this.state.selectedNode;
+      var detailPane = null;
+
+      if (typeof renderDetailPane === 'function') {
+        detailPane = renderDetailPane(selectedNode, _objectSpread({}, this.props, {
+          deselectNode: this.deselectNode
+        }));
+      }
+
       return external_commonjs_react_commonjs2_react_amd_react_root_React_default.a.createElement("div", {
         className: "state-container",
         "data-is-node-selected": !!selectedNode
@@ -21502,7 +21510,7 @@ var StateContainer_StateContainer = function (_React$PureComponent) {
         return external_commonjs_react_commonjs2_react_amd_react_root_React_default.a.cloneElement(child, _objectSpread({}, passProps, {}, _this2.state, {
           onNodeClick: _this2.handleNodeClick
         }));
-      }), this.detailPane());
+      }), detailPane);
     }
   }]);
 
