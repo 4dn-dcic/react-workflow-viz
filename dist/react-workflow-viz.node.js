@@ -25454,7 +25454,7 @@ var Graph_Graph = function (_React$Component) {
       var nodes = this.nodesWithCoordinates(innerWidth, contentWidth, innerHeight);
       var graphHeight = innerHeight + (innerMargin.top || 0) + (innerMargin.bottom || 0);
       return external_commonjs_react_commonjs2_react_amd_react_root_React_default.a.createElement("div", {
-        className: "worfklow-chart-outer-container",
+        className: "workflow-chart-outer-container",
         key: "outer"
       }, external_commonjs_react_commonjs2_react_amd_react_root_React_default.a.createElement("div", {
         className: "workflow-chart-inner-container"

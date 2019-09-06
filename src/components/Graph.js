@@ -304,7 +304,7 @@ export default class Graph extends React.Component {
         */
 
         return (
-            <div className="worfklow-chart-outer-container" key="outer">
+            <div className="workflow-chart-outer-container" key="outer">
                 <div className="workflow-chart-inner-container">
                     <StateContainer {...{ nodes, edges, innerWidth, innerHeight, contentWidth, width }}
                         {..._.pick(this.props, 'innerMargin', 'columnWidth', 'columnSpacing', 'pathArrows', 'href', 'onNodeClick', 'renderDetailPane')}>
