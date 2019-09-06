@@ -8,6 +8,8 @@ export function DefaultDetailPane(props){
     const { selectedNode: node } = props;
     if (!node) return null;
 
+    console.log("selected node", node);
+
     let type;
     if (node.nodeType === 'step'){
         type = 'Analysis Step';

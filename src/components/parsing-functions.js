@@ -139,7 +139,7 @@ export const DEFAULT_PARSING_OPTIONS = {
  * @param {ParsingOptions} [parsingOptions]                Options for parsing and post-processing.
  * @returns {{ 'nodes' : Node[], 'edges' : Edge[] }}    Container object for the two lists.
  */
-export const parseAnalysisSteps = memoize(function(analysis_steps, parsingOptions = {}){
+export function parseAnalysisSteps(analysis_steps, parsingOptions = {}){
 
     const parsingOpts = { ...DEFAULT_PARSING_OPTIONS, ...parsingOptions };
 
@@ -925,7 +925,7 @@ export const parseAnalysisSteps = memoize(function(analysis_steps, parsingOption
     }, []);
 
     return { 'nodes' : sortedNodes, 'edges' : graphData.edges };
-});
+}
 
 /**
  * Use this function to run another function on each node recursively along a path of nodes.
@@ -1037,13 +1037,11 @@ export function parseBasicIOAnalysisSteps(analysis_steps, workflowItem, parsingO
     }
 
     return parseAnalysisSteps([
-        _.extend(
-            _.omit(workflowItem, 'arguments', 'analysis_steps', '@context', 'cwl_data'), // Use workflowItem as if it were AnalysisStep
-            {
-                'inputs'    : _.filter(_.flatten( _.pluck(analysis_steps, 'inputs'), true ), checkIfGlobal),
-                'outputs'   : _.filter(_.flatten( _.pluck(analysis_steps, 'outputs'), true ), checkIfGlobal)
-            }
-        )
+        {
+            ...workflowItem,
+            inputs: _.filter(_.flatten( _.pluck(analysis_steps, 'inputs'), true ), checkIfGlobal),
+            outputs: _.filter(_.flatten( _.pluck(analysis_steps, 'outputs'), true ), checkIfGlobal)
+        }
     ], parsingOptions);
 
 }

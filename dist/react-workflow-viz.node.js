@@ -21609,7 +21609,8 @@ var ScrollContainer_ScrollContainer = function (_React$PureComponent) {
           innerWidth = _this$props.innerWidth,
           children = _this$props.children,
           contentWidth = _this$props.contentWidth,
-          width = _this$props.width;
+          width = _this$props.width,
+          minHeight = _this$props.minHeight;
       var _this$state = this.state,
           outerHeight = _this$state.outerHeight,
           pastHeight = _this$state.pastHeight,
@@ -21624,7 +21625,8 @@ var ScrollContainer_ScrollContainer = function (_React$PureComponent) {
         className: "scroll-container-wrapper",
         ref: this.containerRef,
         style: {
-          width: width
+          width: width,
+          minHeight: minHeight
         }
       }, external_commonjs_react_commonjs2_react_amd_react_root_React_default.a.createElement("div", {
         className: innerCls,
@@ -22714,7 +22716,7 @@ var DEFAULT_PARSING_OPTIONS = {
   'showParameters': true,
   'showIndirectFiles': true
 };
-var parseAnalysisSteps = memoize_one_esm(function (analysis_steps) {
+function parseAnalysisSteps(analysis_steps) {
   var parsingOptions = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
   var parsingOpts = parsing_functions_objectSpread({}, DEFAULT_PARSING_OPTIONS, {}, parsingOptions);
@@ -23320,7 +23322,7 @@ var parseAnalysisSteps = memoize_one_esm(function (analysis_steps) {
     'nodes': sortedNodes,
     'edges': graphData.edges
   };
-});
+}
 function traceNodePathAndRun(nextNode, fxn) {
   var direction = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'output';
   var lastNode = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
@@ -23402,9 +23404,9 @@ function parseBasicIOAnalysisSteps(analysis_steps, workflowItem, parsingOptions)
     }) || false;
   }
 
-  return parseAnalysisSteps([underscore_default.a.extend(underscore_default.a.omit(workflowItem, 'arguments', 'analysis_steps', '@context', 'cwl_data'), {
-    'inputs': underscore_default.a.filter(underscore_default.a.flatten(underscore_default.a.pluck(analysis_steps, 'inputs'), true), checkIfGlobal),
-    'outputs': underscore_default.a.filter(underscore_default.a.flatten(underscore_default.a.pluck(analysis_steps, 'outputs'), true), checkIfGlobal)
+  return parseAnalysisSteps([parsing_functions_objectSpread({}, workflowItem, {
+    inputs: underscore_default.a.filter(underscore_default.a.flatten(underscore_default.a.pluck(analysis_steps, 'inputs'), true), checkIfGlobal),
+    outputs: underscore_default.a.filter(underscore_default.a.flatten(underscore_default.a.pluck(analysis_steps, 'outputs'), true), checkIfGlobal)
   })], parsingOptions);
 }
 
@@ -25176,6 +25178,7 @@ var DebugVizGraphLayer = external_commonjs_react_commonjs2_react_amd_react_root_
 function DefaultDetailPane(props) {
   var node = props.selectedNode;
   if (!node) return null;
+  console.log("selected node", node);
 
   if (node.nodeType === 'step') {} else {
     node.ioType || node.nodeType;
@@ -25231,6 +25234,7 @@ function Graph_inherits(subClass, superClass) { if (typeof superClass !== "funct
 function Graph_setPrototypeOf(o, p) { Graph_setPrototypeOf = Object.setPrototypeOf || function (o, p) { o.__proto__ = p; return o; }; return Graph_setPrototypeOf(o, p); }
 
 function Graph_defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 
 
@@ -25448,7 +25452,7 @@ var Graph_Graph = function (_React$Component) {
       }
 
       var nodes = this.nodesWithCoordinates(innerWidth, contentWidth, innerHeight);
-      var fullHeight = Math.max(typeof minimumHeight === 'number' && minimumHeight || 0, innerHeight + (innerMargin.top || 0) + (innerMargin.bottom || 0));
+      var graphHeight = innerHeight + (innerMargin.top || 0) + (innerMargin.bottom || 0);
       return external_commonjs_react_commonjs2_react_amd_react_root_React_default.a.createElement("div", {
         className: "worfklow-chart-outer-container",
         key: "outer"
@@ -25462,7 +25466,8 @@ var Graph_Graph = function (_React$Component) {
         contentWidth: contentWidth,
         width: width
       }, underscore_default.a.pick(this.props, 'innerMargin', 'columnWidth', 'columnSpacing', 'pathArrows', 'href', 'onNodeClick', 'renderDetailPane')), external_commonjs_react_commonjs2_react_amd_react_root_React_default.a.createElement(ScrollContainer_ScrollContainer, {
-        outerHeight: fullHeight
+        outerHeight: graphHeight,
+        minHeight: minimumHeight
       }, external_commonjs_react_commonjs2_react_amd_react_root_React_default.a.createElement(EdgesLayer_EdgesLayer, underscore_default.a.pick(this.props, 'isNodeDisabled', 'isNodeCurrentContext', 'isNodeSelected', 'edgeStyle', 'rowSpacing', 'columnWidth', 'columnSpacing', 'nodeEdgeLedgeWidths')), external_commonjs_react_commonjs2_react_amd_react_root_React_default.a.createElement(NodesLayer_NodesLayer, underscore_default.a.pick(this.props, 'renderNodeElement', 'isNodeDisabled', 'isNodeCurrentContext', 'nodeClassName'))))));
     }
   }]);
@@ -25543,10 +25548,61 @@ Graph_defineProperty(Graph_Graph, "defaultProps", {
 });
 
 
-var GraphParser = external_commonjs_react_commonjs2_react_amd_react_root_React_default.a.memo(function (props) {
-  props.steps;
+var Graph_GraphParser = function (_React$Component2) {
+  Graph_inherits(GraphParser, _React$Component2);
+
+  function GraphParser(props) {
+    var _this2;
+
+    Graph_classCallCheck(this, GraphParser);
+
+    _this2 = Graph_possibleConstructorReturn(this, Graph_getPrototypeOf(GraphParser).call(this, props));
+    _this2.memoized = {
+      parseAnalysisSteps: memoize_one_esm(parseAnalysisSteps),
+      parseBasicIOAnalysisSteps: memoize_one_esm(parseBasicIOAnalysisSteps)
+    };
+    return _this2;
+  }
+
+  Graph_createClass(GraphParser, [{
+    key: "render",
+    value: function render() {
+      var _this$props5 = this.props,
+          steps = _this$props5.steps,
+          parentItem = _this$props5.parentItem,
+          children = _this$props5.children,
+          parsingOptions = _this$props5.parsingOptions;
+      var parseBasicIO = parsingOptions.parseBasicIO;
+      var graphData;
+
+      if (parseBasicIO) {
+        graphData = this.memoized.parseBasicIOAnalysisSteps(steps, parentItem, parsingOptions);
+      } else {
+        graphData = this.memoized.parseAnalysisSteps(steps, parsingOptions);
+      }
+
+      return external_commonjs_react_commonjs2_react_amd_react_root_React_default.a.Children.map(children, function (child) {
+        return external_commonjs_react_commonjs2_react_amd_react_root_React_default.a.cloneElement(child, graphData);
+      });
+    }
+  }]);
+
+  return GraphParser;
+}(external_commonjs_react_commonjs2_react_amd_react_root_React_default.a.Component);
+
+Graph_defineProperty(Graph_GraphParser, "defaultProps", {
+  'parsingOptions': {
+    showReferenceFiles: true,
+    showParameters: true,
+    showIndirectFiles: true,
+    parseBasicIO: false
+  },
+  'parentItem': {
+    name: "Workflow"
+  }
 });
 // CONCATENATED MODULE: ./src/index.js
+/* concated harmony reexport GraphParser */__webpack_require__.d(__webpack_exports__, "GraphParser", function() { return Graph_GraphParser; });
 /* concated harmony reexport parseAnalysisSteps */__webpack_require__.d(__webpack_exports__, "parseAnalysisSteps", function() { return parseAnalysisSteps; });
 /* concated harmony reexport parseBasicIOAnalysisSteps */__webpack_require__.d(__webpack_exports__, "parseBasicIOAnalysisSteps", function() { return parseBasicIOAnalysisSteps; });
 /* concated harmony reexport DEFAULT_PARSING_OPTIONS */__webpack_require__.d(__webpack_exports__, "DEFAULT_PARSING_OPTIONS", function() { return DEFAULT_PARSING_OPTIONS; });
@@ -25556,6 +25612,7 @@ var GraphParser = external_commonjs_react_commonjs2_react_amd_react_root_React_d
 
 
 /* harmony default export */ var src = __webpack_exports__["default"] = (Graph_Graph);
+
 
 
 

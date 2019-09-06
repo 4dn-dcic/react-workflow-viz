@@ -528,16 +528,17 @@ $workflow-node-color-type-global-context:           #ffb3b3 !default;
 
                 display: flex;
                 justify-content: center;
+                align-items: center;
 
             }
 
             .scroll-container {
 
                 position: relative;
-                transition: height .5s ease-out;
+                transition: height .5s ease-out, width .5s ease-out;
 
                 &.height-decreasing {
-                    transition: height .5s .5s ease-out;
+                    transition: height .5s .5s ease-out, width .5s ease-out;
                 }
 
                 .nodes-layer-wrapper,

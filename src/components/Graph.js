@@ -13,6 +13,8 @@ import EdgesLayer from './EdgesLayer';
 import { DefaultDetailPane } from './DefaultDetailPane';
 import { DefaultNodeElement } from './Node';
 
+import { parseAnalysisSteps, parseBasicIOAnalysisSteps } from './parsing-functions';
+
 /**
  * Primary/entry component for the Workflow graph.
  *
@@ -292,16 +294,13 @@ export default class Graph extends React.Component {
         }
 
         const nodes = this.nodesWithCoordinates(innerWidth, contentWidth, innerHeight);
-        const fullHeight = Math.max(
-            (typeof minimumHeight === 'number' && minimumHeight) || 0,
-            innerHeight + (innerMargin.top || 0) + (innerMargin.bottom || 0)
-        );
+        const graphHeight = innerHeight + (innerMargin.top || 0) + (innerMargin.bottom || 0);
 
         /* TODO: later
         var spacerCount = _.reduce(nodes, function(m,n){ if (n.nodeType === 'spacer'){ return m + 1; } else { return m; }}, 0);
         if (spacerCount){
             height += (spacerCount * this.props.columnSpacing);
-            fullHeight += (spacerCount * this.props.columnSpacing);
+            graphHeight += (spacerCount * this.props.columnSpacing);
         }
         */
 
@@ -310,7 +309,7 @@ export default class Graph extends React.Component {
                 <div className="workflow-chart-inner-container">
                     <StateContainer {...{ nodes, edges, innerWidth, innerHeight, contentWidth, width }}
                         {..._.pick(this.props, 'innerMargin', 'columnWidth', 'columnSpacing', 'pathArrows', 'href', 'onNodeClick', 'renderDetailPane')}>
-                        <ScrollContainer outerHeight={fullHeight}>
+                        <ScrollContainer outerHeight={graphHeight} minHeight={minimumHeight}>
                             <EdgesLayer {..._.pick(this.props, 'isNodeDisabled', 'isNodeCurrentContext', 'isNodeSelected', 'edgeStyle', 'rowSpacing', 'columnWidth', 'columnSpacing', 'nodeEdgeLedgeWidths')} />
                             <NodesLayer {..._.pick(this.props, 'renderNodeElement', 'isNodeDisabled', 'isNodeCurrentContext', 'nodeClassName')} />
                         </ScrollContainer>
@@ -322,9 +321,50 @@ export default class Graph extends React.Component {
 
 }
 
+/**
+ * Optional component to wrap Graph and pass steps in.
+ * @todo Test for (lack of) bidirectionality in data and fix.
+ */
+export class GraphParser extends React.Component {
 
-// TODO: implement
-export const GraphParser = React.memo(function GraphParser(props){
-    const { steps } = props;
-});
+    static defaultProps = {
+        'parsingOptions' : {
+            showReferenceFiles: true,
+            showParameters: true,
+            showIndirectFiles: true,
+            parseBasicIO: false
+        },
+        'parentItem' : { name: "Workflow" }
+    };
 
+    constructor(props){
+        super(props);
+        this.memoized = {
+            parseAnalysisSteps : memoize(parseAnalysisSteps),
+            parseBasicIOAnalysisSteps : memoize(parseBasicIOAnalysisSteps)
+        };
+    }
+
+    render(){
+        const {
+            steps,
+            parentItem,
+            children,
+            parsingOptions
+        } = this.props;
+    
+        const { parseBasicIO } = parsingOptions;
+
+        let graphData;
+
+        if (parseBasicIO) {
+            graphData = this.memoized.parseBasicIOAnalysisSteps(steps, parentItem, parsingOptions);
+        } else {
+            graphData = this.memoized.parseAnalysisSteps(steps, parsingOptions);
+        }
+
+        return React.Children.map(children, function(child){
+            return React.cloneElement(child, graphData);
+        });
+    }
+}

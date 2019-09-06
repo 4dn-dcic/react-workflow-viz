@@ -45,13 +45,13 @@ export default class ScrollContainer extends React.PureComponent {
     }
 
     render(){
-        const { innerMargin, innerWidth, children, contentWidth, width } = this.props;
+        const { innerMargin, innerWidth, children, contentWidth, width, minHeight } = this.props;
         const { outerHeight, pastHeight, isHeightDecreasing, mounted } = this.state;
         const innerCls = 'scroll-container' + (isHeightDecreasing ? ' height-decreasing' : '');
         const innerStyle = { 'width' : Math.max(contentWidth, width), 'height': outerHeight };
 
         return (
-            <div className="scroll-container-wrapper" ref={this.containerRef} style={{ width }}>
+            <div className="scroll-container-wrapper" ref={this.containerRef} style={{ width, minHeight }}>
                 <div className={innerCls} style={innerStyle}>
                     {
                         React.Children.map(children, (child)=>

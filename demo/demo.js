@@ -1,14 +1,13 @@
 import { Component } from 'react';
 import ReactDOM from 'react-dom';
-import memoize from 'memoize-one';
+import _ from 'underscore';
 
-import Graph, { parseAnalysisSteps, parseBasicIOAnalysisSteps, DEFAULT_PARSING_OPTIONS } from 'react-workflow-viz';
+import Graph, { GraphParser } from 'react-workflow-viz';
 
 
 import { STEPS as testWorkflowBedToBedDB } from './testdata/workflow-bedtobeddb';
 import { STEPS as testWorkflowAtacSeq } from './testdata/workflow-atac-seq';
 import { STEPS as testFileProcessed4DNFI9WF1Y8W } from './testdata/provenance-file-processed-4DNFI9WF1Y8W';
-//import { STEPS as testExpSet4DNESXZ4FW4T } from './testdata/provenance-expset-4DNESXZ4FW4T';
 
 
 const workflowOpts = {
@@ -21,18 +20,19 @@ class DemoApp extends Component {
     static defaultProps = {
         "testData" : [
             {
-                "title" : "File Processed - 4DNFI9WF1Y8W",
+                "name" : "File Processed - 4DNFI9WF1Y8W",
                 "description" : null,
-                "steps" : testFileProcessed4DNFI9WF1Y8W
+                "steps" : testFileProcessed4DNFI9WF1Y8W,
+                "opts" : {}
             },
             {
-                "title" : "CWL Workflow - ATAC-SEQ",
+                "name" : "CWL Workflow - ATAC-SEQ",
                 "description" : null,
                 "steps" : testWorkflowAtacSeq,
                 "opts" : workflowOpts
             },
             {
-                "title" : "CWL Workflow - BED to BEDDB",
+                "name" : "CWL Workflow - BED to BEDDB",
                 "description" : null,
                 "steps" : testWorkflowBedToBedDB,
                 "opts" : workflowOpts
@@ -44,7 +44,7 @@ class DemoApp extends Component {
         super(props);
         this.handleParsingOptChange = this.handleParsingOptChange.bind(this);
         this.handleRowSpacingTypeChange = this.handleRowSpacingTypeChange.bind(this);
-        this.handleChangeBasicIO = this.handleChangeBasicIO.bind(this);
+        this.handleDemoChange = this.handleDemoChange.bind(this);
         this.state = {
             currentDemoIdx: 1,
             parsingOptions: {
@@ -53,11 +53,7 @@ class DemoApp extends Component {
                 showIndirectFiles: false
             },
             rowSpacingType: "compact",
-            showBasicIO: false
-        };
-        this.memoized = {
-            parseAnalysisSteps: memoize(parseAnalysisSteps),
-            parseBasicIOAnalysisSteps: memoize(parseBasicIOAnalysisSteps)
+            parseBasicIO: false
         };
     }
 
@@ -75,50 +71,68 @@ class DemoApp extends Component {
             // todo - rename internal stuff
             "Centered" : "compact",
             "Stacked" : "stacked",
-            "Stretched" : "wide"
+            "Spread" : "wide"
         };
         const nextValue = evt.target.value && valMap[evt.target.value];
         if (!nextValue) return false;
         this.setState({ rowSpacingType: nextValue });
     }
 
-    handleChangeBasicIO(evt){
-        this.setState(function({ showBasicIO }){
-            return { showBasicIO : !showBasicIO  };
-        });
+    handleDemoChange(evt){
+        const { testData } = this.props;
+        const nextValue = evt.target.value;
+        const nextIdx = nextValue && _.findIndex(testData, { name: nextValue });
+        if (nextIdx === -1) return false;
+        this.setState({ currentDemoIdx: nextIdx });
     }
 
     render(){
         const { testData } = this.props;
-        const { currentDemoIdx, parsingOptions, rowSpacingType, showBasicIO } = this.state;
-        const { title, description, steps, opts } = testData[currentDemoIdx];
-        const fullParseOpts = { ...parsingOptions, ...opts };
-        let graphData;
-        if (showBasicIO){
-            graphData = this.memoized.parseBasicIOAnalysisSteps(steps, { name: title }, fullParseOpts);
-        } else {
-            graphData = this.memoized.parseAnalysisSteps(steps, fullParseOpts);
-        }
-        const { nodes, edges } = graphData;
+        const { currentDemoIdx, parsingOptions, rowSpacingType } = this.state;
+        const { name, description, steps, opts: overrideOpts } = testData[currentDemoIdx];
+        const fullParseOpts = { ...parsingOptions, ...overrideOpts };
 
         return (
             <div className="demo-app-container">
-                <ParsingOptsCheckboxes {...parsingOptions} dataOpts={opts} showBasicIO={showBasicIO}
+                <TestDataSelect {...{ currentDemoIdx, testData }} onChange={this.handleDemoChange} />
+                <ParsingOptsCheckboxes {...parsingOptions} dataOpts={overrideOpts}
                     onChange={this.handleParsingOptChange} onChangeBasicIO={this.handleChangeBasicIO} />
                 <RowSpacingTypeSelect rowSpacingType={rowSpacingType} onChange={this.handleRowSpacingTypeChange} />
-                <Graph {...{ nodes, edges, rowSpacingType }} />
+                <GraphParser parsingOptions={fullParseOpts} parentItem={{ name }} steps={steps}>
+                    <Graph rowSpacingType={rowSpacingType} minimumHeight={300} />
+                </GraphParser>
             </div>
         );
     }
 
 }
 
+
+function TestDataSelect(props){
+    const { currentDemoIdx, testData, onChange } = props;
+    const { name: currDemoName } = testData[currentDemoIdx];
+    const optionItems = testData.map(function({ name, steps, description }, idx){
+        return <option name={idx} key={idx}>{ name }</option>;
+    });
+    return (
+        <div className="row-spacing-type-container options-container">
+            <label>
+                <h5>Test Data</h5>
+                <select onChange={onChange} value={currDemoName}>
+                { optionItems }
+                </select>
+            </label>
+        </div>
+    );
+}
+
+
 function RowSpacingTypeSelect(props){
     const { rowSpacingType, onChange } = props;
     const titleMap = {
         "compact" : "Centered",
         "stacked" : "Stacked",
-        "wide" : "Stretched"
+        "wide" : "Spread"
     };
     return (
         <div className="row-spacing-type-container options-container">
@@ -127,7 +141,7 @@ function RowSpacingTypeSelect(props){
                 <select onChange={onChange} value={titleMap[rowSpacingType]}>
                     <option name="compact">Centered</option>
                     <option name="stacked">Stacked</option>
-                    <option name="wide">Stretched</option>
+                    <option name="wide">Spread</option>
                 </select>
             </label>
         </div>
@@ -135,7 +149,7 @@ function RowSpacingTypeSelect(props){
 }
 
 function ParsingOptsCheckboxes(props){
-    const { showReferenceFiles, showParameters, showIndirectFiles, showBasicIO, onChange, onChangeBasicIO, dataOpts } = props;
+    const { showReferenceFiles, showParameters, showIndirectFiles, parseBasicIO, onChange, dataOpts } = props;
     return (
         <div className="parsing-options-container options-container">
             <h5>Parsing Options</h5>
@@ -161,10 +175,10 @@ function ParsingOptsCheckboxes(props){
                 Show Indirect Files
             </label>
             <label>
-                <input type="checkbox" name="showBasicIO"
-                    checked={dataOpts['showBasicIO'] || showBasicIO}
-                    onChange={onChangeBasicIO}
-                    disabled={typeof dataOpts['showBasicIO'] !== 'undefined'} />
+                <input type="checkbox" name="parseBasicIO"
+                    checked={dataOpts['parseBasicIO'] || parseBasicIO}
+                    onChange={onChange}
+                    disabled={typeof dataOpts['parseBasicIO'] !== 'undefined'} />
                 Show Terminal I/O
             </label>
         </div>
@@ -172,8 +186,5 @@ function ParsingOptsCheckboxes(props){
 }
 
 
-ReactDOM.render(
-    <DemoApp />,
-    document.getElementById("root")
-);
+ReactDOM.render(<DemoApp />, document.getElementById("root"));
 

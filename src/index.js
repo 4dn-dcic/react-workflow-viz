@@ -4,6 +4,8 @@ import Graph from './components/Graph';
 
 export default Graph;
 
+export { GraphParser } from './components/Graph';
+
 export {
     parseAnalysisSteps,
     parseBasicIOAnalysisSteps,
