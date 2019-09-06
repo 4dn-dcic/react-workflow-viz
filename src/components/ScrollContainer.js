@@ -48,7 +48,11 @@ export default class ScrollContainer extends React.PureComponent {
         const { innerMargin, innerWidth, children, contentWidth, width, minHeight } = this.props;
         const { outerHeight, pastHeight, isHeightDecreasing, mounted } = this.state;
         const innerCls = 'scroll-container' + (isHeightDecreasing ? ' height-decreasing' : '');
-        const innerStyle = { 'width' : Math.max(contentWidth, width), 'height': outerHeight };
+        const innerStyle = {
+            'width' : Math.max(contentWidth, width),
+            'height': outerHeight,
+            'overflowY' : outerHeight < minHeight ? "hidden" : null
+        };
 
         return (
             <div className="scroll-container-wrapper" ref={this.containerRef} style={{ width, minHeight }}>

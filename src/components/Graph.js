@@ -103,7 +103,7 @@ export default class Graph extends React.Component {
         'nodeEdgeLedgeWidths' : [3,5]
     };
 
-    static getHeightFromNodes(nodes, nodesPreSortFxn, rowSpacing, minimumHeight){
+    static getHeightFromNodes(nodes, nodesPreSortFxn, rowSpacing){
         // Run pre-sort fxn, e.g. to manually pre-arrange nodes into different columns.
         if (typeof nodesPreSortFxn === 'function'){
             nodes = nodesPreSortFxn(nodes.slice(0));
@@ -115,8 +115,7 @@ export default class Graph extends React.Component {
                 .reduce(function(maxCount, nodeSet){
                     return Math.max(nodeSet[1].length, maxCount);
                 }, 0)
-                .value() * (rowSpacing) - rowSpacing,
-            minimumHeight
+                .value() * (rowSpacing) - rowSpacing
         );
     }
 
@@ -256,8 +255,8 @@ export default class Graph extends React.Component {
     }
 
     height() {
-        const { nodes, nodesPreSortFxn, rowSpacing, minimumHeight } = this.props;
-        return this.memoized.getHeightFromNodes(nodes, nodesPreSortFxn, rowSpacing, minimumHeight);
+        const { nodes, nodesPreSortFxn, rowSpacing } = this.props;
+        return this.memoized.getHeightFromNodes(nodes, nodesPreSortFxn, rowSpacing);
     }
 
     scrollableWidth(){

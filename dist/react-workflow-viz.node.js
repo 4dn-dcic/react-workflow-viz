@@ -21619,7 +21619,8 @@ var ScrollContainer_ScrollContainer = function (_React$PureComponent) {
       var innerCls = 'scroll-container' + (isHeightDecreasing ? ' height-decreasing' : '');
       var innerStyle = {
         'width': Math.max(contentWidth, width),
-        'height': outerHeight
+        'height': outerHeight,
+        'overflowY': outerHeight < minHeight ? "hidden" : null
       };
       return external_commonjs_react_commonjs2_react_amd_react_root_React_default.a.createElement("div", {
         className: "scroll-container-wrapper",
@@ -25253,14 +25254,14 @@ var Graph_Graph = function (_React$Component) {
 
   Graph_createClass(Graph, null, [{
     key: "getHeightFromNodes",
-    value: function getHeightFromNodes(nodes, nodesPreSortFxn, rowSpacing, minimumHeight) {
+    value: function getHeightFromNodes(nodes, nodesPreSortFxn, rowSpacing) {
       if (typeof nodesPreSortFxn === 'function') {
         nodes = nodesPreSortFxn(nodes.slice(0));
       }
 
       return Math.max(underscore_default()(nodes).chain().groupBy('column').pairs().reduce(function (maxCount, nodeSet) {
         return Math.max(nodeSet[1].length, maxCount);
-      }, 0).value() * rowSpacing - rowSpacing, minimumHeight);
+      }, 0).value() * rowSpacing - rowSpacing);
     }
   }, {
     key: "getScrollableWidthFromNodes",
@@ -25400,9 +25401,8 @@ var Graph_Graph = function (_React$Component) {
       var _this$props = this.props,
           nodes = _this$props.nodes,
           nodesPreSortFxn = _this$props.nodesPreSortFxn,
-          rowSpacing = _this$props.rowSpacing,
-          minimumHeight = _this$props.minimumHeight;
-      return this.memoized.getHeightFromNodes(nodes, nodesPreSortFxn, rowSpacing, minimumHeight);
+          rowSpacing = _this$props.rowSpacing;
+      return this.memoized.getHeightFromNodes(nodes, nodesPreSortFxn, rowSpacing);
     }
   }, {
     key: "scrollableWidth",

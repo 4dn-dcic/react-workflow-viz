@@ -50,10 +50,10 @@ class DemoApp extends Component {
             parsingOptions: {
                 showReferenceFiles: true,
                 showParameters: false,
-                showIndirectFiles: false
+                showIndirectFiles: false,
+                parseBasicIO: false
             },
-            rowSpacingType: "compact",
-            parseBasicIO: false
+            rowSpacingType: "compact"
         };
     }
 
