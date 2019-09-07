@@ -528,24 +528,36 @@ $workflow-node-color-type-global-context:           #ffb3b3 !default;
 
                 display: flex;
                 justify-content: center;
-                align-items: center;
+                //align-items: center;
 
             }
 
             .scroll-container {
 
                 position: relative;
-                transition: height .5s ease-out, width .5s ease-out;
+                box-sizing: content-box;
+                transition:
+                    height .5s ease-out,
+                    width 0s .5s ease-out,
+                    padding-top .5s ease-out,
+                    padding-bottom .5s ease-out;
 
                 &.height-decreasing {
-                    transition: height .5s .5s ease-out, width .5s ease-out;
+                    transition:
+                        height .5s ease-out,
+                        width 0s .5s ease-out,
+                        padding-top .5s ease-out,
+                        padding-bottom .5s ease-out;
+                }
+
+                &.height-decreasing,
+                &.height-increasing {
+                    overflow: hidden;
                 }
 
                 .nodes-layer-wrapper,
                 .edges-layer-wrapper {
                     position: absolute;
-                    left: 0;
-                    top: 0;
                 }
 
                 .nodes-layer-wrapper {

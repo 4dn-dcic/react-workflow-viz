@@ -21554,7 +21554,7 @@ var ScrollContainer_ScrollContainer = function (_React$PureComponent) {
     _this = ScrollContainer_possibleConstructorReturn(this, ScrollContainer_getPrototypeOf(ScrollContainer).call(this, props));
     _this.state = {
       'mounted': false,
-      'isHeightDecreasing': false,
+      'isHeightDecreasing': null,
       'outerHeight': props.outerHeight,
       'pastHeight': null
     };
@@ -21577,33 +21577,20 @@ var ScrollContainer_ScrollContainer = function (_React$PureComponent) {
 
       var updateOuterHeight = this.props.outerHeight;
 
-      if (updateOuterHeight < prevProps.outerHeight) {
-        this.setState(function (_ref) {
-          _ref.isHeightDecreasing;
-          return {
-            'isHeightDecreasing': true,
-            'pastHeight': prevProps.outerHeight,
-            outerHeight: updateOuterHeight
-          };
+      if (updateOuterHeight !== prevProps.outerHeight) {
+        var isHeightDecreasing = updateOuterHeight < prevProps.outerHeight;
+        this.setState({
+          'isHeightDecreasing': isHeightDecreasing,
+          'pastHeight': isHeightDecreasing ? prevProps.outerHeight : null,
+          'outerHeight': updateOuterHeight
         }, function () {
           _this2.heightTimer && clearTimeout(_this2.heightTimer);
           _this2.heightTimer = setTimeout(function () {
             _this2.setState({
-              'isHeightDecreasing': false,
-              'pastHeight': null,
-              outerHeight: updateOuterHeight
+              'isHeightDecreasing': null,
+              'pastHeight': null
             });
           }, 500);
-        });
-        return;
-      }
-
-      if (updateOuterHeight > prevProps.outerHeight) {
-        this.heightTimer && clearTimeout(this.heightTimer);
-        this.setState({
-          'isHeightDecreasing': false,
-          'pastHeight': null,
-          outerHeight: updateOuterHeight
         });
       }
     }
@@ -21624,12 +21611,17 @@ var ScrollContainer_ScrollContainer = function (_React$PureComponent) {
           pastHeight = _this$state.pastHeight,
           isHeightDecreasing = _this$state.isHeightDecreasing,
           mounted = _this$state.mounted;
-      var innerCls = 'scroll-container' + (isHeightDecreasing ? ' height-decreasing' : '');
+      var innerCls = 'scroll-container' + (isHeightDecreasing ? ' height-decreasing' : '') + (isHeightDecreasing === false ? ' height-increasing' : '');
       var innerStyle = {
         'width': Math.max(contentWidth, width),
         'height': outerHeight,
         'overflowY': outerHeight < minHeight ? "hidden" : null
       };
+
+      if (minHeight > outerHeight) {
+        innerStyle.paddingTop = innerStyle.paddingBottom = Math.floor((minHeight - outerHeight) / 2);
+      }
+
       return external_commonjs_react_commonjs2_react_amd_react_root_React_default.a.createElement("div", {
         className: "scroll-container-wrapper",
         ref: this.containerRef,

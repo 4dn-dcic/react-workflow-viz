@@ -11,7 +11,7 @@ export default class ScrollContainer extends React.PureComponent {
         super(props);
         this.state = {
             'mounted' : false,
-            'isHeightDecreasing' : false,
+            'isHeightDecreasing' : null,
             'outerHeight' : props.outerHeight,
             'pastHeight' : null
         };
@@ -25,34 +25,38 @@ export default class ScrollContainer extends React.PureComponent {
 
     componentDidUpdate(prevProps, pastState){
         const { outerHeight: updateOuterHeight } = this.props;
-        if (updateOuterHeight < prevProps.outerHeight){
-            this.setState(({ isHeightDecreasing })=>{
-                return { 'isHeightDecreasing' : true, 'pastHeight' : prevProps.outerHeight, outerHeight: updateOuterHeight };
+        if (updateOuterHeight !== prevProps.outerHeight){
+            const isHeightDecreasing = updateOuterHeight < prevProps.outerHeight;
+            this.setState({
+                'isHeightDecreasing' : isHeightDecreasing,
+                'pastHeight' : isHeightDecreasing ? prevProps.outerHeight : null,
+                'outerHeight': updateOuterHeight
             }, ()=>{
                 this.heightTimer && clearTimeout(this.heightTimer);
                 this.heightTimer = setTimeout(()=>{
-                    this.setState({ 'isHeightDecreasing' : false, 'pastHeight' : null, outerHeight: updateOuterHeight });
+                    this.setState({ 'isHeightDecreasing' : null, 'pastHeight' : null });
                 }, 500);
             });
-            return;
-        }
-
-        if (updateOuterHeight > prevProps.outerHeight){
-            this.heightTimer && clearTimeout(this.heightTimer);
-            this.setState({ 'isHeightDecreasing' : false, 'pastHeight' : null, outerHeight: updateOuterHeight });
-            return;
         }
     }
 
     render(){
         const { innerMargin, innerWidth, children, contentWidth, width, minHeight } = this.props;
         const { outerHeight, pastHeight, isHeightDecreasing, mounted } = this.state;
-        const innerCls = 'scroll-container' + (isHeightDecreasing ? ' height-decreasing' : '');
+        const innerCls = (
+            'scroll-container'
+            + (isHeightDecreasing ? ' height-decreasing' : '')
+            + (isHeightDecreasing === false ? ' height-increasing' : '')
+        );
         const innerStyle = {
             'width' : Math.max(contentWidth, width),
             'height': outerHeight,
             'overflowY' : outerHeight < minHeight ? "hidden" : null
         };
+
+        if (minHeight > outerHeight){
+            innerStyle.paddingTop = innerStyle.paddingBottom = Math.floor((minHeight - outerHeight) / 2);
+        }
 
         return (
             <div className="scroll-container-wrapper" ref={this.containerRef} style={{ width, minHeight }}>
