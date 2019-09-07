@@ -4,6 +4,7 @@ const log = require('fancy-log');
 const webpack = require('webpack');
 const sass = require('node-sass');
 const fs = require('fs');
+const { spawn } = require('child_process');
 const webpackConfig = require('./webpack.config.workflow-viz');
 const demoWebpackConfig = require('./webpack.config.demo');
 
@@ -86,6 +87,15 @@ function doBuildScss(done){
     performSassBuild(done, {});
 }
 
+function doWatchScss(done){
+    spawn("node-sass", [
+        "./src/styles.scss",
+        "./dist/react-workflow-viz.min.css",
+        "--watch",
+        "--recursive"
+    ], { stdio: "inherit" });
+}
+
 
 gulp.task('build', doWebpack);
 //gulp.task('build-publish',  gulp.series(setProduction, doWebpack));
@@ -98,7 +108,7 @@ gulp.task('watch',
         gulp.parallel(
             watch,
             watchDemo,
-            // todo watch scss
+            doWatchScss
         )
     )
 );
