@@ -2,8 +2,8 @@
   "name": "@hms-dbmi-bgm/react-workflow-viz",
   "version": "0.0.10",
   "description": "React component for visualizing CWL-like workflows and provenance graphs.",
-  "main": "dist/react-workflow-viz.min.js",
-  "module": "dist/react-workflow-viz.node.js",
+  "main": "./dist/react-workflow-viz.min.js",
+  "module": "./es",
   "repository": {
     "type": "git",
     "url": "https://github.com/4dn-dcic/react-workflow-viz"
