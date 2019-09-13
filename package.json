@@ -1,6 +1,6 @@
 {
   "name": "@hms-dbmi-bgm/react-workflow-viz",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "React component for visualizing CWL-like workflows and provenance graphs.",
   "main": "dist/react-workflow-viz.min.js",
   "module": "dist/react-workflow-viz.node.js",
@@ -10,9 +10,8 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "rm ./dist/* && export NODE_ENV=production && gulp build",
-    "build-full": "npm run build && gulp build-scss",
-    "dev": "rm ./dist/* && export NODE_ENV=development && gulp watch"
+    "build" : "rm ./dist/* && rm ./es/* && gulp build",
+    "dev": "rm ./dist/* && gulp watch"
   },
   "keywords": [
     "CWL",
@@ -25,6 +24,7 @@
   "author": "4DN DCIC",
   "license": "MIT",
   "devDependencies": {
+    "@babel/cli": "^7.6.0",
     "@babel/core": "^7.1.2",
     "@babel/plugin-proposal-class-properties": "^7.3.3",
     "@babel/plugin-proposal-object-rest-spread": "^7.3.2",

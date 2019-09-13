@@ -5,9 +5,19 @@ const webpack = require('webpack');
 const sass = require('node-sass');
 const fs = require('fs');
 const { spawn } = require('child_process');
-const webpackConfig = require('./webpack.config.workflow-viz');
-const demoWebpackConfig = require('./webpack.config.demo');
+const path = require("path");
 
+
+
+function setProduction(done){
+    process.env.NODE_ENV = 'production';
+    done();
+}
+
+function setDevelopment(done){
+    process.env.NODE_ENV = 'development';
+    done();
+}
 
 
 function webpackOnBuild(done) {
@@ -30,20 +40,40 @@ function webpackOnBuild(done) {
 
 
 function doWebpack(cb){
+    const webpackConfig = require('./webpack.config.workflow-viz');
     webpack(webpackConfig).run(webpackOnBuild(cb));
 };
 
 function doDemoWebpack(cb){
+    const demoWebpackConfig = require('./webpack.config.demo');
     webpack(demoWebpackConfig).run(webpackOnBuild(cb));
 }
 
 function watch(){
+    const webpackConfig = require('./webpack.config.workflow-viz');
     webpack(webpackConfig).watch(300, webpackOnBuild());
 };
 
 function watchDemo(){
+    const demoWebpackConfig = require('./webpack.config.demo');
     webpack(demoWebpackConfig).watch(300, webpackOnBuild());
 };
+
+
+function doBuildESModules(done){
+    const subP = spawn("npx", [
+        "babel",
+        path.join(__dirname, 'src'),
+        "--out-dir",
+        path.join(__dirname, 'es'),
+        "--env-name",
+        "esm"
+    ], { stdio: "inherit" });
+
+    subP.on("close", (code)=>{
+        done();
+    });
+}
 
 
 function performSassBuild(done, options = {}){
@@ -88,20 +118,24 @@ function doBuildScss(done){
 }
 
 function doWatchScss(done){
-    spawn("node-sass", [
+    const subP = spawn("node-sass", [
         "./src/styles.scss",
         "./dist/react-workflow-viz.min.css",
         "--watch",
         "--recursive"
     ], { stdio: "inherit" });
+
+    subP.on("close", (code)=>{
+        done();
+    });
 }
 
 
-gulp.task('build', doWebpack);
 //gulp.task('build-publish',  gulp.series(setProduction, doWebpack));
 //gulp.task('watch', gulp.series(doWebpack, watch));
 gulp.task('watch',
     gulp.series(
+        setDevelopment,
         doWebpack,
         doDemoWebpack,
         doBuildScss,
@@ -110,6 +144,18 @@ gulp.task('watch',
             watchDemo,
             doWatchScss
         )
+    )
+);
+
+gulp.task('build',
+    gulp.parallel(
+        gulp.series(
+            setProduction,
+            doWebpack,
+            doDemoWebpack,
+        ),
+        doBuildScss,
+        doBuildESModules
     )
 );
 
