@@ -8,6 +8,10 @@ import Graph, { GraphParser } from 'react-workflow-viz';
 import { STEPS as testWorkflowBedToBedDB } from './testdata/workflow-bedtobeddb';
 import { STEPS as testWorkflowAtacSeq } from './testdata/workflow-atac-seq';
 import { STEPS as testFileProcessed4DNFI9WF1Y8W } from './testdata/provenance-file-processed-4DNFI9WF1Y8W';
+import { STEPS as testFileProcessedGAPFIWCFWBCO } from './testdata/provenance-file-processed-GAPFIWCFWBCO';
+import { STEPS as testExpset4DNESUJC9Y83 } from './testdata/provenance-expset-4DNESUJC9Y83';
+import { STEPS as testExpset4DNES54YB6TQ } from './testdata/provenance-expset-4DNES54YB6TQ';
+
 
 
 const workflowOpts = {
@@ -23,6 +27,24 @@ class DemoApp extends Component {
                 "name" : "File Processed - 4DNFI9WF1Y8W",
                 "description" : null,
                 "steps" : testFileProcessed4DNFI9WF1Y8W,
+                "opts" : {}
+            },
+            {
+                "name" : "File Processed - GAPFIWCFWBCO",
+                "description" : null,
+                "steps" : testFileProcessedGAPFIWCFWBCO,
+                "opts" : {}
+            },
+            {
+                "name" : "Experiment Set - 4DNES54YB6TQ",
+                "description" : null,
+                "steps" : testExpset4DNES54YB6TQ,
+                "opts" : {}
+            },
+            {
+                "name" : "Experiment Set - 4DNESUJC9Y83",
+                "description" : null,
+                "steps" : testExpset4DNESUJC9Y83,
                 "opts" : {}
             },
             {
