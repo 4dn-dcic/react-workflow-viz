@@ -13,9 +13,10 @@ _Side Note -_ Is there a way to auto-generate a `CHANGELOG.md` file out of relea
 
 #### 2012-10-06
 
-Improved ordering of terminal reference file input nodes.
-Now compares distance of closest step that is being input into; those which go into further steps get pushed to bottom.
-Including comments in ESM build output.
+- Improved ordering of terminal reference file input nodes.
+  - Now compares distance of closest step that is being input into; those which go into further steps get pushed to bottom.
+- For edges spanning more than one column gap, longer edges now get drawn/'traced' before shorter edges (experimental-ish).
+- Including comments in ESM build output.
 
 
 ## Things to do before NPM release
