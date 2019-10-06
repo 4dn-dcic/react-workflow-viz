@@ -25474,15 +25474,30 @@ function traceEdges(originalEdges, nodes, columnWidth, columnSpacing, rowSpacing
     }
 
     var originalEdgesSortedByLength = originalEdges.slice(0).sort(function (edgeA, edgeB) {
-      // Handle the shorter edges first
       var sA = edgeA.source,
           tA = edgeA.target;
       var sB = edgeB.source,
           tB = edgeB.target;
+      var colDifA = Math.abs(tA.colum - sA.column);
+      var colDifB = Math.abs(tB.colum - sB.column); // If just 1 col dif, move to front for intersection testing (tracing skipped)
+
+      if (colDifA === 1 && colDifB === 1) {
+        return 0;
+      }
+
+      if (colDifA === 1) {
+        return -1;
+      }
+
+      if (colDifB === 1) {
+        return 1;
+      } // Else do longer edges first
+
+
       var xDistA = Math.abs(tA.x - sA.x);
       var xDistB = Math.abs(tB.x - sB.x);
-      if (xDistA < xDistB) return -1;
-      if (xDistA > xDistB) return 1;
+      if (xDistA > xDistB) return -1;
+      if (xDistA < xDistB) return 1;
       var yDistA = Math.abs(tA.y - sA.y);
       var yDistB = Math.abs(tB.y - sB.y);
       if (yDistA < yDistB) return -1;
