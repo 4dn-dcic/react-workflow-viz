@@ -69,13 +69,13 @@ function traceEdges(originalEdges, nodes, columnWidth, columnSpacing, rowSpacing
   var topMargin = innerMargin && innerMargin.top || 0;
   var leftMargin = innerMargin && innerMargin.left || 0;
   var endHeight = topMargin + contentHeight + (innerMargin && Math.max(0, innerMargin.bottom - 10)) || 0;
-  var colStartXMap = {};
+  var colStartXMap = {}; // Filled in visibility graph
 
   var nodesByColumn = _underscore["default"].reduce(nodes, function (m, node) {
     var column = node.column;
 
     if (typeof m[column] === 'undefined') {
-      m[column] = [];
+      m[column] = []; // Keys assigned as str, not numbers
     }
 
     m[column].push(node);
@@ -86,6 +86,7 @@ function traceEdges(originalEdges, nodes, columnWidth, columnSpacing, rowSpacing
 
   function buildVisibilityGraph() {
     var subdivisions = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 4;
+    // Horizontal Line Y Coords
     var partialHeight = rowSpacing / subdivisions;
     var quarterHeight = rowSpacing / 4;
     var horizontalLineYCoords = [];
@@ -153,7 +154,8 @@ function traceEdges(originalEdges, nodes, columnWidth, columnSpacing, rowSpacing
       var startXForCol = colStartXMap[columnIdx];
       var prevEdgesLen = previousEdges.length;
       var upperY = Math.max(prevYCoord, targetYCoord);
-      var lowerY = Math.min(prevYCoord, targetYCoord);
+      var lowerY = Math.min(prevYCoord, targetYCoord); //const yCoordMedian = (prevYCoord + targetYCoord) / 2;
+
       var closestSegmentDiff = Infinity;
       var closestSegmentIdx = -1;
       var currSegment = null,
@@ -171,15 +173,20 @@ function traceEdges(originalEdges, nodes, columnWidth, columnSpacing, rowSpacing
 
         if (currSegment[0][0] !== startXForCol) {
           continue;
-        }
+        } //currDiff = Math.abs(yCoordMedian - currSegmentY);
+
 
         if (currSegmentY > upperY) {
           currDiff = currSegmentY - upperY;
         } else if (currSegmentY < lowerY) {
           currDiff = lowerY - currSegmentY;
         } else {
+          // Any path between lower and upper bound is fine.
+          // Favor those closer to prev edge
+          //currDiff = Math.abs(targetYCoord - currSegmentY) * 0.01;
           currDiff = Math.abs(prevYCoord - currSegmentY) * 0.01;
-        }
+        } // Check for intersections, add to score
+
 
         intersections = 0;
 
@@ -193,7 +200,7 @@ function traceEdges(originalEdges, nodes, columnWidth, columnSpacing, rowSpacing
           }
 
           prevVs.reduce(function (prevV, v) {
-            if (!prevV) return v;
+            if (!prevV) return v; // First V
 
             if (!(prevV[0] + nodeEdgeLedgeWidths[0] < startXForCol && v[0] >= startXForCol)) {
               return v;
@@ -201,19 +208,24 @@ function traceEdges(originalEdges, nodes, columnWidth, columnSpacing, rowSpacing
 
             if (v[1] > currSegmentY && prevV[1] < prevYCoord || v[1] < currSegmentY && prevV[1] > prevYCoord) {
               if (intersections === 0) intersections += 2;
-              intersections++;
+              intersections++; //if (startXForCol> 1400 && startXForCol < 1600){
+              //    console.log('X', v[0], v[1], '<-', prevV[0], prevV[1]);
+              //}
             }
 
             return v;
           }, null);
         }
 
-        currDiff += intersections * (rowSpacing * 0.8);
+        currDiff += intersections * (rowSpacing * 0.8); //if (startXForCol> 1400 && startXForCol < 1600){
+        //    console.log('INT', currDiff, currSegmentY, intersections, prevYCoord);
+        //}
 
         if (closestSegmentDiff > currDiff) {
           closestSegmentDiff = currDiff;
           closestSegmentIdx = i;
-        }
+        } // console.log("SEG", currSegment, intersections, prevYCoord, currDiff);
+
       }
 
       if (closestSegmentIdx === -1) {
@@ -226,6 +238,7 @@ function traceEdges(originalEdges, nodes, columnWidth, columnSpacing, rowSpacing
     }
 
     var originalEdgesSortedByLength = originalEdges.slice(0).sort(function (edgeA, edgeB) {
+      // Handle the shorter edges first
       var sA = edgeA.source,
           tA = edgeA.target;
       var sB = edgeB.source,
@@ -253,20 +266,23 @@ function traceEdges(originalEdges, nodes, columnWidth, columnSpacing, rowSpacing
       var columnDiff = targetCol - sourceCol;
 
       if (columnDiff <= 0) {
+        // Shouldn't happen I don't think except if file is re-used/generated or some other unexpected condition.
         console.error("Target column is greater than source column", source, target);
         resultEdges.push(edge);
-        return;
+        return; // Skip tracing it.
       }
 
       if (columnDiff === 1) {
         resultEdges.push(edge);
-        return;
+        return; // Doesn't need to go around obstacles, skip.
       }
 
       var vertices = [[sourceX + columnWidth, sourceY]];
       var prevY = sourceY;
 
       for (var colIdx = sourceCol + 1; colIdx < targetCol; colIdx++) {
+        //const yDiff = targetY - prevY;
+        //const idealYCoord = prevY + (yDiff / 2); // (((colIdx - sourceCol) / columnDiff) * yDiff);
         var bestSegment = getNearestSegment(colIdx, prevY, targetY, resultEdges);
 
         if (!bestSegment) {
@@ -286,7 +302,8 @@ function traceEdges(originalEdges, nodes, columnWidth, columnSpacing, rowSpacing
         prevY = beY;
       }
 
-      vertices.push([targetX, targetY]);
+      vertices.push([targetX, targetY]); // console.log("EDGE", edge);
+
       resultEdges.push(_objectSpread({}, edge, {
         vertices: vertices
       }));
@@ -322,11 +339,17 @@ function traceEdges(originalEdges, nodes, columnWidth, columnSpacing, rowSpacing
   };
 }
 
-var EdgesLayer = function (_React$PureComponent) {
+var EdgesLayer =
+/*#__PURE__*/
+function (_React$PureComponent) {
   _inherits(EdgesLayer, _React$PureComponent);
 
   _createClass(EdgesLayer, null, [{
     key: "sortedEdges",
+
+    /**
+     * Move selected edges to top, and disabled ones to bottom, because CSS z-index doesn't work for SVG elements.
+     */
     value: function sortedEdges(edges, selectedNode, isNodeDisabled) {
       return edges.slice(0).sort(function (a, b) {
         var isASelected = _Edge["default"].isSelected(a, selectedNode, isNodeDisabled);
@@ -364,20 +387,44 @@ var EdgesLayer = function (_React$PureComponent) {
     _this = _possibleConstructorReturn(this, _getPrototypeOf(EdgesLayer).call(this, props));
 
     _defineProperty(_assertThisInitialized(_this), "sortedEdges", (0, _memoizeOne["default"])(function (edges, selectedNodes, isNodeDisabled) {
-      var nextEdges = EdgesLayer.sortedEdges(edges, selectedNodes, isNodeDisabled);
+      var nextEdges = EdgesLayer.sortedEdges(edges, selectedNodes, isNodeDisabled); // Create new list of refs each time we're updated.
+      //this.edgeRefs = [];
+      //_.forEach(nextEdges, ()=>{
+      //    this.edgeRefs.push(React.createRef());
+      //});
+
       return nextEdges;
     }));
 
-    _this.sortedEdges = _this.sortedEdges.bind(_assertThisInitialized(_this));
+    _this.sortedEdges = _this.sortedEdges.bind(_assertThisInitialized(_this)); //this.getAllPathElements = this.getAllPathElements.bind(this);
+    //this.edgeRefs = [];
+
     return _this;
   }
 
   _createClass(EdgesLayer, [{
     key: "pathArrows",
+    // Experimentation with transitioning multiple edges at once within requestAnimationFrame.
+    // Need to rethink design of this, an array for this.edgeRefs won't work as we need to keep
+    // state.source.x, state.source.y cached in state and associated w/ each edge.
+    // Possibly can use object keyed by 'key' string (as determined in render method).
+    // Keeping for reference.
+    //
+    //getAllPathElements(){
+    //    return _.map(this.edgeRefs, function(ref){
+    //        return ref && ref.current && ref.current.pathRef && ref.current.pathRef.current;
+    //    });
+    //}
     value: function pathArrows() {
       if (!this.props.pathArrows) return null;
       return _Edge["default"].pathArrowsMarkers();
     }
+    /**
+     * Wraps Edges and each Edge in TransitionGroup and Transition, respectively.
+     * We cannot use CSSTransition at the moment because it does not change the className
+     * of SVG element(s). We must manually change it (or an attribute of it).
+     */
+
   }, {
     key: "render",
     value: function render() {
@@ -455,6 +502,7 @@ var EdgesLayer = function (_React$PureComponent) {
     key: "edgeOnEntered",
     value: function edgeOnEntered(elem) {
       elem.style.opacity = null;
+      /** Allows CSS to override, e.g. .15 opacity for disabled edges */
     }
   }, {
     key: "edgeOnExit",

@@ -47,7 +47,10 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-var DefaultNodeElement = function (_React$PureComponent) {
+/** @todo separate methods out into functional components */
+var DefaultNodeElement =
+/*#__PURE__*/
+function (_React$PureComponent) {
   _inherits(DefaultNodeElement, _React$PureComponent);
 
   function DefaultNodeElement() {
@@ -91,7 +94,7 @@ var DefaultNodeElement = function (_React$PureComponent) {
     key: "tooltip",
     value: function tooltip() {
       var node = this.props.node;
-      var output = '';
+      var output = ''; // Node Type
 
       if (node.nodeType === 'step') {
         output += '<small>Step ' + ((node.column - 1) / 2 + 1) + '</small>';
@@ -99,9 +102,10 @@ var DefaultNodeElement = function (_React$PureComponent) {
         var nodeType = node.nodeType;
         nodeType = nodeType.charAt(0).toUpperCase() + nodeType.slice(1);
         output += '<small>' + nodeType + '</small>';
-      }
+      } // Title
 
-      output += '<h5 class="text-600 tooltip-title">' + (node.title || node.name) + '</h5>';
+
+      output += '<h5 class="text-600 tooltip-title">' + (node.title || node.name) + '</h5>'; // Description
 
       if (typeof node.description === 'string' || node.meta && typeof node.meta.description === 'string') {
         output += '<div>' + (node.description || node.meta.description) + '</div>';
@@ -144,14 +148,38 @@ _defineProperty(DefaultNodeElement, "propTypes", {
   'columnWidth': _propTypes["default"].number
 });
 
-var Node = function (_React$Component) {
+var Node =
+/*#__PURE__*/
+function (_React$Component) {
   _inherits(Node, _React$Component);
 
   _createClass(Node, null, [{
     key: "isSelected",
+
+    /**
+     * @param {Object} currentNode - Current node, e.g. node calling this function
+     * @param {?Object} selectedNode - Currently-selected node reference for view.
+     * @returns {boolean} True if currentNode matches selectedNode, and is thus the selectedNode.
+     */
     value: function isSelected(currentNode, selectedNode) {
       if (!selectedNode) return false;
       if (selectedNode === currentNode) return true;
+      /*
+      // We shouldn't need the below and can just rely on a simple reference comparison
+      // Keeping around for now/reference.
+      if (typeof selectedNode.name === 'string' && typeof currentNode.name === 'string') {
+          if (selectedNode.name === currentNode.name){
+              // Case: IO node (which would have add'l self-generated ID to ensure uniqueness)
+              if (typeof selectedNode.id === 'string'){
+                  if (selectedNode.id === currentNode.id) return true;
+                  return false;
+              }
+              return true;
+          }
+          return false;
+      }
+      */
+
       return false;
     }
   }, {
@@ -183,6 +211,11 @@ var Node = function (_React$Component) {
 
       return false;
     }
+    /**
+     * Returns list of common step nodes that input/output nodes
+     * are both input into.
+     */
+
   }, {
     key: "findCommonStepNodesInputInto",
     value: function findCommonStepNodesInputInto() {
@@ -202,12 +235,13 @@ var Node = function (_React$Component) {
   }, {
     key: "isRelated",
     value: function isRelated(currentNode, selectedNode) {
-      if (!selectedNode) return false;
+      if (!selectedNode) return false; // Ensure that an argument name (as appears on a step input/output arg) matches selectedNode name.
 
       if (selectedNode.name === currentNode.name || _underscore["default"].any((currentNode._source || []).concat(currentNode._target || []), function (s) {
         return s.name === selectedNode.name;
       })) {
         if (currentNode.nodeType === 'input' || currentNode.nodeType === 'output') {
+          // An output node may be an input of another node.
           return Node.isInputOfSameStep(currentNode, selectedNode);
         }
 
@@ -250,12 +284,15 @@ var Node = function (_React$Component) {
 
     _classCallCheck(this, Node);
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(Node).call(this, props));
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(Node).call(this, props)); // Own memoized variants. Binding unnecessary most likely.
+
     _this.isInSelectionPath = (0, _memoizeOne["default"])(Node.isInSelectionPath.bind(_assertThisInitialized(_this)));
     _this.isRelated = (0, _memoizeOne["default"])(Node.isRelated.bind(_assertThisInitialized(_this)));
     _this.isDisabled = (0, _memoizeOne["default"])(_this.isDisabled.bind(_assertThisInitialized(_this)));
     return _this;
   }
+  /** Scrolls the scrollable element to the current context node, if any. */
+
 
   _createClass(Node, [{
     key: "componentDidMount",

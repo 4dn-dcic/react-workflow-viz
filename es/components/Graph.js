@@ -63,12 +63,32 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-var Graph = function (_React$Component) {
+/**
+ * Primary/entry component for the Workflow graph.
+ *
+ * @class Graph
+ * @prop {Object[]}     nodes                   Array of node objects to plot. Both nodes and edges can be generated from a CWL-like structure using static functions, including the provided 'parseAnalysisSteps'. See propTypes in class def below for object structure.
+ * @prop {Object[]}     edges                   Array of edge objects to plot. See propTypes in class def below for object structure.
+ * @prop {function}     renderNodeElement       Function to render out own custom Node Element. Accepts two params - 'node' and 'props' (of graph).
+ * @prop {function?}    renderDetailPane        Function to render out own custom Detail Pane. Accepts two params - 'selectedNode' and 'props' (of graph). Pass in null to perform your own logic in onNodeClick.
+ * @prop {function}     [onNodeClick]           A function to be executed each time a node is clicked. 'this' will refer to internal statecontainer. Should accept params: {Object} 'node', {Object|null} 'selectedNode', and {MouseEvent} 'evt'. By default, it changes internal state's selectedNode. You should either disable props.checkHrefForSelectedNode -or- change href in this function.
+ * @prop {function}     [isNodeDisabled]        Function which accepts a 'node' object and returns a boolean.
+ * @prop {Object}       [innerMargin={top : 20, bottom: 48, left: 15, right: 15}]     Provide this object, containing numbers for 'top', 'bottom', 'left', and 'right', if want to adjust chart margins.
+ * @prop {boolean}      [pathArrows=true]       Whether to display arrows at the end side of edges.
+ * @prop {number}       [columnSpacing=56]      Adjust default spacing between columns, where edges are drawn.
+ * @prop {number}       [columnWidth=150]       Adjust width of columns, where nodes are drawn.
+ * @prop {number}       [rowSpacing=56]         Adjust vertical spacing between node centers (NOT between their bottom/top).
+ * @prop {function}     [nodeTitle]             Optional function to supply to get node title, before is passed to visible Node element. Useful if want to display some meta sub-property rather than technical title.
+ */
+var Graph =
+/*#__PURE__*/
+function (_React$Component) {
   _inherits(Graph, _React$Component);
 
   _createClass(Graph, null, [{
     key: "getHeightFromNodes",
     value: function getHeightFromNodes(nodes, nodesPreSortFxn, rowSpacing) {
+      // Run pre-sort fxn, e.g. to manually pre-arrange nodes into different columns.
       if (typeof nodesPreSortFxn === 'function') {
         nodes = nodesPreSortFxn(nodes.slice(0));
       }
@@ -84,6 +104,20 @@ var Graph = function (_React$Component) {
         return Math.max(node.column, highestCol);
       }, 0) + 1) * (columnWidth + columnSpacing) + (innerMargin.left || 0) + (innerMargin.right || 0) - columnSpacing;
     }
+    /**
+     * Extends each node with X & Y coordinates.
+     *
+     * Converts column placement and position within columns,
+     * along with other chart dimension settings, into X & Y coordinates.
+     *
+     * IMPORTANT:
+     * Returns a new array but _modifies array items in place_.
+     * If need fresh nodes, deep-clone before supplying `props.nodes`.
+     *
+     * @static
+     * @memberof Graph
+     */
+
   }, {
     key: "getNodesWithCoordinates",
     value: function getNodesWithCoordinates() {
@@ -103,20 +137,23 @@ var Graph = function (_React$Component) {
       var columnSpacing = arguments.length > 8 && arguments[8] !== undefined ? arguments[8] : 56;
       var isNodeCurrentContext = arguments.length > 9 && arguments[9] !== undefined ? arguments[9] : false;
 
+      /** Vertically centers a single node within a column */
       function centerNode(n) {
         n.y = contentHeight / 2 + innerMargin.top;
         n.nodesInColumn = 1;
         n.indexInColumn = 0;
       }
 
-      var nodesByColumnPairs, leftOffset, nodesWithCoords;
+      var nodesByColumnPairs, leftOffset, nodesWithCoords; // Arrange into lists of columns
+      // Ensure we're sorted, using column _numbers_ (JS objs keyed by str).
+
       nodesByColumnPairs = _underscore["default"].sortBy(_underscore["default"].map(_underscore["default"].pairs(_underscore["default"].groupBy(nodes, 'column')), function (_ref) {
         var _ref2 = _slicedToArray(_ref, 2),
             columnNumStr = _ref2[0],
             nodesInColumn = _ref2[1];
 
         return [parseInt(columnNumStr), nodesInColumn];
-      }), 0);
+      }), 0); // Set correct Y coordinate on each node depending on how many nodes are in each column.
 
       _underscore["default"].forEach(nodesByColumnPairs, function (_ref3) {
         var _ref4 = _slicedToArray(_ref3, 2),
@@ -138,7 +175,8 @@ var Graph = function (_React$Component) {
         } else if (rowSpacingType === 'stacked') {
           _underscore["default"].forEach(nodesInColumn, function (nodeInCol, idx) {
             if (!nodeInCol) return;
-            nodeInCol.y = rowSpacing * idx + innerMargin.top;
+            nodeInCol.y = rowSpacing * idx + innerMargin.top; //num + (this.props.innerMargin.top + verticalMargin);
+
             nodeInCol.nodesInColumn = countInCol;
           });
         } else if (rowSpacingType === 'wide') {
@@ -163,15 +201,17 @@ var Graph = function (_React$Component) {
 
         return m.concat(nodesInColumn);
       }, []);
-      leftOffset = innerMargin.left;
+      leftOffset = innerMargin.left; // Center graph contents horizontally if needed.
 
       if (contentWidth && viewportWidth && contentWidth < viewportWidth) {
         leftOffset += (viewportWidth - contentWidth) / 2;
-      }
+      } // Set correct X coordinate on each node depending on column and spacing prop.
+
 
       _underscore["default"].forEach(nodesWithCoords, function (node) {
         node.x = node.column * (columnWidth + columnSpacing) + leftOffset;
-      });
+      }); // Finally, add boolean `isCurrentContext` flag to each node object if needed.
+
 
       if (typeof isNodeCurrentContext === 'function') {
         _underscore["default"].forEach(nodesWithCoords, function (node) {
@@ -267,6 +307,14 @@ var Graph = function (_React$Component) {
 
       var nodes = this.nodesWithCoordinates(innerWidth, contentWidth, innerHeight);
       var graphHeight = innerHeight + (innerMargin.top || 0) + (innerMargin.bottom || 0);
+      /* TODO: later
+      var spacerCount = _.reduce(nodes, function(m,n){ if (n.nodeType === 'spacer'){ return m + 1; } else { return m; }}, 0);
+      if (spacerCount){
+          height += (spacerCount * this.props.columnSpacing);
+          graphHeight += (spacerCount * this.props.columnSpacing);
+      }
+      */
+
       return _react["default"].createElement("div", {
         className: "workflow-chart-outer-container",
         key: "outer"
@@ -288,6 +336,11 @@ var Graph = function (_React$Component) {
 
   return Graph;
 }(_react["default"].Component);
+/**
+ * Optional component to wrap Graph and pass steps in.
+ * @todo Test for (lack of) bidirectionality in data and fix.
+ */
+
 
 exports["default"] = Graph;
 
@@ -307,8 +360,11 @@ _defineProperty(Graph, "propTypes", {
     'nodeType': _propTypes["default"].string.isRequired,
     'ioType': _propTypes["default"].string,
     'id': _propTypes["default"].string,
+    // Optional unique ID if node names might be same.
     'outputOf': _propTypes["default"].object,
+    // Unused currently
     'inputOf': _propTypes["default"].arrayOf(_propTypes["default"].object),
+    // Unused currently
     'description': _propTypes["default"].string,
     'meta': _propTypes["default"].oneOfType([_propTypes["default"].object, _propTypes["default"].shape({
       'target': _propTypes["default"].arrayOf(_propTypes["default"].shape({
@@ -329,6 +385,7 @@ _defineProperty(Graph, "propTypes", {
 
 _defineProperty(Graph, "defaultProps", {
   'height': null,
+  // Unused, should be set to nodes count in highest column * rowSpacing + innerMargins.
   'width': null,
   'columnSpacing': 100,
   'columnWidth': 150,
@@ -346,6 +403,7 @@ _defineProperty(Graph, "defaultProps", {
     }));
   },
   'onNodeClick': null,
+  // Use StateContainer.defaultOnNodeClick
   'innerMargin': {
     'top': 80,
     'bottom': 80,
@@ -363,7 +421,9 @@ _defineProperty(Graph, "defaultProps", {
   'nodeEdgeLedgeWidths': [3, 5]
 });
 
-var GraphParser = function (_React$Component2) {
+var GraphParser =
+/*#__PURE__*/
+function (_React$Component2) {
   _inherits(GraphParser, _React$Component2);
 
   function GraphParser(props) {

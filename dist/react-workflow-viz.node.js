@@ -21411,7 +21411,9 @@ var memoizedFindNode = memoize_one_esm(function (nodes, name, nodeType) {
   });
 });
 
-var StateContainer_StateContainer = function (_React$PureComponent) {
+var StateContainer_StateContainer =
+/*#__PURE__*/
+function (_React$PureComponent) {
   _inherits(StateContainer, _React$PureComponent);
 
   _createClass(StateContainer, null, [{
@@ -21543,7 +21545,9 @@ function ScrollContainer_setPrototypeOf(o, p) { ScrollContainer_setPrototypeOf =
 
 
 
-var ScrollContainer_ScrollContainer = function (_React$PureComponent) {
+var ScrollContainer_ScrollContainer =
+/*#__PURE__*/
+function (_React$PureComponent) {
   ScrollContainer_inherits(ScrollContainer, _React$PureComponent);
 
   function ScrollContainer(props) {
@@ -22697,15 +22701,114 @@ function parsing_functions_defineProperty(obj, key, value) { if (key in obj) { O
 
 
 
+/** @module parsing-functions */
+
+/**
+ * Type definition for Step input/output argument source or target object.
+ *
+ * @typedef {Object} StepIOArgumentTargetOrSource
+ * @property {string} type      Type of IO argument in context of this target/source, e.g. 'Input File', 'Output Processed File'. "Global" workflow file args/IOs are "Workflow Output File" or "Workflow Input File"
+ * @property {string} name      Name of this IO/argument in context of this target/source (e.g. if a step, or global workflow arg).
+ * @property {string} [step]    ID of the step IO/argument comes from or is going to, if not a global argument w/ type = 'Workflow Output File' or type = 'Workflow Input File'.
+ */
+
 var StepIOArgumentTargetOrSource;
+/**
+ * Type definition for a Step input/output argument run_data.
+ * Exact same as Node.meta.run_data, however here the arguments have not yet been expanded into multiple nodes per argument, so properties are lists to-be-expanded.
+ *
+ * @typedef {Object} StepIOArgumentRunData
+ * @property {Object[]} [file]                      File(s) for step argument. This should be a list of objects. This might be list of 'at-id' strings in case WorkflowRun has not finished indexing.
+ * @property {string[]|number[]} [value]            Value(s) for step argument. This should be a list of strings or numbers. Is present if is an IO parameter input.
+ * @property {Object[]} [meta]                      Additional information about the file or run that might not be included on the Files or Values themselves.
+ */
+
 var StepIOArgumentRunData;
+/**
+ * Type definition for a Step input/output argument.
+ *
+ * @typedef {Object} StepIOArgument
+ * @property {string} name                          Name of argument in context of step itself
+ * @property {Object} meta                          Various properties related to the argument itself, in context of Step.
+ * @property {StepIOArgumentRunData} [run_data]     Data about the run, if any present (if WorkflowRun or WorkflowRun trace).
+ * @property {StepIOArgumentTargetOrSource[]} [target]   List of targets for IO
+ * @property {StepIOArgumentTargetOrSource[]} [source]   List of sources for IO
+ */
+
 var StepIOArgument;
+/**
+ * Type definition for a Step.
+ *
+ * @typedef {Object} Step
+ * @property {string} name                          Name of step
+ * @property {Object} meta                          Various properties related to the step itself.
+ * @property {StepIOArgument[]} inputs              Input arguments
+ * @property {StepIOArgument[]} outputs             Output arguments
+ */
+
 var parsing_functions_Step;
+/**
+ * Type definition for a Node's Run Data.
+ * More properties may be added to this node after parseAnalysisSteps() function is complete which relate to Graph/UI state.
+ *
+ * @typedef {Object} NodeRunData
+ * @property {Object} [file]                        Related file for node. This should be an object, e.g. as returned from a linkTo.
+ * @property {string|number} [value]                Value for node. This should be a string or number. Is present if is an IO paramater node.
+ * @property {Object} [meta]                        Additional information about the file or run that might not be included on the File or Value itself.
+ */
+
 var NodeRunData;
+/**
+ * @typedef {Object} NodeMeta
+ * @property {NodeRunData} [run_data]                   Information about specific to a run(s), if we have a WorkflowRun or WorkflowRun trace. For example - file or parameter value.
+ * @property {StepIOArgumentTargetOrSource[]} [source]  List of sources for IO, copied over from step(s) which reference it.
+ * @property {StepIOArgumentTargetOrSource[]} [target]  List of targets for IO, copied over from step(s) which reference it.
+ */
+
 var NodeMeta;
+/**
+ * Object structure which represents a visible 'node' on the workflow graph.
+ *
+ * @typedef {Object} Node
+ * @property {string} type                          Basic categorization of the node - one of "input", "output", "input-group", "step". Subject to change.
+ * @property {string} name                          Name of node. Unique for all step nodes. Not necessarily unique for IO nodes.
+ * @property {string} [id]                          For IO nodes only: Unique self-generated ID exists on IO nodes, in addition to non-necessarily-unique name.
+ * @property {NodeMeta} meta                        Various properties related to the node, to be used for styling & annotating the node or showing information onClick.
+ * @property {number} column                        Column to which the Node is currently assigned.
+ * @property {Node[]} [inputNodes]                  For Step nodes only: List of other nodes which lead to this node, if is a step node.
+ * @property {Node[]} [outputNodes]                 For Step nodes only: List of other nodes to which this node leads, if is a step node.
+ * @property {Node[]} [inputOf]                     For IO nodes only: List of other node references to which this input is an input to, if an IO node.
+ * @property {Node} [outputOf]                      For IO nodes only: Another node reference from which this node is output of, if an output IO node.
+ * @property {Object} [argNamesOnSteps]             For IO nodes only: Mapping of IO name by step name, as IO name varies by step it is described by.
+ * @property {string} [format]                      For IO nodes only: The 'argument_type' from CWL, e.g. 'Workflow Parameter', 'Workflow Output File', etc.
+ */
+
 var parsing_functions_Node;
+/**
+ * Connects two nodes together via reference.
+ *
+ * @typedef {Object} Edge
+ * @property {Node} source - Node at which the edge starts.
+ * @property {Node} target - Node at which the edge ends.
+ */
+
 var parsing_functions_Edge;
+/**
+ * @typedef {Object} ParsingOptions
+ * @property {string}   direction                   Direction of tracing. Only output is currently supported.
+ * @property {number[]} [skipSortOnColumns=[1]]     List of column integers to skip sorting on.
+ * @property {boolean}  [dontCorrectColumns=false]  If true, will leave column assignments as were given at 'time of trace' rather than re-calculated on preceding nodes.
+ * @property {function} [nodesPreSortFxn]           Function through which all nodes get run through before sorting within column. Use this to change nodes' column assignments before sorting within columns.
+ * @property {function} [nodesInColumnSortFxn]      A sort function taking 2 nodes as params and returning a 1 or -1. Arranges nodes within a column.
+ * @property {function} [nodesInColumnPostSortFxn]  A function  which takes list of nodes and column number and returns list of nodes. Use to run post-sort transformations or re-ordering.
+ *
+ * @property {boolean}  [showReferenceFiles=true]   If false, nodes/edges or IOs with 'meta.type === reference file' will be filtered out of graph. TODO: Replace with more flexible list of 'filter out rules'.
+ * @property {boolean}  [showParameters=true]       If false, nodes/edges or IOs with 'meta.type === parameter' will be filtered out of graph. TODO: Replace with more flexible list of 'filter out rules'.
+ */
+
 var ParsingOptions;
+/** @type ParsingOptions */
+
 var DEFAULT_PARSING_OPTIONS = {
   'direction': 'output',
   'skipSortOnColumns': [1],
@@ -22717,23 +22820,75 @@ var DEFAULT_PARSING_OPTIONS = {
   'showParameters': true,
   'showIndirectFiles': true
 };
+/**
+ * Converts a list of steps (each with inputs & outputs) into a list of nodes and list of edges between those nodes to feed directly into the
+ * Workflow graph component.
+ *
+ * @param {Step[]} analysis_steps                       List of steps from the back-end to generate nodes & edges from.
+ * @param {ParsingOptions} [parsingOptions]                Options for parsing and post-processing.
+ * @returns {{ 'nodes' : Node[], 'edges' : Edge[] }}    Container object for the two lists.
+ */
+
 function parseAnalysisSteps(analysis_steps) {
   var parsingOptions = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
   var parsingOpts = parsing_functions_objectSpread({}, DEFAULT_PARSING_OPTIONS, {}, parsingOptions);
+  /*************
+   ** Outputs **
+   *************/
+
+  /** @type Node[] */
+
 
   var nodes = [];
+  /** @type Edge[] */
+
   var edges = [];
+  /*************
+   * Temp Vars *
+   *************/
+
+  /**
+   * Keep track of IO arg node ids used, via keys; prevent duplicates by incrementing int val.
+   * @type {Object.<string, number>}
+   */
+
   var ioIdsUsed = {};
+  /**
+   * Keep track of steps already processed & added to graph.
+   * We start drawing first step, and its inputs/outputs, then recursively draw steps that its outputs go to.
+   * At the end, we restart the process from a step that has not yet been encountered/processed, if any.
+   *
+   * @type {Object.<string, Node>}
+   */
+
   var processedSteps = {};
+  /***************
+   ** Functions **
+   ***************/
+
+  /**
+   * @param {StepIOArgument} stepIOArg - Input or output argument of a step.
+   * @param {boolean} [readOnly=true] - @see preventDuplicateNodeID()
+   * @returns {string} Unique ID for node.
+   */
 
   function ioNodeID(stepIOArg) {
     var readOnly = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
     return preventDuplicateNodeID(stepIOArg.id || stepIOArg.name, readOnly);
   }
+  /**
+   * Generate name for IO node based on 'global' step argument input source or output target name, if available.
+   * If no global source or target (w/ 'type' === 'Workflow (Input|Output) File') available, reverts to StepIOArgument.name (name of argument in context of step itself, at time of drawing).
+   *
+   * @param {StepIOArgument} stepIOArg - Input or output argument of a step.
+   * @returns {string} Name of node.
+   */
+
 
   function ioNodeName(stepIOArg) {
-    var nameToUse = stepIOArg.name || null;
+    var nameToUse = stepIOArg.name || null; // Default; name of step argument from step we're drawing IO nodes currently.
+
     var isGlobal = stepIOArg.meta && stepIOArg.meta.global === true;
 
     if (isGlobal) {
@@ -22753,6 +22908,7 @@ function parseAnalysisSteps(analysis_steps) {
 
       for (i = 0; i < listLength; i++) {
         if (list[i] && typeof list[i].step === 'undefined' && typeof list[i].name === 'string') {
+          // Source or Target --not-- going to a step; use name of that (assumed global source/target)
           nameToUse = list[i].name;
           break;
         }
@@ -22761,6 +22917,15 @@ function parseAnalysisSteps(analysis_steps) {
 
     return nameToUse;
   }
+  /**
+   * Pass a should-be-unique IO Node ID through this function to check if same ID exists already.
+   * If so, returns a copy of ID with '~' + increment appended to it.
+   *
+   * @param   {string}  id               ID to make sure is unique.
+   * @param  {boolean}  [readOnly=true]  If true, will NOT update increment count in cache. Use readOnly when generating nodes to match against without concretely adding them to final list of nodes (yet/ever).
+   * @returns {string} Original id, if unique, or uniqueified ID.
+   */
+
 
   function preventDuplicateNodeID(id) {
     var readOnly = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
@@ -22778,15 +22943,25 @@ function parseAnalysisSteps(analysis_steps) {
 
     return id + '~' + ++ioIdsUsed[id];
   }
+  /**
+  * Returns true if the files are the same, using the @id. Returns false if file1 or file2 is falsy.
+  *
+  * @param {string|object} file1  First file to compare. May be a string containing the file's @id or an object with the @id field.
+  * @param {string|object} file2  Second file to compare. May be a string containing the file's @id or an object with the @id field.
+  * @returns {boolean}
+  */
+
 
   function compareTwoFilesByID(file1, file2) {
     if (!file1 || !file2) return false;
 
     if (typeof file1 === 'string' && typeof file2 === 'string' && file1 === file2) {
+      // Somewhat deprecated case, but can still occur if WorkflowRun has not finished indexing and we are graphing it.
       return true;
     }
 
     if (parsing_functions_typeof(file1) === 'object' && parsing_functions_typeof(file2) === 'object' && (file1['@id'] || 'a') === (file2['@id'] || 'b')) {
+      // Common case.
       return true;
     }
 
@@ -22801,6 +22976,11 @@ function parseAnalysisSteps(analysis_steps) {
     return false;
   }
 
+  /**
+   * @param    {Step}  step     A step object from which to generate step node from.
+   * @param  {number}  column   Column number to assign to this node.
+   * @returns {Node} Node object representation.
+   */
   function generateStepNode(step, column) {
     return {
       'nodeType': 'step',
@@ -22811,14 +22991,25 @@ function parseAnalysisSteps(analysis_steps) {
       'column': column
     };
   }
+  /**
+   * @param  {StepIOArgument}  stepIOArgument   Input or output argument of a step for/from which to create output node(s) from.
+   * @param          {number}  column           Column number to assign to this node.
+   * @param            {Node}  stepNode         Step node from which this IO node is being created from. Will be connected to IO node with an edge.
+   * @param          {string}  nodeType         Type of node in relation to stepNode - either "input" or "output".
+   * @param         {boolean}  [readOnly=true]  If true, will not generate unique ID for IO node.
+   * @returns {Node} Node object representation.
+   */
+
 
   function generateIONode(stepIOArgument, column, stepNode, nodeType) {
     var readOnly = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : true;
-    if (nodeType !== 'input' && nodeType !== 'output') throw new Error('Incorrect type, must be one of input or output.');
+    if (nodeType !== 'input' && nodeType !== 'output') throw new Error('Incorrect type, must be one of input or output.'); // Relation to the stepNode. Input nodes have sources from the stepNode, output nodes have targets from the stepNode.
+
     nodeType === 'input' ? 'source' : 'target';
     var namesOnSteps = {};
     namesOnSteps[stepNode.name] = stepIOArgument.name;
-    var ioType = stepIOArgument.meta && typeof stepIOArgument.meta.type === 'string' && stepIOArgument.meta.type.toLowerCase();
+    var ioType = stepIOArgument.meta && typeof stepIOArgument.meta.type === 'string' && stepIOArgument.meta.type.toLowerCase(); // Will be one of "data file", "report", "QC", "reference file", "parameter"
+
     var ioNode = {
       'column': column,
       'ioType': ioType,
@@ -22830,14 +23021,40 @@ function parseAnalysisSteps(analysis_steps) {
       '_target': stepIOArgument.target,
       'meta': underscore_default.a.extend({}, stepIOArgument.meta || {}, underscore_default.a.omit(stepIOArgument, 'name', 'meta', 'source', 'target'))
     };
-    if (nodeType === 'input') ioNode.inputOf = [stepNode];else if (nodeType === 'output') ioNode.outputOf = stepNode;
+    if (nodeType === 'input') ioNode.inputOf = [stepNode]; // May be input of multiple steps
+    else if (nodeType === 'output') ioNode.outputOf = stepNode;
     return ioNode;
   }
+  /**
+   * Generate multiple nodes from one step input or output.
+   * Checks to see if WorkflowRun (via presence of run_data object in step input/output), and if multiple files exist in run_data.file,
+   * will generate that many nodes.
+   *
+   * @param {StepIOArgument} stepIOArgument   Input or output argument of a step for/from which to create output node(s) from.
+   * @param {number} column                   Column number to assign to this node.
+   * @param {Node} stepNode                   Step node from which this IO node is being created from. Will be connected to IO node with an edge.
+   * @param {string} nodeType                 Type of node in relation to stepNode - either "input" or "output".
+   * @param {boolean} [readOnly=true]         If true, will not generate unique ID for IO node.
+   * @returns {Node[]} List of expanded I/O nodes.
+   */
+
 
   function expandIONodes(stepIOArgument, column, stepNode, nodeType, readOnly) {
+    //console.log('PARAM1', column, stepNode, stepIOArgument);
+    // Return just the single node if we don't have array for run_data.file or run_data.value.
     if (typeof stepIOArgument.run_data === 'undefined' || !stepIOArgument.run_data.file && !stepIOArgument.run_data.value || stepIOArgument.run_data.file && (!Array.isArray(stepIOArgument.run_data.file) || stepIOArgument.run_data.file.length === 0) || stepIOArgument.run_data.value && (!Array.isArray(stepIOArgument.run_data.value) || stepIOArgument.run_data.value.length === 0)) {
+      // Not valid WorkflowRun
       return [generateIONode(stepIOArgument, column, stepNode, nodeType, readOnly)];
     }
+    /**
+     * This is how multiple files or values per step argument are handled.
+     * A Step argument with an array instead of single item for 'run_data.file' or 'run_data.value' will get mapped/cloned to multiple nodes, each with a different single 'file' or 'value', respectively.
+     *
+     * @param {Array} value_list - List of Files or Values from run_data to expand into multiple IO nodes.
+     * @param {string} [propertyToExpend="file"] - One of 'file' or 'value' (for parameters).
+     * @returns {Object[]} List of nodes for step argument.
+     */
+
 
     function expandRunDataArraysToIndividualNodes(value_list) {
       var propertyToExpand = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'file';
@@ -22858,9 +23075,11 @@ function parseAnalysisSteps(analysis_steps) {
           id += val && val.accession || val && val.uuid || idx;
           run_data.file = val;
         } else if (propertyToExpand === 'value') {
+          // Case: Parameter or anything else.
           id += idx;
           run_data.value = val;
-        }
+        } //console.log('RUNDATA', run_data);
+
 
         return generateIONode(underscore_default.a.extend({}, stepIOArgument, {
           'name': ioNodeName(stepIOArgument),
@@ -22878,7 +23097,9 @@ function parseAnalysisSteps(analysis_steps) {
     } else {
       isParameterArgument = false;
       valuesForArgument = stepIOArgument.run_data.file;
-    }
+    } //console.log('PARAM', isParameterArgument, valuesForArgument);
+    // CREATE/HANDLE GROUP NODES ---- N.B. THIS IS LIKELY TEMPORARY AND WILL CHANGE ONCE WE HAVE DESIGN/IDEA FOR GROUPED WFRs. DOES NOT HANDLE PARAMETERS
+
 
     var groupSources = underscore_default.a.filter(stepIOArgument.source || [], function (s) {
       return typeof s.grouped_by === 'string' && typeof s[s.grouped_by] !== 'undefined' && typeof s.for_file === 'string';
@@ -22903,7 +23124,9 @@ function parseAnalysisSteps(analysis_steps) {
         var incl = false;
 
         underscore_default.a.forEach(groupKeys, function (groupingTypeKey) {
+          // = 'workflow'
           underscore_default.a.forEach(underscore_default.a.keys(groups[groupingTypeKey]), function (group) {
+            // id of workflow
             if (groups[groupingTypeKey][group].has(file['@id'] || file)) {
               if (typeof m[groupingTypeKey] === 'undefined') {
                 m[groupingTypeKey] = {};
@@ -22924,7 +23147,9 @@ function parseAnalysisSteps(analysis_steps) {
         }
 
         return m;
-      }, {});
+      }, {}); // Returns e.g. { 'workflow' : { '/someWorkflow/@id/' : Set([ { ..file.. },{ ..file.. },{ ..file.. }  ]) } }
+      // Should only be one groupingName for now.
+
 
       var groupingName = 'workflow';
 
@@ -22949,10 +23174,22 @@ function parseAnalysisSteps(analysis_steps) {
       }, []);
 
       return expandRunDataArraysToIndividualNodes(filesNotInGroups).concat(groupNodes);
-    }
+    } // END CREATE/HANDLE GROUP NODEES
+
 
     return expandRunDataArraysToIndividualNodes(valuesForArgument, isParameterArgument ? 'value' : 'file');
   }
+  /**
+   * Find existing or generate new IO nodes for each input or output argument in step.inputs or step.outputs and
+   * create edges between them and stepNode.
+   *
+   * @param {Step} step - Analysis Step
+   * @param {number} column - Column index (later translated into X coordinate).
+   * @param {Node} stepNode - Analysis Step Node Reference
+   * @param {string} [ioNodeType='input'] - Type of IO, either 'input' or 'output'.
+   * @returns {{ 'created' : Node[], 'matched' : Node[] }} Object containing two lists - 'created' and 'matched' - containing nodes which were newly created and matched & re-used, respectively, for this step's input arguments.
+   */
+
 
   function generateIONodesFromStep(step, column, stepNode) {
     var ioNodeType = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'input';
@@ -22960,8 +23197,17 @@ function parseAnalysisSteps(analysis_steps) {
     var oppIOTargetType = ioNodeType === 'input' ? 'target' : 'source';
     var ioNodesMatched = [];
     var ioNodesCreated = [];
+    /**
+     * Compares an input node and a step input argument to see if they refer to same file or value, independent of matching argument names.
+     * Used as an extra check to help handle provenance graphs where step argument names for terminal input files might differ, yet use the same file.
+     *
+     * @param {Node} node - Node to compare run_data file from.
+     * @param {StepIOArgument} - Step Input argument whose source.for_file to compare against node run_data file.
+     * @returns {boolean} True if both have same file.
+     */
 
     function areInputRunDataPresentAndEqual(node, stepIO) {
+      // False if our step IO argument has a source step -- means is not a global input argument.
       if (stepIO[stepIOTargetType].length > 1 || typeof stepIO[stepIOTargetType][0].step !== 'undefined') return false;
       return areAnyRunDataPresentAndEqual(node, stepIO);
     }
@@ -22974,30 +23220,44 @@ function parseAnalysisSteps(analysis_steps) {
 
     underscore_default.a.forEach(step[ioNodeType + 's'], function (stepIO) {
       if (!Array.isArray(stepIO[stepIOTargetType])) return;
-      var isGlobalInputArg = stepIO[stepIOTargetType].length === 1 && typeof stepIO[stepIOTargetType][0].step === 'undefined' && !(stepIO.meta && stepIO.meta.cardinality === 'array');
+      var isGlobalInputArg = stepIO[stepIOTargetType].length === 1 && typeof stepIO[stepIOTargetType][0].step === 'undefined' && !(stepIO.meta && stepIO.meta.cardinality === 'array'); // Step 1a. Associate existing input nodes from prev. steps if same argument/name as for this one.
+
       var ioNodeIDsMatched = {};
 
       var currentIONodesMatched = underscore_default.a.filter(nodes, function (n) {
-        if (n.nodeType === 'step') return false;
+        // Ignore any step nodes
+        if (n.nodeType === 'step') return false; // Re-use global inputs nodes if not cardinality:array
 
         if (ioNodeType === 'input' && isGlobalInputArg) {
-          if (Array.isArray(n['_' + stepIOTargetType]) && n['_' + stepIOTargetType].length === 1 && typeof n['_' + stepIOTargetType][0].step === 'undefined' && (n['_' + stepIOTargetType][0].name === stepIO[stepIOTargetType][0].name || areInputRunDataPresentAndEqual(n, stepIO))) {
+          // Is global input file
+          if (Array.isArray(n['_' + stepIOTargetType]) && n['_' + stepIOTargetType].length === 1 && typeof n['_' + stepIOTargetType][0].step === 'undefined' && (n['_' + stepIOTargetType][0].name === stepIO[stepIOTargetType][0].name
+          /* <-- for workflows, workflow_runs */
+          || areInputRunDataPresentAndEqual(n, stepIO)
+          /* <-- for provenance graphs */
+          )) {
+            // Double check that if there is a file, that files are equal as well, to account for provenance graphs with multiple workflows of same type and having same IO arg names, etc.
             if (!(n.meta && n.meta.run_data) || !stepIO.run_data || areInputRunDataPresentAndEqual(n, stepIO)) {
               ioNodeIDsMatched[n.id] = ioNodeName(stepIO);
               return true;
             }
           }
         } else if (!isGlobalInputArg && underscore_default.a.any(stepIO[stepIOTargetType], function (s) {
+          // Compare IO nodes against step input arg sources
+          // Match nodes by source step & name, check that they target this step.
           if (s.step && n.argNamesOnSteps[s.step] === s.name && Array.isArray(n['_' + oppIOTargetType]) && underscore_default.a.any(n['_' + oppIOTargetType], function (t) {
             return t.step === step.name;
           })) {
+            // Double check that if there is a file, that files are equal as well, to account for provenance graphs with multiple workflows of same type and having same IO arg names, etc.
             if (!(n.meta && n.meta.run_data) || !stepIO.run_data || areAnyRunDataPresentAndEqual(n, stepIO)) {
               return true;
             }
-          }
+          } // Extra CWL-like check case by existing node target step match
+
 
           if (Array.isArray(n['_' + oppIOTargetType]) && underscore_default.a.any(n['_' + oppIOTargetType], function (t) {
             if (t.step && t.step === step.name && stepIO.name === t.name) {
+              // Is a match
+              // Double check that if there is a file, that files are equal as well, to account for provenance graphs with multiple workflows of same type and having same IO arg names, etc.
               if (!(n.meta && n.meta.run_data) || !stepIO.run_data || areAnyRunDataPresentAndEqual(n, stepIO)) {
                 return true;
               }
@@ -23005,39 +23265,58 @@ function parseAnalysisSteps(analysis_steps) {
 
             return false;
           })) return true;
+          /**** EXTRA NON-CWL THINGS ****/
+          // Match Groups
 
           if (ioNodeType === 'input' && typeof s.grouped_by === 'string' && typeof s[s.grouped_by] === 'string') {
             if (n.meta && Array.isArray(n['_' + stepIOTargetType]) && underscore_default.a.any(n['_' + stepIOTargetType], function (nodeSource) {
               return typeof nodeSource.grouped_by === 'string' && typeof nodeSource[nodeSource.grouped_by] === 'string' && nodeSource[nodeSource.grouped_by] === s[s.grouped_by];
             })) {
+              // Matched by Workflow (or other grouping type), now lets ensure it's the right group.
               var nodeBeingCheckedGroupFiles = underscore_default.a.pluck(underscore_default.a.filter(n['_' + stepIOTargetType], function (nS) {
                 return typeof nS.for_file === 'string';
               }), 'for_file');
 
               return s.for_file && underscore_default.a.contains(nodeBeingCheckedGroupFiles, s.for_file) && true || false;
             }
-          }
+          } // Match By File
+          //if (Array.isArray(s.for_file) && _.any(s.for_file, checkNodeFileForMatch.bind(checkNodeFileForMatch, n))){
+          //    return true;
+          //} else if (s.for_file && !Array.isArray(s.for_file) && checkNodeFileForMatch(n, s.for_file)){
+          //    return true;
+          //}
+
 
           return false;
         })) {
+          // We save stepIOArgument.name here rather than the stepIO ID because ID is generated by us and is just name + ~increment if non-unique name (same arg name on different steps).
+          // IO node name is unique re: unique context of input/output names within a step.
           ioNodeIDsMatched[n.id] = ioNodeName(stepIO);
           return true;
         }
 
         return false;
-      });
+      }); //if (step.name === "/workflow-runs-awsem/024503ed-3820-4f99-aedf-6757c04a395a/"){
+      //    console.log('MATCHED', step.name, stepIO, currentIONodesMatched, nodes, ioNodeIDsMatched);
+      //}
+      // Step 1b. Create input nodes we need to add, and extend our matched node with its fake-new-node-counterpart's data.
 
-      var ioNodesToCreate = expandIONodes(stepIO, column, stepNode, ioNodeType, true);
+
+      var ioNodesToCreate = expandIONodes(stepIO, column, stepNode, ioNodeType, true); //console.log('NEED TO FILTER for' + stepIO.name, _.pluck(inputNodesToMatch, 'id'));
+      //console.log('NEED TO EXTEND FROM', inputNodesToMatch);
 
       if (currentIONodesMatched.length > 0) {
-        ioNodesMatched = ioNodesMatched.concat(currentIONodesMatched);
+        ioNodesMatched = ioNodesMatched.concat(currentIONodesMatched); // Extend each existing node `n` that we've matched with data from nodes that would've been newly created otherwise `inNode`.
 
         underscore_default.a.forEach(currentIONodesMatched, function (n) {
+          // Sub-Step 1: Grab the new node we created (inputNodesTomatch) but didn't use because matched existing node in `var currentIONodesMatched`.
           try {
+            //console.log('FIND', n.id, ioNodeIDsMatched[n.id], stepNode);
             var inNode,
                 inNodes = underscore_default.a.where(ioNodesToCreate, {
               'name': ioNodeIDsMatched[n.id]
-            });
+            }); // Sometimes we may have more than 1 file per argument 'name'. So lets narrow it down.
+
 
             if (inNodes.length === 1) {
               inNode = inNodes[0];
@@ -23048,6 +23327,7 @@ function parseAnalysisSteps(analysis_steps) {
                       fileToCheck = inMore.meta.run_data.file;
 
                   if (!Array.isArray(origFile) && !Array.isArray(fileToCheck)) {
+                    // Common case. Other cases are re: groups.
                     return compareTwoFilesByID(n.meta.run_data.file, inMore.meta.run_data.file);
                   } else if (Array.isArray(origFile) && !Array.isArray(fileToCheck)) {
                     return underscore_default.a.any(origFile, function (oF) {
@@ -23074,17 +23354,22 @@ function parseAnalysisSteps(analysis_steps) {
           } catch (e) {
             console.warn("Didn't find newly-created temporary node to extend from which was previously matched against node", n, stepIO, stepNode, e);
             return;
-          }
+          } // Sub-Step 2: Extend the node we did match with any new relevant information from input definition on next step (available from new node we created but are throwing out).
+
 
           var combinedMeta = underscore_default.a.extend({}, n.meta, inNode.meta, {
             'global': n.meta.global || inNode.meta.global || false,
+            // Make true if either is true.
             'type': n.meta && n.meta.type || inNode.meta && inNode.meta.type,
             'file_format': n.meta && n.meta.file_format || inNode.meta && inNode.meta.file_format
-          });
+          }); // TEMP: Re Grouping
+
 
           if (n.meta.run_data && Array.isArray(n.meta.run_data.file)) {
+            // Combine run data (files) from both nodes, in case of groups.
             var runDataToUse = n.meta.run_data,
-                runDataToUseFileIDs = underscore_default.a.pluck(runDataToUse.file, '@id');
+                //useNewRunData ? n.meta.run_data : inNode.meta.run_data,
+            runDataToUseFileIDs = underscore_default.a.pluck(runDataToUse.file, '@id');
 
             if (Array.isArray(inNode.meta.run_data.file)) {
               underscore_default.a.forEach(inNode.meta.run_data.file, function (f, idx) {
@@ -23111,23 +23396,27 @@ function parseAnalysisSteps(analysis_steps) {
             '_target': n._target || inNode._target,
             'ioType': n.ioType || inNode.ioType,
             'inputOf': underscore_default.a.sortBy((n.inputOf || []).concat(inNode.inputOf || []), 'id'),
-            'nodeType': n.nodeType === 'output' || inNode.nodeType === 'output' ? 'output' : n.nodeType || inNode.nodeType
+            'nodeType': n.nodeType === 'output' || inNode.nodeType === 'output' ? 'output' : n.nodeType || inNode.nodeType // Prefer nodeType=output
+
           });
 
           if (ioNodeType === 'input') {
-            n.wasMatchedAsInputOf = (n.wasMatchedAsInputOf || []).concat(stepNode.name);
+            n.wasMatchedAsInputOf = (n.wasMatchedAsInputOf || []).concat(stepNode.name); // Used only for debugging.
           } else {
-            n.wasMatchedAsOutputOf = stepNode.name;
+            n.wasMatchedAsOutputOf = stepNode.name; // Used only for debugging.
+
             n.outputOf = stepNode;
           }
         });
-      }
+      } // Step 2. Filter out nodes from ioNodesToCreate which we have matched already, then for any unmatched input nodes, create them (via adding to high-level output 'nodes' list & cementing their ID).
+
 
       if (currentIONodesMatched.length < ioNodesToCreate.length) {
         var unmatchedIONodesToCreate = underscore_default.a.map(underscore_default.a.filter(ioNodesToCreate, function (n) {
-          if (typeof ioNodeIDsMatched[n.id] !== 'undefined') return false;
+          if (typeof ioNodeIDsMatched[n.id] !== 'undefined') return false; // Compare new node's file with already-matched files to filter new node out, if have files.
 
           if (n.meta && n.meta.run_data && n.meta.run_data.file) {
+            // Get the @id or obj representation of the file we want to match.
             var fileToMatch = n.meta.run_data.file,
                 filesToCheck = underscore_default.a.filter(underscore_default.a.map(currentIONodesMatched, function (n2) {
               return n2 && n2.meta && n2.meta.run_data && n2.meta.run_data.file || null;
@@ -23142,10 +23431,10 @@ function parseAnalysisSteps(analysis_steps) {
 
           return true;
         }), function (n) {
-          n.id = preventDuplicateNodeID(n.id, false);
+          n.id = preventDuplicateNodeID(n.id, false); // Cement ID in dupe ID cache from previously read-only 'to-check-only' value.
 
           if (ioNodeType === 'input') {
-            n.generatedAsInputOf = (n.generatedAsInputOf || []).concat(stepNode.name);
+            n.generatedAsInputOf = (n.generatedAsInputOf || []).concat(stepNode.name); // Add reference to stepNode to indicate how/where was drawn from. For debugging only.
           } else {
             n.generatedAsOutputOf = (n.generatedAsOutputOf || []).concat(stepNode.name);
           }
@@ -23153,11 +23442,18 @@ function parseAnalysisSteps(analysis_steps) {
           return n;
         });
 
-        nodes = nodes.concat(unmatchedIONodesToCreate);
-        ioNodesCreated = ioNodesCreated.concat(unmatchedIONodesToCreate);
-      }
+        nodes = nodes.concat(unmatchedIONodesToCreate); // <- Add new nodes to list of all nodes.
 
-      stepNode[ioNodeType + 'Nodes'] = underscore_default.a.sortBy(ioNodesCreated.concat(ioNodesMatched), 'id');
+        ioNodesCreated = ioNodesCreated.concat(unmatchedIONodesToCreate); //if (step.name === "/workflow-runs-awsem/024503ed-3820-4f99-aedf-6757c04a395a/"){
+        //    console.log('NEW NODES CREATED', unmatchedIONodesToCreate, unmatchedIONodesToCreate[0].column, stepNode.column, stepNode.id);
+        //}
+      } //console.log('CREATED', inputNodesCreated, ioNodeIDsMatched);
+      // Keep references to incoming nodes on our step.
+      //console.log('EXISTINGNODES', stepNode[ioNodeType + 'Nodes'])
+
+
+      stepNode[ioNodeType + 'Nodes'] = underscore_default.a.sortBy(ioNodesCreated.concat(ioNodesMatched), 'id'); //console.log('NEWNODES', stepNode[ioNodeType + 'Nodes']) // We get EXISTINGNODES + 1.
+      // Finally, attach edge to all input nodes associated to step input. We do this by scanning all of the existing nodes and making sure they have the edges they expect to have.
 
       if (stepNode[ioNodeType + 'Nodes'].length > 0) {
         underscore_default.a.forEach(stepNode[ioNodeType + 'Nodes'], function (n) {
@@ -23203,6 +23499,14 @@ function parseAnalysisSteps(analysis_steps) {
 
     return _toConsumableArray(nextSteps);
   }
+  /**
+   * Recursive function which generates step, output, and input nodes (if input not matched to existing node),
+   * starting at param 'step' and tracing path, splitting if needs to, of outputNodes->meta.target.step->outputNodes->meta.target.step->...
+   *
+   * @param {Step} step - Step object representation from backend-provided list of steps.
+   * @param {number} [level=0] - Step level or depth. Used for nodes' column (precursor to X axis position).
+   */
+
 
   function processStepInPath(step) {
     var level = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
@@ -23227,10 +23531,23 @@ function parseAnalysisSteps(analysis_steps) {
       throw new Error("Input-direction drawing not currently supported.");
     }
   }
+  /***********************************************************************************************
+   ** Process each Analysis Step as a node. Inputs & output nodes placed in alternating column. **
+   ***********************************************************************************************/
 
+  /**
+   * Process step[]->output[]->step[]->output[] graph. Start at first analysis step in array.
+   * @returns {void} Nothing
+   */
+
+
+  /*********************
+   **** Entry Point ****
+   *********************/
   (function () {
     if (Array.isArray(analysis_steps) && analysis_steps.length > 0) {
-      processStepInPath(analysis_steps[0]);
+      processStepInPath(analysis_steps[0]); // We should be done at this point, however there might steps which were not drawn from output path stemming from first step, so here
+      // we loop up to 1000 times and repeat drawing process until no more steps are left to draw.
 
       for (var i = 0; i < 1000; i++) {
         if (underscore_default.a.keys(processedSteps).length < analysis_steps.length) {
@@ -23248,6 +23565,10 @@ function parseAnalysisSteps(analysis_steps) {
       }
     }
   })();
+  /************************
+   ** Do post-processing **
+   ************************/
+
 
   var graphData = {
     nodes: nodes,
@@ -23270,9 +23591,11 @@ function parseAnalysisSteps(analysis_steps) {
 
   if (typeof parsingOpts.nodesPreSortFxn === 'function') {
     sortedNodes = parsingOpts.nodesPreSortFxn(sortedNodes);
-  }
+  } // Arrange into lists of columns
 
-  var nodesByColumnPairs = underscore_default.a.pairs(underscore_default.a.groupBy(correctColumnAssignments(sortedNodes), 'column'));
+
+  var nodesByColumnPairs = underscore_default.a.pairs(underscore_default.a.groupBy(correctColumnAssignments(sortedNodes), 'column')); // Add prelim index for each node, over-written in sorting if any.
+
 
   nodesByColumnPairs = underscore_default.a.map(nodesByColumnPairs, function (columnGroupPair) {
     underscore_default.a.forEach(columnGroupPair[1], function (n, i) {
@@ -23280,7 +23603,7 @@ function parseAnalysisSteps(analysis_steps) {
     });
 
     return [parseInt(columnGroupPair[0]), columnGroupPair[1]];
-  });
+  }); // Sort nodes within columns.
 
   if (typeof parsingOpts.nodesInColumnSortFxn === 'function') {
     nodesByColumnPairs = underscore_default.a.map(nodesByColumnPairs, function (_ref) {
@@ -23288,7 +23611,7 @@ function parseAnalysisSteps(analysis_steps) {
           columnGroupIdx = _ref2[0],
           columnGroupNodes = _ref2[1];
 
-      var nodesInColumn;
+      var nodesInColumn; // Sort
 
       if (Array.isArray(parsingOpts.skipSortOnColumns) && parsingOpts.skipSortOnColumns.indexOf(columnGroupIdx) > -1) {
         nodesInColumn = columnGroupNodes.slice(0);
@@ -23298,14 +23621,17 @@ function parseAnalysisSteps(analysis_steps) {
 
       underscore_default.a.forEach(nodesInColumn, function (n, i) {
         n.indexInColumn = i;
-      });
+      }); // Update w/ new index in column
+      // Run post-sort fxn, e.g. to manually re-arrange nodes within columns. If avail.
+
 
       if (typeof parsingOpts.nodesInColumnPostSortFxn === 'function') {
         nodesInColumn = parsingOpts.nodesInColumnPostSortFxn(nodesInColumn, columnGroupIdx);
 
         underscore_default.a.forEach(nodesInColumn, function (n, i) {
           n.indexInColumn = i;
-        });
+        }); // Update w/ new index in column
+
       }
 
       return [columnGroupIdx, nodesInColumn];
@@ -23324,6 +23650,19 @@ function parseAnalysisSteps(analysis_steps) {
     'edges': graphData.edges
   };
 }
+/**
+ * Use this function to run another function on each node recursively along a path of nodes.
+ * See how is used in function correctColumnAssignments.
+ * TODO: Create typedef for node Object.
+ *
+ * @param {Node}     nextNode               - Current node in path on which fxn is ran on.
+ * @param {function} fxn                    - Function to be ran on each node. Is passed a {Object} 'node', {Object} 'previousNode', and {Object[]} 'nextNodes' positional arguments. previousNode will be null when fxn is executed for first time, unless passed in initially.
+ * @param {string}   [direction='output']   - One of 'output' or 'input'. Which direction to traverse.
+ * @param {Node}     [lastNode=null]        - Optionally supply the initial 'last node' to be included.
+ * @param {number}   [depth=0]              - Internal recursion depth.
+ * @returns {Array} Unflattened list of function results.
+ */
+
 function traceNodePathAndRun(nextNode, fxn) {
   var direction = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'output';
   var lastNode = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
@@ -23343,6 +23682,11 @@ function traceNodePathAndRun(nextNode, fxn) {
 
   return [fxnResult, nextResults];
 }
+/**
+ * @param {{ nodes: Node[], edges: Edge[] }|Node[] } graphData - Object containing nodes and edges. Or just nodes themselves.
+ * @returns {{ nodes: Node[], edges: Edge[] }|Node[] } graphData or nodes with corrected column assignments.
+ */
+
 function correctColumnAssignments(graphData) {
   var nodes;
   if (Array.isArray(graphData)) nodes = graphData;else if (Array.isArray(graphData.nodes)) nodes = graphData.nodes;else throw new Error('No nodes provided.');
@@ -23365,12 +23709,13 @@ function correctColumnAssignments(graphData) {
     if (typeof node.column !== 'number') {
       console.error('No column number on node', node);
       return;
-    }
+    } // Case: Step Node
+
 
     if (Array.isArray(node.outputNodes) && node.outputNodes.length > 0) {
       var laggingOutputNodes = underscore_default.a.filter(node.outputNodes, function (oN) {
         if (typeof oN.column === 'number' && oN.column <= node.column) {
-          return true;
+          return true; // !FIX!
         }
 
         return false;
@@ -23379,12 +23724,13 @@ function correctColumnAssignments(graphData) {
       underscore_default.a.forEach(laggingOutputNodes, function (loN) {
         traceNodePathAndRun(loN, colCorrectFxn, 'output', node);
       });
-    }
+    } // Case: IO Node
+
 
     if (Array.isArray(node.inputOf) && node.inputOf.length > 0) {
       var laggingStepNodes = underscore_default.a.filter(node.inputOf, function (sN) {
         if (typeof sN.column === 'number' && sN.column <= node.column) {
-          return true;
+          return true; // !FIX!
         }
 
         return false;
@@ -23410,6 +23756,7 @@ function parseBasicIOAnalysisSteps(analysis_steps, workflowItem, parsingOptions)
     outputs: underscore_default.a.filter(underscore_default.a.flatten(underscore_default.a.pluck(analysis_steps, 'outputs'), true), checkIfGlobal)
   })], parsingOptions);
 }
+/** Functions for post-processing, used as defaults but may be overriden. */
 
 function cleanEdgesByDeletedNodes(edges, deletedNodesObj) {
   return underscore_default.a.filter(edges, function (e) {
@@ -23434,6 +23781,13 @@ function cleanNodeReferencesByDeletedNodes(nodes, deletedNodesObj) {
 
   return nodes;
 }
+/**
+ * For when "Show Parameters" UI setting === false.
+ *
+ * @param {{ nodes : Node[], edges: Edge[] }} graphData - Object containing nodes and edges.
+ * @returns {{ nodes : Node[], edges: Edge[] }} Copy of graphData with 'parameter' nodes and edges filtered out.
+ */
+
 
 function filterOutParametersFromGraphData(graphData) {
   var deleted = {};
@@ -23452,6 +23806,13 @@ function filterOutParametersFromGraphData(graphData) {
     'edges': cleanEdgesByDeletedNodes(graphData.edges, deleted)
   };
 }
+/**
+ * For when "Show Reference Files" UI setting === false.
+ *
+ * @param {{ nodes : Node[], edges: Edge[] }} graphData - Object containing nodes and edges.
+ * @returns {{ nodes : Node[], edges: Edge[] }} Copy of graphData with 'reference file' nodes and edges filtered out.
+ */
+
 function filterOutReferenceFilesFromGraphData(graphData) {
   var deleted = {};
 
@@ -23490,7 +23851,15 @@ function filterOutIndirectFilesFromGraphData(graphData) {
     'edges': cleanEdgesByDeletedNodes(graphData.edges, deleted)
   };
 }
+/**
+ * Use for changing columns of nodes before sorting/arranging within columns.
+ *
+ * @param {Node[]} nodes - List of nodes which will be modified before sorting within columns.
+ */
+
 function parsing_functions_nodesPreSortFxn(nodes) {
+  // For any 'global input files', put them in first column (index 0).
+  // MODIFIES IN-PLACE! Because it's a fine & performant side-effect if column assignment changes in-place. We may change this later.
   underscore_default.a.forEach(nodes, function (node) {
     if (node.nodeType === 'input' && node.meta && node.meta.global && !node.outputOf && node.column !== 0) {
       node.column = 0;
@@ -23499,13 +23868,21 @@ function parsing_functions_nodesPreSortFxn(nodes) {
 
   return nodes;
 }
+/**
+ * Used for listOfNodesForColumn.sort(...) to arrange nodes vertically within a column.
+ *
+ * @param {Node} node1 - Node A to compare.
+ * @param {Node} node2 - Node B to compare.
+ * @returns {number} -1, 0, or 1.
+ */
+
 function nodesInColumnSortFxn(node1, node2) {
   function isNodeFileReference(n) {
     return typeof n.ioType === 'string' && n.ioType === 'reference file';
   }
 
   function isNodeParameter(n) {
-    return typeof n.ioType === 'string' && n.ioType === 'parameter';
+    return typeof n.ioType === 'string' && n.ioType === 'parameter'; //return n.meta.run_data && !n.meta.run_data.file && n.meta.run_data.value && (typeof n.meta.run_data.value === 'string' || typeof n.meta.run_data.value === 'number');
   }
 
   function getNodeFromListForComparison(nodeList) {
@@ -23525,6 +23902,7 @@ function nodesInColumnSortFxn(node1, node2) {
       }
 
       return underscore_default.a.extend({}, nodeList[0], {
+        // Dummy node with averaged indexInColumn
         'indexInColumn': underscore_default.a.reduce(nodeList, function (m, n) {
           return m + (typeof n.indexInColumn === 'number' ? n.indexInColumn : n.origIndexInColumn);
         }, 0) / nodeList.length
@@ -23560,6 +23938,32 @@ function nodesInColumnSortFxn(node1, node2) {
   }
 
   function compareNodeInputOf(n1, n2) {
+    // Try to move nodes who go into more distant nodes to bottom
+    // This would be case mostly for input params and input reference files
+    var n1ClosestColumnDiff = ((n1.nodeType === 'step' ? n1.outputNodes : n1.inputOf) || []).reduce(function (m, inputOfNode) {
+      return Math.min(m, inputOfNode.column - n1.column);
+    }, Infinity);
+    var n2ClosestColumnDiff = ((n2.nodeType === 'step' ? n2.outputNodes : n2.inputOf) || []).reduce(function (m, inputOfNode) {
+      return Math.min(m, inputOfNode.column - n2.column);
+    }, Infinity);
+
+    if (n1ClosestColumnDiff !== n2ClosestColumnDiff) {
+      return n1ClosestColumnDiff - n2ClosestColumnDiff;
+    } /// --- Todo: test this further, likely not needed.
+
+
+    var n1FurthestColumnDiff = ((n1.nodeType === 'step' ? n1.outputNodes : n1.inputOf) || []).reduce(function (m, inputOfNode) {
+      return Math.max(m, inputOfNode.column - n1.column);
+    }, 0);
+    var n2FurthestColumnDiff = ((n2.nodeType === 'step' ? n2.outputNodes : n2.inputOf) || []).reduce(function (m, inputOfNode) {
+      return Math.max(m, inputOfNode.column - n2.column);
+    }, 0);
+
+    if (n1FurthestColumnDiff !== n2FurthestColumnDiff) {
+      return n1FurthestColumnDiff - n2FurthestColumnDiff;
+    } /// ---
+
+
     var n1InputOf = getNodeFromListForComparison(n1.nodeType === 'step' ? n1.outputNodes : n1.inputOf, true, false);
     var n2InputOf = getNodeFromListForComparison(n2.nodeType === 'step' ? n2.outputNodes : n2.inputOf, true, false);
     var ioResult = compareNodesBySameColumnIndex(n1InputOf, n2InputOf);
@@ -23593,7 +23997,7 @@ function nodesInColumnSortFxn(node1, node2) {
 
         if (n1.name < n2.name) return -1;
         if (n1.name > n2.name) return 1;
-        return 0;
+        return 0; //compareNodeInputOf(n1, n2);
       }
 
       return n1OutputOf.name < n2OutputOf.name ? -3 : 3;
@@ -23603,7 +24007,8 @@ function nodesInColumnSortFxn(node1, node2) {
   }
 
   function nonIOStepCompare() {
-    return 0;
+    // Fallback
+    return 0; // Use order step was given to us in.
   }
 
   var ioResult;
@@ -23627,7 +24032,8 @@ function nodesInColumnSortFxn(node1, node2) {
     return -1;
   } else if (node1.nodeType === 'input' && node2.nodeType === 'output') {
     return 1;
-  }
+  } // Groups go to bottom always. For now.
+
 
   if (node1.nodeType === 'input-group' && node2.nodeType !== 'input-group') {
     return 1;
@@ -23681,6 +24087,7 @@ function nodesInColumnPostSortFxn(nodesInColumn) {
       });
 
       if (relatedFileNode) {
+        // Re-arrange group node to be closer to its relation.
         var oldIdx = nodesInColumn.indexOf(gN);
         nodesInColumn.splice(oldIdx, 1);
         var afterThisIdx = nodesInColumn.indexOf(relatedFileNode);
@@ -23688,6 +24095,46 @@ function nodesInColumnPostSortFxn(nodesInColumn) {
       }
     });
   }
+  /*
+  if (nodesInColumn.length > 2 && _.every(nodesInColumn, function(n){ return n.nodeType === 'step'; })){
+      // If all step nodes, move those with more inputs toward the middle.
+      var nodesByNumberOfInputs = _.groupBy(nodesInColumn.slice(0), function(n){ return n.inputNodes.length; });
+      var inputCounts = _.keys(nodesByNumberOfInputs).map(function(num){ return parseInt(num); }).sort();
+      if (inputCounts.length > 1){ // If any step nodes which have more inputs than others.
+          inputCounts.reverse().pop();
+          //console.log('INPUTCOUNTS', inputCounts, nodesByNumberOfInputs);
+          var popped, nodesToCenter, middeIndex;
+          while (inputCounts.length > 0){ // In low->high # of inputs (after first lowest)
+              popped = inputCounts.pop();
+              nodesToCenter = nodesByNumberOfInputs[popped + ''];
+               _.forEach(nodesToCenter, function(nodeToCenter){ // Remove these nodes
+                  var oldIdx = nodesInColumn.indexOf(nodeToCenter);
+                  nodesInColumn.splice(oldIdx, 1);
+              });
+               middeIndex = Math.floor(nodesInColumn.length / 2); // Re-add them in middle of remaining nodes.
+              nodesInColumn.splice(middeIndex, 0, ...nodesToCenter);
+          }
+        }
+  }
+  */
+
+  /* TODO: later
+  if (columnNumber === 0){
+      var firstReferenceIndex = _.findIndex(nodesInColumn, function(n){ return n.ioType === 'reference file'; });
+      if (firstReferenceIndex > -1){
+          nodesInColumn.splice(firstReferenceIndex, 0, {
+              'nodeType' : 'spacer',
+              'column' : 0,
+              'id' : 'spacer1'
+          },{
+              'nodeType' : 'spacer',
+              'column' : 0,
+              'id' : 'spacer2'
+          });
+      }
+  }
+  */
+
 
   return nodesInColumn;
 }
@@ -23729,7 +24176,11 @@ function Node_defineProperty(obj, key, value) { if (key in obj) { Object.defineP
 
 
 
-var Node_DefaultNodeElement = function (_React$PureComponent) {
+/** @todo separate methods out into functional components */
+
+var Node_DefaultNodeElement =
+/*#__PURE__*/
+function (_React$PureComponent) {
   Node_inherits(DefaultNodeElement, _React$PureComponent);
 
   function DefaultNodeElement() {
@@ -23773,7 +24224,7 @@ var Node_DefaultNodeElement = function (_React$PureComponent) {
     key: "tooltip",
     value: function tooltip() {
       var node = this.props.node;
-      var output = '';
+      var output = ''; // Node Type
 
       if (node.nodeType === 'step') {
         output += '<small>Step ' + ((node.column - 1) / 2 + 1) + '</small>';
@@ -23781,9 +24232,10 @@ var Node_DefaultNodeElement = function (_React$PureComponent) {
         var nodeType = node.nodeType;
         nodeType = nodeType.charAt(0).toUpperCase() + nodeType.slice(1);
         output += '<small>' + nodeType + '</small>';
-      }
+      } // Title
 
-      output += '<h5 class="text-600 tooltip-title">' + (node.title || node.name) + '</h5>';
+
+      output += '<h5 class="text-600 tooltip-title">' + (node.title || node.name) + '</h5>'; // Description
 
       if (typeof node.description === 'string' || node.meta && typeof node.meta.description === 'string') {
         output += '<div>' + (node.description || node.meta.description) + '</div>';
@@ -23824,14 +24276,38 @@ Node_defineProperty(Node_DefaultNodeElement, "propTypes", {
   'columnWidth': prop_types_default.a.number
 });
 
-var Node_Node = function (_React$Component) {
+var Node_Node =
+/*#__PURE__*/
+function (_React$Component) {
   Node_inherits(Node, _React$Component);
 
   Node_createClass(Node, null, [{
     key: "isSelected",
+
+    /**
+     * @param {Object} currentNode - Current node, e.g. node calling this function
+     * @param {?Object} selectedNode - Currently-selected node reference for view.
+     * @returns {boolean} True if currentNode matches selectedNode, and is thus the selectedNode.
+     */
     value: function isSelected(currentNode, selectedNode) {
       if (!selectedNode) return false;
       if (selectedNode === currentNode) return true;
+      /*
+      // We shouldn't need the below and can just rely on a simple reference comparison
+      // Keeping around for now/reference.
+      if (typeof selectedNode.name === 'string' && typeof currentNode.name === 'string') {
+          if (selectedNode.name === currentNode.name){
+              // Case: IO node (which would have add'l self-generated ID to ensure uniqueness)
+              if (typeof selectedNode.id === 'string'){
+                  if (selectedNode.id === currentNode.id) return true;
+                  return false;
+              }
+              return true;
+          }
+          return false;
+      }
+      */
+
       return false;
     }
   }, {
@@ -23863,6 +24339,11 @@ var Node_Node = function (_React$Component) {
 
       return false;
     }
+    /**
+     * Returns list of common step nodes that input/output nodes
+     * are both input into.
+     */
+
   }, {
     key: "findCommonStepNodesInputInto",
     value: function findCommonStepNodesInputInto() {
@@ -23882,12 +24363,13 @@ var Node_Node = function (_React$Component) {
   }, {
     key: "isRelated",
     value: function isRelated(currentNode, selectedNode) {
-      if (!selectedNode) return false;
+      if (!selectedNode) return false; // Ensure that an argument name (as appears on a step input/output arg) matches selectedNode name.
 
       if (selectedNode.name === currentNode.name || underscore_default.a.any((currentNode._source || []).concat(currentNode._target || []), function (s) {
         return s.name === selectedNode.name;
       })) {
         if (currentNode.nodeType === 'input' || currentNode.nodeType === 'output') {
+          // An output node may be an input of another node.
           return Node.isInputOfSameStep(currentNode, selectedNode);
         }
 
@@ -23930,12 +24412,15 @@ var Node_Node = function (_React$Component) {
 
     Node_classCallCheck(this, Node);
 
-    _this = Node_possibleConstructorReturn(this, Node_getPrototypeOf(Node).call(this, props));
+    _this = Node_possibleConstructorReturn(this, Node_getPrototypeOf(Node).call(this, props)); // Own memoized variants. Binding unnecessary most likely.
+
     _this.isInSelectionPath = memoize_one_esm(Node.isInSelectionPath.bind(Node_assertThisInitialized(_this)));
     _this.isRelated = memoize_one_esm(Node.isRelated.bind(Node_assertThisInitialized(_this)));
     _this.isDisabled = memoize_one_esm(_this.isDisabled.bind(Node_assertThisInitialized(_this)));
     return _this;
   }
+  /** Scrolls the scrollable element to the current context node, if any. */
+
 
   Node_createClass(Node, [{
     key: "componentDidMount",
@@ -24058,12 +24543,15 @@ function NodesLayer_defineProperty(obj, key, value) { if (key in obj) { Object.d
 
 
 
-var NodesLayer_NodesLayer = function (_React$PureComponent) {
+var NodesLayer_NodesLayer =
+/*#__PURE__*/
+function (_React$PureComponent) {
   NodesLayer_inherits(NodesLayer, _React$PureComponent);
 
   NodesLayer_createClass(NodesLayer, null, [{
     key: "sortedNodes",
     value: function sortedNodes(nodes) {
+      // Sort nodes so on updates, they stay in same(-ish) order and can transition.
       return underscore_default.a.sortBy(nodes.slice(0), 'id');
     }
   }, {
@@ -24208,11 +24696,20 @@ function Edge_defineProperty(obj, key, value) { if (key in obj) { Object.defineP
 
 
 var pathDimensionFunctions = {
+  /**
+   * Draw a bezier path from startPt to endPt.
+   *
+   * @param {Object} startPt - Object with x and y coordinates.
+   * @param {Object} endPt - Object with x and y coordinates.
+   * @param {Number[]} [ledgeWidths] - Little widths of line right before/after node. To allow for horizontal arrow.
+   * @returns {string} 'd' attribute value for an SVG path.
+   */
   'drawBezierEdge': function drawBezierEdge(startPt, endPt, columnSpacing, rowSpacing, nodeEdgeLedgeWidths) {
     var ledgeWidths = nodeEdgeLedgeWidths;
     var path = src_path();
     path.moveTo(startPt.x, startPt.y);
-    path.lineTo(startPt.x + ledgeWidths[0], startPt.y);
+    path.lineTo(startPt.x + ledgeWidths[0], startPt.y); // First ledge
+
     var nodeXDif = Math.abs(endPt.x - startPt.x);
     var bezierStartPt = {
       'x': startPt.x + ledgeWidths[0],
@@ -24223,8 +24720,11 @@ var pathDimensionFunctions = {
       'y': endPt.y
     };
 
-    if (nodeXDif > columnSpacing) {
-        bezierStartPt.x += Math.max(0, nodeXDif - columnSpacing * (Math.abs(endPt.y - startPt.y) / rowSpacing * 2.5));
+    if (nodeXDif > columnSpacing
+    /* && Math.abs(endPt.y - startPt.y) <= this.props.rowSpacing * 2*/
+    ) {
+        // Draw straight line until last section. Length depending on how close together y-axes are (revert to default bezier if far apart).
+        bezierStartPt.x += Math.max(0, nodeXDif - columnSpacing * (Math.abs(endPt.y - startPt.y) / rowSpacing * 2.5)); //path.lineTo(bezierStartPt.x, bezierStartPt.y);
       }
 
     var bezierXDif = Math.abs(bezierStartPt.x - bezierEndPt.x);
@@ -24237,13 +24737,18 @@ var pathDimensionFunctions = {
     }];
 
     if (startPt.x > endPt.x) {
+      // Our input edge appears AFTER the target.
+      //var dif = Math.min(1, 5 / Math.max(1, Math.abs(endPt.y - startPt.y) )) * (this.props.rowSpacing || 75);
       var dif = Math.max(rowSpacing || 75);
       controlPoints[0].y += dif * (endPt.y >= startPt.y ? 1 : -1);
       controlPoints[1].y += dif * (endPt.y - startPt.y > rowSpacing ? -1 : 1);
       controlPoints[1].x = endPt.x - Math.abs(endPt.x - startPt.x) * .5;
     }
 
-    path.bezierCurveTo(controlPoints[0].x, controlPoints[0].y, controlPoints[1].x, controlPoints[1].y, bezierEndPt.x, endPt.y);
+    path.bezierCurveTo(controlPoints[0].x, controlPoints[0].y, // - pathAscend,
+    controlPoints[1].x, controlPoints[1].y, // + pathAscend,
+    bezierEndPt.x, endPt.y); // Final ledge
+
     path.lineTo(endPt.x, endPt.y);
     return path.toString();
   },
@@ -24276,8 +24781,10 @@ var pathDimensionFunctions = {
       adjVertices[adjVertices.length - 2][0] -= nodeEdgeLedgeWidths[0];
     }
 
-    adjVertices[0][0] = startPt && startPt.x || adjVertices[0][0];
-    adjVertices[adjVertices.length - 1][0] = endPt && endPt.x || adjVertices[adjVertices.length - 1][0];
+    adjVertices[0][0] = startPt && startPt.x || adjVertices[0][0]; // + nodeEdgeLedgeWidths[0];
+
+    adjVertices[adjVertices.length - 1][0] = endPt && endPt.x || adjVertices[adjVertices.length - 1][0]; // - nodeEdgeLedgeWidths[1];
+
     var lineGenFxn = src_line().x(function (d) {
       return d[0];
     }).y(function (d) {
@@ -24285,6 +24792,10 @@ var pathDimensionFunctions = {
     }).curve(monotoneX);
     return lineGenFxn(adjVertices);
   },
+
+  /**
+   * @deprecated
+   */
   'drawStraightEdge': function drawStraightEdge(startPt, endPt) {
     var path = src_path();
     path.moveTo(startPt.x, startPt.y);
@@ -24294,7 +24805,9 @@ var pathDimensionFunctions = {
   }
 };
 
-var Edge_Edge = function (_React$Component) {
+var Edge_Edge =
+/*#__PURE__*/
+function (_React$Component) {
   Edge_inherits(Edge, _React$Component);
 
   Edge_createClass(Edge, null, [{
@@ -24305,7 +24818,11 @@ var Edge_Edge = function (_React$Component) {
   }, {
     key: "isRelated",
     value: function isRelated(edge, selectedNode) {
-      return Node_Node.isRelated(edge.source, selectedNode);
+      return Node_Node.isRelated(edge.source, selectedNode); // Enable the following later _if_ we go beyond 1 input node deep.
+      //return (
+      //    Node.isRelated(edge.source, selectedNode) ||
+      //    Node.isRelated(edge.target, selectedNode)
+      //);
     }
   }, {
     key: "isDistantlySelected",
@@ -24405,7 +24922,9 @@ var Edge_Edge = function (_React$Component) {
 
     _this = Edge_possibleConstructorReturn(this, Edge_getPrototypeOf(Edge).call(this, props));
     _this.generatePathDimension = _this.generatePathDimension.bind(Edge_assertThisInitialized(_this));
-    _this.transitionPathDimensions = _this.transitionPathDimensions.bind(Edge_assertThisInitialized(_this));
+    _this.transitionPathDimensions = _this.transitionPathDimensions.bind(Edge_assertThisInitialized(_this)); // Create own memoized copy/instance of intensive static functions.
+    // Otherwise if left static, will be re-ran each time as many edges call it.
+
     _this.memoized = {
       isDistantlySelected: memoize_one_esm(Edge.isDistantlySelected),
       isRelated: memoize_one_esm(Edge.isRelated),
@@ -24420,7 +24939,9 @@ var Edge_Edge = function (_React$Component) {
     _this.getComputedProperties = _this.getComputedProperties.bind(Edge_assertThisInitialized(_this));
     _this.state = {
       'pathDimension': _this.generatePathDimension()
-    };
+    }; // Alternative implementation of transition -
+    // adjust pathRef.current `d` attribute manually
+
     _this.pathRef = external_commonjs_react_commonjs2_react_amd_react_root_React_default.a.createRef();
     return _this;
   }
@@ -24452,6 +24973,11 @@ var Edge_Edge = function (_React$Component) {
         distantlySelected: distantlySelected
       };
     }
+    /**
+     * If any of our nodes' coordinates have updated, update state.pathDimension either via a D3 animation tween acting on setState or instantly via setState.
+     * Whether instant or gradual dimension update is based on result of `this.shouldDoTransitionOfEdge()` : boolean
+     */
+
   }, {
     key: "componentDidUpdate",
     value: function componentDidUpdate(pastProps) {
@@ -24464,20 +24990,25 @@ var Edge_Edge = function (_React$Component) {
 
       if (Edge.didNodeCoordinatesChange(this.props, pastProps)) {
         if (!this.shouldDoTransitionOfEdge()) {
+          // Instant
           this.setState({
             'pathDimension': this.generatePathDimension()
           });
         } else {
+          // Animate
           var startEndPtCoords = [{
             'x': pastProps.startX,
             'y': pastProps.startY
-          }, {
+          }, // StartA
+          {
             'x': startX,
             'y': startY
-          }, {
+          }, // StartB
+          {
             'x': pastProps.endX,
             'y': pastProps.endY
-          }, {
+          }, // StartA
+          {
             'x': endX,
             'y': endY
           }];
@@ -24489,6 +25020,7 @@ var Edge_Edge = function (_React$Component) {
           }
         }
       } else if (!underscore_default.a.isEqual(this.getPathOffsets(), this.getPathOffsets(pastProps))) {
+        // Instant
         this.setState({
           'pathDimension': this.generatePathDimension()
         });
@@ -24514,7 +25046,8 @@ var Edge_Edge = function (_React$Component) {
         if (this.props[propKeys[i]] !== nextProps[propKeys[i]]) {
           return true;
         }
-      }
+      } // If state.pathDimension changes we _do not_ update, since DOM elements should already be transitioned.
+
 
       return false;
     }
@@ -24522,10 +25055,26 @@ var Edge_Edge = function (_React$Component) {
     key: "shouldDoTransitionOfEdge",
     value: function shouldDoTransitionOfEdge() {
       var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.props;
-      if (props.noTransition) return false;
+      if (props.noTransition) return false; // Until we adjust all Edges to transition within a single DOM update/redraw,
+      // we optimize by not transitioning unless <= 50 edges.
+      // This is because each Edge currently launches own transition
+      // which cascades into an exponential number of transitions/viewport-updates.
+
       if (props.edgeCount > 60) return false;
       return true;
     }
+    /**
+     * Transitions edge dimensions over time.
+     * Updates `state.pathDimension` incrementally using d3.transition().
+     *
+     * @todo
+     * In future, all transitions could be done in `EdgesLayer` instead of `Edge`,
+     * this would allow us to batch all the DOM updates into a single function wrapped
+     * in a `requestAnimationFrame` call. This will require some dynamic programming as
+     * well as caching of ege:node-coords to detect changes and run transitions.
+     * The changeTween itself should transition _all_ Edges that need to be transitioned.
+     */
+
   }, {
     key: "transitionPathDimensions",
     value: function transitionPathDimensions(startPtA, startPtB, endPtA, endPtB, startVertices, endVertices) {
@@ -24543,7 +25092,8 @@ var Edge_Edge = function (_React$Component) {
         });
       }
 
-      var pathElem = this.pathRef.current;
+      var pathElem = this.pathRef.current; // Necessary if using alternate transition approach(es).
+
       if (!pathElem) return;
       src_select(this).interrupt().transition().ease(quadOut).duration(500).tween("changeDimension", function changeTween() {
         return function (t) {
@@ -24755,13 +25305,13 @@ function traceEdges(originalEdges, nodes, columnWidth, columnSpacing, rowSpacing
   var topMargin = innerMargin && innerMargin.top || 0;
   var leftMargin = innerMargin && innerMargin.left || 0;
   var endHeight = topMargin + contentHeight + (innerMargin && Math.max(0, innerMargin.bottom - 10)) || 0;
-  var colStartXMap = {};
+  var colStartXMap = {}; // Filled in visibility graph
 
   var nodesByColumn = underscore_default.a.reduce(nodes, function (m, node) {
     var column = node.column;
 
     if (typeof m[column] === 'undefined') {
-      m[column] = [];
+      m[column] = []; // Keys assigned as str, not numbers
     }
 
     m[column].push(node);
@@ -24772,6 +25322,7 @@ function traceEdges(originalEdges, nodes, columnWidth, columnSpacing, rowSpacing
 
   function buildVisibilityGraph() {
     var subdivisions = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 4;
+    // Horizontal Line Y Coords
     var partialHeight = rowSpacing / subdivisions;
     var quarterHeight = rowSpacing / 4;
     var horizontalLineYCoords = [];
@@ -24839,7 +25390,8 @@ function traceEdges(originalEdges, nodes, columnWidth, columnSpacing, rowSpacing
       var startXForCol = colStartXMap[columnIdx];
       var prevEdgesLen = previousEdges.length;
       var upperY = Math.max(prevYCoord, targetYCoord);
-      var lowerY = Math.min(prevYCoord, targetYCoord);
+      var lowerY = Math.min(prevYCoord, targetYCoord); //const yCoordMedian = (prevYCoord + targetYCoord) / 2;
+
       var closestSegmentDiff = Infinity;
       var closestSegmentIdx = -1;
       var currSegment = null,
@@ -24857,15 +25409,20 @@ function traceEdges(originalEdges, nodes, columnWidth, columnSpacing, rowSpacing
 
         if (currSegment[0][0] !== startXForCol) {
           continue;
-        }
+        } //currDiff = Math.abs(yCoordMedian - currSegmentY);
+
 
         if (currSegmentY > upperY) {
           currDiff = currSegmentY - upperY;
         } else if (currSegmentY < lowerY) {
           currDiff = lowerY - currSegmentY;
         } else {
+          // Any path between lower and upper bound is fine.
+          // Favor those closer to prev edge
+          //currDiff = Math.abs(targetYCoord - currSegmentY) * 0.01;
           currDiff = Math.abs(prevYCoord - currSegmentY) * 0.01;
-        }
+        } // Check for intersections, add to score
+
 
         intersections = 0;
 
@@ -24879,7 +25436,7 @@ function traceEdges(originalEdges, nodes, columnWidth, columnSpacing, rowSpacing
           }
 
           prevVs.reduce(function (prevV, v) {
-            if (!prevV) return v;
+            if (!prevV) return v; // First V
 
             if (!(prevV[0] + nodeEdgeLedgeWidths[0] < startXForCol && v[0] >= startXForCol)) {
               return v;
@@ -24887,19 +25444,24 @@ function traceEdges(originalEdges, nodes, columnWidth, columnSpacing, rowSpacing
 
             if (v[1] > currSegmentY && prevV[1] < prevYCoord || v[1] < currSegmentY && prevV[1] > prevYCoord) {
               if (intersections === 0) intersections += 2;
-              intersections++;
+              intersections++; //if (startXForCol> 1400 && startXForCol < 1600){
+              //    console.log('X', v[0], v[1], '<-', prevV[0], prevV[1]);
+              //}
             }
 
             return v;
           }, null);
         }
 
-        currDiff += intersections * (rowSpacing * 0.8);
+        currDiff += intersections * (rowSpacing * 0.8); //if (startXForCol> 1400 && startXForCol < 1600){
+        //    console.log('INT', currDiff, currSegmentY, intersections, prevYCoord);
+        //}
 
         if (closestSegmentDiff > currDiff) {
           closestSegmentDiff = currDiff;
           closestSegmentIdx = i;
-        }
+        } // console.log("SEG", currSegment, intersections, prevYCoord, currDiff);
+
       }
 
       if (closestSegmentIdx === -1) {
@@ -24912,6 +25474,7 @@ function traceEdges(originalEdges, nodes, columnWidth, columnSpacing, rowSpacing
     }
 
     var originalEdgesSortedByLength = originalEdges.slice(0).sort(function (edgeA, edgeB) {
+      // Handle the shorter edges first
       var sA = edgeA.source,
           tA = edgeA.target;
       var sB = edgeB.source,
@@ -24939,20 +25502,23 @@ function traceEdges(originalEdges, nodes, columnWidth, columnSpacing, rowSpacing
       var columnDiff = targetCol - sourceCol;
 
       if (columnDiff <= 0) {
+        // Shouldn't happen I don't think except if file is re-used/generated or some other unexpected condition.
         console.error("Target column is greater than source column", source, target);
         resultEdges.push(edge);
-        return;
+        return; // Skip tracing it.
       }
 
       if (columnDiff === 1) {
         resultEdges.push(edge);
-        return;
+        return; // Doesn't need to go around obstacles, skip.
       }
 
       var vertices = [[sourceX + columnWidth, sourceY]];
       var prevY = sourceY;
 
       for (var colIdx = sourceCol + 1; colIdx < targetCol; colIdx++) {
+        //const yDiff = targetY - prevY;
+        //const idealYCoord = prevY + (yDiff / 2); // (((colIdx - sourceCol) / columnDiff) * yDiff);
         var bestSegment = getNearestSegment(colIdx, prevY, targetY, resultEdges);
 
         if (!bestSegment) {
@@ -24972,7 +25538,8 @@ function traceEdges(originalEdges, nodes, columnWidth, columnSpacing, rowSpacing
         prevY = beY;
       }
 
-      vertices.push([targetX, targetY]);
+      vertices.push([targetX, targetY]); // console.log("EDGE", edge);
+
       resultEdges.push(EdgesLayer_objectSpread({}, edge, {
         vertices: vertices
       }));
@@ -25008,11 +25575,17 @@ function traceEdges(originalEdges, nodes, columnWidth, columnSpacing, rowSpacing
   };
 }
 
-var EdgesLayer_EdgesLayer = function (_React$PureComponent) {
+var EdgesLayer_EdgesLayer =
+/*#__PURE__*/
+function (_React$PureComponent) {
   EdgesLayer_inherits(EdgesLayer, _React$PureComponent);
 
   EdgesLayer_createClass(EdgesLayer, null, [{
     key: "sortedEdges",
+
+    /**
+     * Move selected edges to top, and disabled ones to bottom, because CSS z-index doesn't work for SVG elements.
+     */
     value: function sortedEdges(edges, selectedNode, isNodeDisabled) {
       return edges.slice(0).sort(function (a, b) {
         var isASelected = Edge_Edge.isSelected(a, selectedNode, isNodeDisabled);
@@ -25048,20 +25621,44 @@ var EdgesLayer_EdgesLayer = function (_React$PureComponent) {
     _this = EdgesLayer_possibleConstructorReturn(this, EdgesLayer_getPrototypeOf(EdgesLayer).call(this, props));
 
     EdgesLayer_defineProperty(EdgesLayer_assertThisInitialized(_this), "sortedEdges", memoize_one_esm(function (edges, selectedNodes, isNodeDisabled) {
-      var nextEdges = EdgesLayer.sortedEdges(edges, selectedNodes, isNodeDisabled);
+      var nextEdges = EdgesLayer.sortedEdges(edges, selectedNodes, isNodeDisabled); // Create new list of refs each time we're updated.
+      //this.edgeRefs = [];
+      //_.forEach(nextEdges, ()=>{
+      //    this.edgeRefs.push(React.createRef());
+      //});
+
       return nextEdges;
     }));
 
-    _this.sortedEdges = _this.sortedEdges.bind(EdgesLayer_assertThisInitialized(_this));
+    _this.sortedEdges = _this.sortedEdges.bind(EdgesLayer_assertThisInitialized(_this)); //this.getAllPathElements = this.getAllPathElements.bind(this);
+    //this.edgeRefs = [];
+
     return _this;
   }
 
   EdgesLayer_createClass(EdgesLayer, [{
     key: "pathArrows",
+    // Experimentation with transitioning multiple edges at once within requestAnimationFrame.
+    // Need to rethink design of this, an array for this.edgeRefs won't work as we need to keep
+    // state.source.x, state.source.y cached in state and associated w/ each edge.
+    // Possibly can use object keyed by 'key' string (as determined in render method).
+    // Keeping for reference.
+    //
+    //getAllPathElements(){
+    //    return _.map(this.edgeRefs, function(ref){
+    //        return ref && ref.current && ref.current.pathRef && ref.current.pathRef.current;
+    //    });
+    //}
     value: function pathArrows() {
       if (!this.props.pathArrows) return null;
       return Edge_Edge.pathArrowsMarkers();
     }
+    /**
+     * Wraps Edges and each Edge in TransitionGroup and Transition, respectively.
+     * We cannot use CSSTransition at the moment because it does not change the className
+     * of SVG element(s). We must manually change it (or an attribute of it).
+     */
+
   }, {
     key: "render",
     value: function render() {
@@ -25139,6 +25736,7 @@ var EdgesLayer_EdgesLayer = function (_React$PureComponent) {
     key: "edgeOnEntered",
     value: function edgeOnEntered(elem) {
       elem.style.opacity = null;
+      /** Allows CSS to override, e.g. .15 opacity for disabled edges */
     }
   }, {
     key: "edgeOnExit",
@@ -25248,13 +25846,33 @@ function Graph_defineProperty(obj, key, value) { if (key in obj) { Object.define
 
 
 
+/**
+ * Primary/entry component for the Workflow graph.
+ *
+ * @class Graph
+ * @prop {Object[]}     nodes                   Array of node objects to plot. Both nodes and edges can be generated from a CWL-like structure using static functions, including the provided 'parseAnalysisSteps'. See propTypes in class def below for object structure.
+ * @prop {Object[]}     edges                   Array of edge objects to plot. See propTypes in class def below for object structure.
+ * @prop {function}     renderNodeElement       Function to render out own custom Node Element. Accepts two params - 'node' and 'props' (of graph).
+ * @prop {function?}    renderDetailPane        Function to render out own custom Detail Pane. Accepts two params - 'selectedNode' and 'props' (of graph). Pass in null to perform your own logic in onNodeClick.
+ * @prop {function}     [onNodeClick]           A function to be executed each time a node is clicked. 'this' will refer to internal statecontainer. Should accept params: {Object} 'node', {Object|null} 'selectedNode', and {MouseEvent} 'evt'. By default, it changes internal state's selectedNode. You should either disable props.checkHrefForSelectedNode -or- change href in this function.
+ * @prop {function}     [isNodeDisabled]        Function which accepts a 'node' object and returns a boolean.
+ * @prop {Object}       [innerMargin={top : 20, bottom: 48, left: 15, right: 15}]     Provide this object, containing numbers for 'top', 'bottom', 'left', and 'right', if want to adjust chart margins.
+ * @prop {boolean}      [pathArrows=true]       Whether to display arrows at the end side of edges.
+ * @prop {number}       [columnSpacing=56]      Adjust default spacing between columns, where edges are drawn.
+ * @prop {number}       [columnWidth=150]       Adjust width of columns, where nodes are drawn.
+ * @prop {number}       [rowSpacing=56]         Adjust vertical spacing between node centers (NOT between their bottom/top).
+ * @prop {function}     [nodeTitle]             Optional function to supply to get node title, before is passed to visible Node element. Useful if want to display some meta sub-property rather than technical title.
+ */
 
-var Graph_Graph = function (_React$Component) {
+var Graph_Graph =
+/*#__PURE__*/
+function (_React$Component) {
   Graph_inherits(Graph, _React$Component);
 
   Graph_createClass(Graph, null, [{
     key: "getHeightFromNodes",
     value: function getHeightFromNodes(nodes, nodesPreSortFxn, rowSpacing) {
+      // Run pre-sort fxn, e.g. to manually pre-arrange nodes into different columns.
       if (typeof nodesPreSortFxn === 'function') {
         nodes = nodesPreSortFxn(nodes.slice(0));
       }
@@ -25270,6 +25888,20 @@ var Graph_Graph = function (_React$Component) {
         return Math.max(node.column, highestCol);
       }, 0) + 1) * (columnWidth + columnSpacing) + (innerMargin.left || 0) + (innerMargin.right || 0) - columnSpacing;
     }
+    /**
+     * Extends each node with X & Y coordinates.
+     *
+     * Converts column placement and position within columns,
+     * along with other chart dimension settings, into X & Y coordinates.
+     *
+     * IMPORTANT:
+     * Returns a new array but _modifies array items in place_.
+     * If need fresh nodes, deep-clone before supplying `props.nodes`.
+     *
+     * @static
+     * @memberof Graph
+     */
+
   }, {
     key: "getNodesWithCoordinates",
     value: function getNodesWithCoordinates() {
@@ -25289,20 +25921,23 @@ var Graph_Graph = function (_React$Component) {
       var columnSpacing = arguments.length > 8 && arguments[8] !== undefined ? arguments[8] : 56;
       var isNodeCurrentContext = arguments.length > 9 && arguments[9] !== undefined ? arguments[9] : false;
 
+      /** Vertically centers a single node within a column */
       function centerNode(n) {
         n.y = contentHeight / 2 + innerMargin.top;
         n.nodesInColumn = 1;
         n.indexInColumn = 0;
       }
 
-      var nodesByColumnPairs, leftOffset, nodesWithCoords;
+      var nodesByColumnPairs, leftOffset, nodesWithCoords; // Arrange into lists of columns
+      // Ensure we're sorted, using column _numbers_ (JS objs keyed by str).
+
       nodesByColumnPairs = underscore_default.a.sortBy(underscore_default.a.map(underscore_default.a.pairs(underscore_default.a.groupBy(nodes, 'column')), function (_ref) {
         var _ref2 = Graph_slicedToArray(_ref, 2),
             columnNumStr = _ref2[0],
             nodesInColumn = _ref2[1];
 
         return [parseInt(columnNumStr), nodesInColumn];
-      }), 0);
+      }), 0); // Set correct Y coordinate on each node depending on how many nodes are in each column.
 
       underscore_default.a.forEach(nodesByColumnPairs, function (_ref3) {
         var _ref4 = Graph_slicedToArray(_ref3, 2),
@@ -25324,7 +25959,8 @@ var Graph_Graph = function (_React$Component) {
         } else if (rowSpacingType === 'stacked') {
           underscore_default.a.forEach(nodesInColumn, function (nodeInCol, idx) {
             if (!nodeInCol) return;
-            nodeInCol.y = rowSpacing * idx + innerMargin.top;
+            nodeInCol.y = rowSpacing * idx + innerMargin.top; //num + (this.props.innerMargin.top + verticalMargin);
+
             nodeInCol.nodesInColumn = countInCol;
           });
         } else if (rowSpacingType === 'wide') {
@@ -25349,15 +25985,17 @@ var Graph_Graph = function (_React$Component) {
 
         return m.concat(nodesInColumn);
       }, []);
-      leftOffset = innerMargin.left;
+      leftOffset = innerMargin.left; // Center graph contents horizontally if needed.
 
       if (contentWidth && viewportWidth && contentWidth < viewportWidth) {
         leftOffset += (viewportWidth - contentWidth) / 2;
-      }
+      } // Set correct X coordinate on each node depending on column and spacing prop.
+
 
       underscore_default.a.forEach(nodesWithCoords, function (node) {
         node.x = node.column * (columnWidth + columnSpacing) + leftOffset;
-      });
+      }); // Finally, add boolean `isCurrentContext` flag to each node object if needed.
+
 
       if (typeof isNodeCurrentContext === 'function') {
         underscore_default.a.forEach(nodesWithCoords, function (node) {
@@ -25453,6 +26091,14 @@ var Graph_Graph = function (_React$Component) {
 
       var nodes = this.nodesWithCoordinates(innerWidth, contentWidth, innerHeight);
       var graphHeight = innerHeight + (innerMargin.top || 0) + (innerMargin.bottom || 0);
+      /* TODO: later
+      var spacerCount = _.reduce(nodes, function(m,n){ if (n.nodeType === 'spacer'){ return m + 1; } else { return m; }}, 0);
+      if (spacerCount){
+          height += (spacerCount * this.props.columnSpacing);
+          graphHeight += (spacerCount * this.props.columnSpacing);
+      }
+      */
+
       return external_commonjs_react_commonjs2_react_amd_react_root_React_default.a.createElement("div", {
         className: "workflow-chart-outer-container",
         key: "outer"
@@ -25474,6 +26120,11 @@ var Graph_Graph = function (_React$Component) {
 
   return Graph;
 }(external_commonjs_react_commonjs2_react_amd_react_root_React_default.a.Component);
+/**
+ * Optional component to wrap Graph and pass steps in.
+ * @todo Test for (lack of) bidirectionality in data and fix.
+ */
+
 
 Graph_defineProperty(Graph_Graph, "propTypes", {
   'isNodeDisabled': prop_types_default.a.func,
@@ -25491,8 +26142,11 @@ Graph_defineProperty(Graph_Graph, "propTypes", {
     'nodeType': prop_types_default.a.string.isRequired,
     'ioType': prop_types_default.a.string,
     'id': prop_types_default.a.string,
+    // Optional unique ID if node names might be same.
     'outputOf': prop_types_default.a.object,
+    // Unused currently
     'inputOf': prop_types_default.a.arrayOf(prop_types_default.a.object),
+    // Unused currently
     'description': prop_types_default.a.string,
     'meta': prop_types_default.a.oneOfType([prop_types_default.a.object, prop_types_default.a.shape({
       'target': prop_types_default.a.arrayOf(prop_types_default.a.shape({
@@ -25513,6 +26167,7 @@ Graph_defineProperty(Graph_Graph, "propTypes", {
 
 Graph_defineProperty(Graph_Graph, "defaultProps", {
   'height': null,
+  // Unused, should be set to nodes count in highest column * rowSpacing + innerMargins.
   'width': null,
   'columnSpacing': 100,
   'columnWidth': 150,
@@ -25530,6 +26185,7 @@ Graph_defineProperty(Graph_Graph, "defaultProps", {
     }));
   },
   'onNodeClick': null,
+  // Use StateContainer.defaultOnNodeClick
   'innerMargin': {
     'top': 80,
     'bottom': 80,
@@ -25548,7 +26204,9 @@ Graph_defineProperty(Graph_Graph, "defaultProps", {
 });
 
 
-var Graph_GraphParser = function (_React$Component2) {
+var Graph_GraphParser =
+/*#__PURE__*/
+function (_React$Component2) {
   Graph_inherits(GraphParser, _React$Component2);
 
   function GraphParser(props) {

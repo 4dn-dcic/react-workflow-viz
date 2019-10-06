@@ -148,16 +148,15 @@ gulp.task('watch',
 );
 
 gulp.task('build',
-    gulp.parallel(
-        doBuildScss,
-        gulp.series(
-            setProduction,
-            doWebpack
-        ),
-        gulp.series(
-            setProduction,
-            doBuildESModules,
-            doDemoWebpack
+    gulp.series(
+        setProduction,
+        gulp.parallel(
+            doBuildScss,
+            doWebpack,
+            gulp.series(
+                doBuildESModules,
+                doDemoWebpack
+            )
         )
     )
 );

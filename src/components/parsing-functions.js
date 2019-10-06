@@ -1164,6 +1164,7 @@ export function nodesInColumnSortFxn(node1, node2){
     function getNodeFromListForComparison(nodeList, averaged = true, highestColumn = true, ownColumnFilter=null){
         if (!Array.isArray(nodeList) || nodeList.length === 0) return null;
         if (nodeList.length === 1) return nodeList[0];
+
         if (averaged){
             if (typeof ownColumnFilter === 'number' && ownColumnFilter > 1){
                 var nodeListFiltered = _.filter(nodeList, function(n){
@@ -1203,6 +1204,35 @@ export function nodesInColumnSortFxn(node1, node2){
     }
 
     function compareNodeInputOf(n1, n2){
+
+        // Try to move nodes who go into more distant nodes to bottom
+        // This would be case mostly for input params and input reference files
+        const n1ClosestColumnDiff = ((n1.nodeType === 'step' ? n1.outputNodes : n1.inputOf) || []).reduce(function(m, inputOfNode){
+            return Math.min(m, inputOfNode.column - n1.column);
+        }, Infinity);
+
+        const n2ClosestColumnDiff = ((n2.nodeType === 'step' ? n2.outputNodes : n2.inputOf) || []).reduce(function(m, inputOfNode){
+            return Math.min(m, inputOfNode.column - n2.column);
+        }, Infinity);
+
+        if (n1ClosestColumnDiff !== n2ClosestColumnDiff){
+            return n1ClosestColumnDiff - n2ClosestColumnDiff;
+        }
+
+        /// --- Todo: test this further, likely not needed.
+        const n1FurthestColumnDiff = ((n1.nodeType === 'step' ? n1.outputNodes : n1.inputOf) || []).reduce(function(m, inputOfNode){
+            return Math.max(m, inputOfNode.column - n1.column);
+        }, 0);
+
+        const n2FurthestColumnDiff = ((n2.nodeType === 'step' ? n2.outputNodes : n2.inputOf) || []).reduce(function(m, inputOfNode){
+            return Math.max(m, inputOfNode.column - n2.column);
+        }, 0);
+
+        if (n1FurthestColumnDiff !== n2FurthestColumnDiff){
+            return n1FurthestColumnDiff - n2FurthestColumnDiff;
+        }
+        /// ---
+
         var n1InputOf = getNodeFromListForComparison(n1.nodeType === 'step' ? n1.outputNodes : n1.inputOf, true, false);
         var n2InputOf = getNodeFromListForComparison(n2.nodeType === 'step' ? n2.outputNodes : n2.inputOf, true, false);
 

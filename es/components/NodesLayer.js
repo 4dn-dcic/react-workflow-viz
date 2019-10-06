@@ -37,12 +37,15 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-var NodesLayer = function (_React$PureComponent) {
+var NodesLayer =
+/*#__PURE__*/
+function (_React$PureComponent) {
   _inherits(NodesLayer, _React$PureComponent);
 
   _createClass(NodesLayer, null, [{
     key: "sortedNodes",
     value: function sortedNodes(nodes) {
+      // Sort nodes so on updates, they stay in same(-ish) order and can transition.
       return _underscore["default"].sortBy(nodes.slice(0), 'id');
     }
   }, {

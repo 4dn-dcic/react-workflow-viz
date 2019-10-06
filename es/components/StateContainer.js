@@ -53,7 +53,9 @@ var memoizedFindNode = (0, _memoizeOne["default"])(function (nodes, name, nodeTy
   });
 });
 
-var StateContainer = function (_React$PureComponent) {
+var StateContainer =
+/*#__PURE__*/
+function (_React$PureComponent) {
   _inherits(StateContainer, _React$PureComponent);
 
   _createClass(StateContainer, null, [{

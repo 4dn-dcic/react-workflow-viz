@@ -52,11 +52,20 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 var pathDimensionFunctions = {
+  /**
+   * Draw a bezier path from startPt to endPt.
+   *
+   * @param {Object} startPt - Object with x and y coordinates.
+   * @param {Object} endPt - Object with x and y coordinates.
+   * @param {Number[]} [ledgeWidths] - Little widths of line right before/after node. To allow for horizontal arrow.
+   * @returns {string} 'd' attribute value for an SVG path.
+   */
   'drawBezierEdge': function drawBezierEdge(startPt, endPt, columnSpacing, rowSpacing, nodeEdgeLedgeWidths) {
     var ledgeWidths = nodeEdgeLedgeWidths;
     var path = d3.path();
     path.moveTo(startPt.x, startPt.y);
-    path.lineTo(startPt.x + ledgeWidths[0], startPt.y);
+    path.lineTo(startPt.x + ledgeWidths[0], startPt.y); // First ledge
+
     var nodeXDif = Math.abs(endPt.x - startPt.x);
     var bezierStartPt = {
       'x': startPt.x + ledgeWidths[0],
@@ -67,8 +76,11 @@ var pathDimensionFunctions = {
       'y': endPt.y
     };
 
-    if (nodeXDif > columnSpacing) {
-        bezierStartPt.x += Math.max(0, nodeXDif - columnSpacing * (Math.abs(endPt.y - startPt.y) / rowSpacing * 2.5));
+    if (nodeXDif > columnSpacing
+    /* && Math.abs(endPt.y - startPt.y) <= this.props.rowSpacing * 2*/
+    ) {
+        // Draw straight line until last section. Length depending on how close together y-axes are (revert to default bezier if far apart).
+        bezierStartPt.x += Math.max(0, nodeXDif - columnSpacing * (Math.abs(endPt.y - startPt.y) / rowSpacing * 2.5)); //path.lineTo(bezierStartPt.x, bezierStartPt.y);
       }
 
     var bezierXDif = Math.abs(bezierStartPt.x - bezierEndPt.x);
@@ -81,13 +93,18 @@ var pathDimensionFunctions = {
     }];
 
     if (startPt.x > endPt.x) {
+      // Our input edge appears AFTER the target.
+      //var dif = Math.min(1, 5 / Math.max(1, Math.abs(endPt.y - startPt.y) )) * (this.props.rowSpacing || 75);
       var dif = Math.max(rowSpacing || 75);
       controlPoints[0].y += dif * (endPt.y >= startPt.y ? 1 : -1);
       controlPoints[1].y += dif * (endPt.y - startPt.y > rowSpacing ? -1 : 1);
       controlPoints[1].x = endPt.x - Math.abs(endPt.x - startPt.x) * .5;
     }
 
-    path.bezierCurveTo(controlPoints[0].x, controlPoints[0].y, controlPoints[1].x, controlPoints[1].y, bezierEndPt.x, endPt.y);
+    path.bezierCurveTo(controlPoints[0].x, controlPoints[0].y, // - pathAscend,
+    controlPoints[1].x, controlPoints[1].y, // + pathAscend,
+    bezierEndPt.x, endPt.y); // Final ledge
+
     path.lineTo(endPt.x, endPt.y);
     return path.toString();
   },
@@ -120,8 +137,10 @@ var pathDimensionFunctions = {
       adjVertices[adjVertices.length - 2][0] -= nodeEdgeLedgeWidths[0];
     }
 
-    adjVertices[0][0] = startPt && startPt.x || adjVertices[0][0];
-    adjVertices[adjVertices.length - 1][0] = endPt && endPt.x || adjVertices[adjVertices.length - 1][0];
+    adjVertices[0][0] = startPt && startPt.x || adjVertices[0][0]; // + nodeEdgeLedgeWidths[0];
+
+    adjVertices[adjVertices.length - 1][0] = endPt && endPt.x || adjVertices[adjVertices.length - 1][0]; // - nodeEdgeLedgeWidths[1];
+
     var lineGenFxn = d3.line().x(function (d) {
       return d[0];
     }).y(function (d) {
@@ -129,6 +148,10 @@ var pathDimensionFunctions = {
     }).curve(d3.curveMonotoneX);
     return lineGenFxn(adjVertices);
   },
+
+  /**
+   * @deprecated
+   */
   'drawStraightEdge': function drawStraightEdge(startPt, endPt) {
     var path = d3.path();
     path.moveTo(startPt.x, startPt.y);
@@ -139,7 +162,9 @@ var pathDimensionFunctions = {
 };
 exports.pathDimensionFunctions = pathDimensionFunctions;
 
-var Edge = function (_React$Component) {
+var Edge =
+/*#__PURE__*/
+function (_React$Component) {
   _inherits(Edge, _React$Component);
 
   _createClass(Edge, null, [{
@@ -150,7 +175,11 @@ var Edge = function (_React$Component) {
   }, {
     key: "isRelated",
     value: function isRelated(edge, selectedNode) {
-      return _Node["default"].isRelated(edge.source, selectedNode);
+      return _Node["default"].isRelated(edge.source, selectedNode); // Enable the following later _if_ we go beyond 1 input node deep.
+      //return (
+      //    Node.isRelated(edge.source, selectedNode) ||
+      //    Node.isRelated(edge.target, selectedNode)
+      //);
     }
   }, {
     key: "isDistantlySelected",
@@ -250,7 +279,9 @@ var Edge = function (_React$Component) {
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(Edge).call(this, props));
     _this.generatePathDimension = _this.generatePathDimension.bind(_assertThisInitialized(_this));
-    _this.transitionPathDimensions = _this.transitionPathDimensions.bind(_assertThisInitialized(_this));
+    _this.transitionPathDimensions = _this.transitionPathDimensions.bind(_assertThisInitialized(_this)); // Create own memoized copy/instance of intensive static functions.
+    // Otherwise if left static, will be re-ran each time as many edges call it.
+
     _this.memoized = {
       isDistantlySelected: (0, _memoizeOne["default"])(Edge.isDistantlySelected),
       isRelated: (0, _memoizeOne["default"])(Edge.isRelated),
@@ -265,7 +296,9 @@ var Edge = function (_React$Component) {
     _this.getComputedProperties = _this.getComputedProperties.bind(_assertThisInitialized(_this));
     _this.state = {
       'pathDimension': _this.generatePathDimension()
-    };
+    }; // Alternative implementation of transition -
+    // adjust pathRef.current `d` attribute manually
+
     _this.pathRef = _react["default"].createRef();
     return _this;
   }
@@ -297,6 +330,11 @@ var Edge = function (_React$Component) {
         distantlySelected: distantlySelected
       };
     }
+    /**
+     * If any of our nodes' coordinates have updated, update state.pathDimension either via a D3 animation tween acting on setState or instantly via setState.
+     * Whether instant or gradual dimension update is based on result of `this.shouldDoTransitionOfEdge()` : boolean
+     */
+
   }, {
     key: "componentDidUpdate",
     value: function componentDidUpdate(pastProps) {
@@ -309,20 +347,25 @@ var Edge = function (_React$Component) {
 
       if (Edge.didNodeCoordinatesChange(this.props, pastProps)) {
         if (!this.shouldDoTransitionOfEdge()) {
+          // Instant
           this.setState({
             'pathDimension': this.generatePathDimension()
           });
         } else {
+          // Animate
           var startEndPtCoords = [{
             'x': pastProps.startX,
             'y': pastProps.startY
-          }, {
+          }, // StartA
+          {
             'x': startX,
             'y': startY
-          }, {
+          }, // StartB
+          {
             'x': pastProps.endX,
             'y': pastProps.endY
-          }, {
+          }, // StartA
+          {
             'x': endX,
             'y': endY
           }];
@@ -334,6 +377,7 @@ var Edge = function (_React$Component) {
           }
         }
       } else if (!_underscore["default"].isEqual(this.getPathOffsets(), this.getPathOffsets(pastProps))) {
+        // Instant
         this.setState({
           'pathDimension': this.generatePathDimension()
         });
@@ -359,7 +403,8 @@ var Edge = function (_React$Component) {
         if (this.props[propKeys[i]] !== nextProps[propKeys[i]]) {
           return true;
         }
-      }
+      } // If state.pathDimension changes we _do not_ update, since DOM elements should already be transitioned.
+
 
       return false;
     }
@@ -367,10 +412,26 @@ var Edge = function (_React$Component) {
     key: "shouldDoTransitionOfEdge",
     value: function shouldDoTransitionOfEdge() {
       var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.props;
-      if (props.noTransition) return false;
+      if (props.noTransition) return false; // Until we adjust all Edges to transition within a single DOM update/redraw,
+      // we optimize by not transitioning unless <= 50 edges.
+      // This is because each Edge currently launches own transition
+      // which cascades into an exponential number of transitions/viewport-updates.
+
       if (props.edgeCount > 60) return false;
       return true;
     }
+    /**
+     * Transitions edge dimensions over time.
+     * Updates `state.pathDimension` incrementally using d3.transition().
+     *
+     * @todo
+     * In future, all transitions could be done in `EdgesLayer` instead of `Edge`,
+     * this would allow us to batch all the DOM updates into a single function wrapped
+     * in a `requestAnimationFrame` call. This will require some dynamic programming as
+     * well as caching of ege:node-coords to detect changes and run transitions.
+     * The changeTween itself should transition _all_ Edges that need to be transitioned.
+     */
+
   }, {
     key: "transitionPathDimensions",
     value: function transitionPathDimensions(startPtA, startPtB, endPtA, endPtB, startVertices, endVertices) {
@@ -388,7 +449,8 @@ var Edge = function (_React$Component) {
         });
       }
 
-      var pathElem = this.pathRef.current;
+      var pathElem = this.pathRef.current; // Necessary if using alternate transition approach(es).
+
       if (!pathElem) return;
       d3.select(this).interrupt().transition().ease(d3.easeQuadOut).duration(500).tween("changeDimension", function changeTween() {
         return function (t) {

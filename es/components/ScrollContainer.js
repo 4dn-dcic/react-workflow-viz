@@ -31,7 +31,9 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function (o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-var ScrollContainer = function (_React$PureComponent) {
+var ScrollContainer =
+/*#__PURE__*/
+function (_React$PureComponent) {
   _inherits(ScrollContainer, _React$PureComponent);
 
   function ScrollContainer(props) {
