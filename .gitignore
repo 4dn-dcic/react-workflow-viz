@@ -1,2 +1,7 @@
+# Build artifacts:
+demo/demo-compiled.js
+dist
+es
+
 node_modules
 .DS_Store

@@ -6,7 +6,16 @@ This is in alpha/beta phase.
 
 Is being used by HMS-DBMI in the [4DN Data Portal](https://data.4dnucleome.org/experiment-set-replicates/4DNESMU2MA2G/#graph-section) to show provenance of analytical pipeline runs.
 Also being used in the CGAP (final name TDB) project for similar purposes.
-Checkout the current demo.
+
+## Build demo
+
+With a checkout of the repo:
+```
+npm install
+npm run-script build
+```
+
+When it completes, load `file:///path-to-your-checkout/react-workflow-viz/index.html`.
 
 ## Changelog
 _Side Note -_ Is there a way to auto-generate a `CHANGELOG.md` file out of releases' content?
