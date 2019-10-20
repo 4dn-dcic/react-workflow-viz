@@ -14,7 +14,7 @@ Checkout the current demo at [4dn-dcic.github.io/react-workflow-viz/](https://4d
 With a checkout of the repo:
 ```
 npm install
-npm run-script build
+npm run build
 ```
 
 When it completes, load `file:///path-to-your-checkout/react-workflow-viz/index.html`.
