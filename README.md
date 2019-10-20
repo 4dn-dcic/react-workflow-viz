@@ -11,7 +11,7 @@ Checkout the current demo.
 ## Changelog
 _Side Note -_ Is there a way to auto-generate a `CHANGELOG.md` file out of releases' content?
 
-#### 2012-10-06
+#### 2019-10-06
 
 - Improved ordering of terminal reference file input nodes.
   - Now compares distance of closest step that is being input into; those which go into further steps get pushed to bottom.
