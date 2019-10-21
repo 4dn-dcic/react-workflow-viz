@@ -7,12 +7,14 @@ This is in alpha/beta phase.
 Is being used by HMS-DBMI in the [4DN Data Portal](https://data.4dnucleome.org/experiment-set-replicates/4DNESMU2MA2G/#graph-section) to show provenance of analytical pipeline runs.
 Also being used in the CGAP (final name TDB) project for similar purposes.
 
+Checkout the current demo at [4dn-dcic.github.io/react-workflow-viz/](https://4dn-dcic.github.io/react-workflow-viz/), which points to the index.html file in the distributable NPM package (and in this repo).
+
 ## Build demo
 
 With a checkout of the repo:
 ```
 npm install
-npm run-script build
+npm run build
 ```
 
 When it completes, load `file:///path-to-your-checkout/react-workflow-viz/index.html`.
@@ -20,7 +22,7 @@ When it completes, load `file:///path-to-your-checkout/react-workflow-viz/index.
 ## Changelog
 _Side Note -_ Is there a way to auto-generate a `CHANGELOG.md` file out of releases' content?
 
-#### 2012-10-06
+#### 2019-10-06
 
 - Improved ordering of terminal reference file input nodes.
   - Now compares distance of closest step that is being input into; those which go into further steps get pushed to bottom.
