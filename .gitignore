@@ -1,5 +1,4 @@
 # Build artifacts - to be removed after NPM publish:
-dist/
 dist/react-workflow-viz.min.js
 dist/react-workflow-viz.min.js.map
 dist/react-workflow-viz.node.js
