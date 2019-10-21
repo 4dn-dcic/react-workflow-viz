@@ -216,11 +216,6 @@ export default class Edge extends React.Component {
         return false;
     }
 
-    static defaultProps = {
-        'edgeStyle' : 'bezier',
-        'curveRadius' : 12
-    };
-
     static pathArrowsMarkers(){
         return (
             <defs>
