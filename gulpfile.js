@@ -102,7 +102,7 @@ function performSassBuild(done, options = {}){
             console.log("Finished compiling SCSS in", result.stats.duration, "ms");
             console.log("Writing to", cssOutputLocation);
 
-            fs.writeFile(cssOutputLocation, result.css.toString(), null, function(err){
+            fs.writeFile(cssOutputLocation, result.css.toString(), function(err){
                 if (err){
                     return console.error(err);
                 }
