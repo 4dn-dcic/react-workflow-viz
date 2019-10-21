@@ -7,7 +7,7 @@ This is in alpha/beta phase.
 Is being used by HMS-DBMI in the [4DN Data Portal](https://data.4dnucleome.org/experiment-set-replicates/4DNESMU2MA2G/#graph-section) to show provenance of analytical pipeline runs.
 Also being used in the CGAP (final name TDB) project for similar purposes.
 
-Checkout the current demo at [4dn-dcic.github.io/react-workflow-viz/](https://4dn-dcic.github.io/react-workflow-viz/), which points to the index.html file in the distributable NPM package (and in this repo).
+Checkout the current demo at [unpkg.com/@hms-dbmi-bgm/react-workflow-viz/index.html](https://unpkg.com/@hms-dbmi-bgm/react-workflow-viz/index.html), which points to the index.html file in the distributable NPM package (and in this repo).
 
 ## Build demo
 
