@@ -1,6 +1,7 @@
 # Build artifacts - to be removed after NPM publish:
 dist
 es
+demo/demo-compiled.js
 
 node_modules
 .DS_Store
