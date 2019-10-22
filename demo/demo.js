@@ -6,6 +6,7 @@ import Graph, { GraphParser } from 'react-workflow-viz';
 
 
 import { STEPS as testMinimal } from './testdata/minimal-cwl';
+import { STEPS as testMinimalProv } from './testdata/minimal-prov-to-cwl';
 import { STEPS as testWorkflowBedToBedDB } from './testdata/workflow-bedtobeddb';
 import { STEPS as testWorkflowAtacSeq } from './testdata/workflow-atac-seq';
 import { STEPS as testFileProcessed4DNFI9WF1Y8W } from './testdata/provenance-file-processed-4DNFI9WF1Y8W';
@@ -24,6 +25,18 @@ class DemoApp extends Component {
 
     static defaultProps = {
         "testData" : [
+            {
+                "name" : "Minimal PROV to CWL",
+                "description" : null,
+                "steps" : testMinimalProv,
+                "opts" : workflowOpts
+            },
+            {
+                "name" : "Minimal CWL",
+                "description" : null,
+                "steps" : testMinimal,
+                "opts" : workflowOpts
+            },
             {
                 "name" : "File Processed - 4DNFI9WF1Y8W",
                 "description" : null,
@@ -58,12 +71,6 @@ class DemoApp extends Component {
                 "name" : "CWL Workflow - BED to BEDDB",
                 "description" : null,
                 "steps" : testWorkflowBedToBedDB,
-                "opts" : workflowOpts
-            },
-            {
-                "name" : "Minimal CWL",
-                "description" : null,
-                "steps" : testMinimal,
                 "opts" : workflowOpts
             }
         ]
