@@ -5,7 +5,7 @@ import _ from 'underscore';
 import Graph, { GraphParser } from 'react-workflow-viz';
 
 
-import { STEPS as testW3cProv } from './testdata/w3c-prov';
+import { STEPS as testMinimal } from './testdata/minimal-cwl';
 import { STEPS as testWorkflowBedToBedDB } from './testdata/workflow-bedtobeddb';
 import { STEPS as testWorkflowAtacSeq } from './testdata/workflow-atac-seq';
 import { STEPS as testFileProcessed4DNFI9WF1Y8W } from './testdata/provenance-file-processed-4DNFI9WF1Y8W';
@@ -61,9 +61,9 @@ class DemoApp extends Component {
                 "opts" : workflowOpts
             },
             {
-                "name" : "Translate W3C PROV to CWL",
+                "name" : "Minimal CWL",
                 "description" : null,
-                "steps" : testW3cProv,
+                "steps" : testMinimal,
                 "opts" : workflowOpts
             }
         ]
