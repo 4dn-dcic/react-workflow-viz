@@ -1,10 +1,9 @@
-const Edge = require('../es/components/Edge');
-// TODO: Configure Babel for Jasmine (or another framework) so we can import the source code.
+import { pathDimensionFunctions } from '../src/components/Edge';
 
 describe('pathDimensionFunctions', () => {
   describe('drawBezierEdge', () => {
     it('works', () => {
-      const path = Edge.pathDimensionFunctions.drawBezierEdge(
+      const path = pathDimensionFunctions.drawBezierEdge(
         {x: 0, y: 0},
         {x: 100, y: 100},
         20, 20,

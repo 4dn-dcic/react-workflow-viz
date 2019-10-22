@@ -1,5 +1,4 @@
-const parsingFunctions = require('../es/components/parsing-functions');
-// TODO: Configure Babel for Jasmine (or another framework) so we can import the source code.
+import { nodesPreSortFxn } from '../src/components/parsing-functions';
 
 describe('parsing-function.js', () => {
   describe('nodesPreSortFxn', () => {
@@ -13,7 +12,7 @@ describe('parsing-function.js', () => {
           column: 1
         }
       ];
-      nodesAfter = parsingFunctions.nodesPreSortFxn(nodes);
+      const nodesAfter = nodesPreSortFxn(nodes);
       expect(nodesAfter[0].column).toEqual(0)
     });
   });
