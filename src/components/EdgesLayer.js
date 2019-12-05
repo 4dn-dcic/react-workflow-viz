@@ -73,7 +73,7 @@ export function traceEdges(
             });
         }
 
-        console.warn('HORZ', horizontalLineYCoords, endHeight, nodesByColumn, segments);
+        // console.log('HORZ', horizontalLineYCoords, endHeight, nodesByColumn, segments);
         return { segments, segmentsByColumnIdx };
     }
 
@@ -172,7 +172,7 @@ export function traceEdges(
             const { source: sB, target: tB } = edgeB;
             const colDifA = Math.abs(tA.colum - sA.column);
             const colDifB = Math.abs(tB.colum - sB.column);
-            
+
             // If just 1 col dif, move to front for intersection testing (tracing skipped)
             if (colDifA === 1 && colDifB === 1){
                 return 0;
@@ -405,4 +405,3 @@ const DebugVizGraphLayer = React.memo(function DebugVizGraphLayer({ segments, en
         </g>
     );
 });
-
