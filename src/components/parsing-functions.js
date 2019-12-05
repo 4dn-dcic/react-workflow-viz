@@ -136,7 +136,7 @@ export const DEFAULT_PARSING_OPTIONS = {
  * Workflow graph component.
  *
  * @param {Step[]} analysis_steps                       List of steps from the back-end to generate nodes & edges from.
- * @param {ParsingOptions} [parsingOptions]                Options for parsing and post-processing.
+ * @param {ParsingOptions} [parsingOptions]             Options for parsing and post-processing.
  * @returns {{ 'nodes' : Node[], 'edges' : Edge[] }}    Container object for the two lists.
  */
 export function parseAnalysisSteps(analysis_steps, parsingOptions = {}){
