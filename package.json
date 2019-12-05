@@ -10,7 +10,7 @@
     "url": "https://github.com/4dn-dcic/react-workflow-viz"
   },
   "scripts": {
-    "test": "jasmine",
+    "test": "eslint src && jasmine",
     "build": "rm -rf ./dist/* && rm -rf ./es/* && gulp build",
     "dev": "rm -rf ./dist/* && gulp watch"
   },
@@ -38,7 +38,7 @@
     "babel-plugin-minify-dead-code-elimination": "^0.5.0",
     "d3": "^5.9.0",
     "eslint": "^5.16.0",
-    "eslint-plugin-react": "^7.12.4",
+    "eslint-plugin-react": "^7.16.0",
     "fancy-log": "^1.3.3",
     "gulp": "^4.0.0",
     "jasmine": "^3.5.0",
