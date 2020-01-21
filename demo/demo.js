@@ -1,9 +1,12 @@
 import { Component } from 'react';
 import ReactDOM from 'react-dom';
 import _ from 'underscore';
+import url from 'url';
 
+// Loaded on index.html, defined as an external in webpack.config.demo.js
 import Graph, { GraphParser } from 'react-workflow-viz';
 
+// TODO: Load via AJAX or something, replace 'steps' with a 'href', ..
 
 import { STEPS as testWorkflowBedToBedDB } from './testdata/workflow-bedtobeddb';
 import { STEPS as testWorkflowAtacSeq } from './testdata/workflow-atac-seq';
@@ -27,6 +30,8 @@ class DemoApp extends Component {
                 "name" : "File Processed - 4DNFI9WF1Y8W",
                 "description" : null,
                 "steps" : testFileProcessed4DNFI9WF1Y8W,
+                // todo:
+                //"href" : "https://unpkg.com/@hms-dbmi-bgm/react-workflow-viz/demo/testdata/provenance-file-processed-4DNFI9WF1Y8W.json",
                 "opts" : {}
             },
             {
@@ -67,6 +72,7 @@ class DemoApp extends Component {
         this.handleParsingOptChange = this.handleParsingOptChange.bind(this);
         this.handleRowSpacingTypeChange = this.handleRowSpacingTypeChange.bind(this);
         this.handleDemoChange = this.handleDemoChange.bind(this);
+        this.loadDemoData = this.loadDemoData.bind(this);
         this.state = {
             currentDemoIdx: 1,
             parsingOptions: {
@@ -84,7 +90,7 @@ class DemoApp extends Component {
         if (!key) return false;
         this.setState(function({ parsingOptions : prevOpts }){
             const nextOpts = { ...prevOpts, [key] : !prevOpts[key] };
-            return { parsingOptions : nextOpts  };
+            return { parsingOptions : nextOpts };
         });
     }
 
@@ -105,7 +111,24 @@ class DemoApp extends Component {
         const nextValue = evt.target.value;
         const nextIdx = nextValue && _.findIndex(testData, { name: nextValue });
         if (nextIdx === -1) return false;
-        this.setState({ currentDemoIdx: nextIdx });
+        this.setState({ currentDemoIdx: nextIdx }, this.loadDemoData);
+    }
+
+    loadDemoData(){
+        const { testData } = this.props;
+        const { currentDemoIdx } = this.state;
+        const currDemoInfo = testData[currentDemoIdx];
+        const { name, href } = currDemoInfo;
+        const existingSteps = currDemoInfo.steps || this.state['loadedStepsFor: ' + name];
+        if (!Array.isArray(existingSteps)) {
+            this.setState({ loadingSteps: true },()=>{
+                window.fetch(url.resolve(window.location.href, href)).then((resp)=>{
+                    return JSON.parse(resp);
+                }).then((resp)=>{
+                    this.setState({ ['loadedStepsFor: ' + name] : resp, loadingSteps: false });
+                });
+            });
+        }
     }
 
     render(){

@@ -42,7 +42,7 @@ function webpackOnBuild(done) {
 function doWebpack(cb){
     const webpackConfig = require('./webpack.config.workflow-viz');
     webpack(webpackConfig).run(webpackOnBuild(cb));
-};
+}
 
 function doDemoWebpack(cb){
     const demoWebpackConfig = require('./webpack.config.demo');
@@ -52,18 +52,34 @@ function doDemoWebpack(cb){
 function watch(){
     const webpackConfig = require('./webpack.config.workflow-viz');
     webpack(webpackConfig).watch(300, webpackOnBuild());
-};
+}
 
 function watchDemo(){
     const demoWebpackConfig = require('./webpack.config.demo');
     webpack(demoWebpackConfig).watch(300, webpackOnBuild());
-};
+}
 
 
 function doBuildESModules(done){
     const subP = spawn("npx", [
         "babel",
         path.join(__dirname, 'src'),
+        "--out-dir",
+        path.join(__dirname, 'es'),
+        "--env-name",
+        "esm"
+    ], { stdio: "inherit" });
+
+    subP.on("close", (code)=>{
+        done();
+    });
+}
+
+function doWatchESModules(done){
+    const subP = spawn("npx", [
+        "babel",
+        path.join(__dirname, 'src'),
+        "--watch",
         "--out-dir",
         path.join(__dirname, 'es'),
         "--env-name",
@@ -111,7 +127,7 @@ function performSassBuild(done, options = {}){
             });
         }
     });
-};
+}
 
 function doBuildScss(done){
     performSassBuild(done, {});
@@ -136,13 +152,15 @@ function doWatchScss(done){
 gulp.task('watch',
     gulp.series(
         setDevelopment,
+        doBuildScss,
+        doBuildESModules,
         doWebpack,
         doDemoWebpack,
-        doBuildScss,
         gulp.parallel(
+            doWatchScss,
+            doWatchESModules,
             watch,
-            watchDemo,
-            doWatchScss
+            watchDemo
         )
     )
 );
@@ -150,11 +168,11 @@ gulp.task('watch',
 gulp.task('build',
     gulp.series(
         setProduction,
+        doBuildESModules,
         gulp.parallel(
             doBuildScss,
-            doWebpack,
             gulp.series(
-                doBuildESModules,
+                doWebpack,
                 doDemoWebpack
             )
         )

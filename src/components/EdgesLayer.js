@@ -79,8 +79,19 @@ export function traceEdges(
 
     function assembleSegments(segmentQ, subdivisionsUsed = 4){
 
-        function getNearestSegment(columnIdx, prevYCoord, targetYCoord, previousEdges = []){
-            const segmentQLen = segmentQ.length;
+        const usedSegments = new Map(); // (segment, [source, target])
+        const segmentQLen = segmentQ.length;
+
+        /**
+         * 
+         * @param {number} columnIdx - Higher-level abstraction of 'prevXCoord'. Previous/curr column to get segment from.
+         * @param {number} prevYCoord - Previous Y
+         * @param {Object} source - Source Node
+         * @param {Object} target - Target Node
+         * @param {*} previousEdges 
+         */
+        function getNearestSegment(columnIdx, prevYCoord, source, target, previousEdges = []){
+            const { y: targetYCoord } = target;
             const startXForCol = colStartXMap[columnIdx];
             const prevEdgesLen = previousEdges.length;
 
@@ -90,13 +101,22 @@ export function traceEdges(
 
             let closestSegmentDiff = Infinity;
             let closestSegmentIdx = -1;
-            let currSegment = null, currDiff = null, currSegmentY = 0;
+            let currSegment = null, currSegmentY = 0, currExistingSegmentNodes = null, currDiff = null;
             let i, j, prevEdge, prevVs, intersections = 0;
             for (i = 0; i < segmentQLen; i++){
                 currSegment = segmentQ[i];
                 currSegmentY = currSegment[0][1];
+
                 if (currSegment[0][0] !== startXForCol){
                     continue;
+                }
+
+                // Skip used segments unless (going to same target node) or (from same source node and on same Y coord).
+                currExistingSegmentNodes = usedSegments.get(currSegment);
+                if (currExistingSegmentNodes){
+                    if (!(currExistingSegmentNodes[1] === target || (currExistingSegmentNodes[0] === source && currSegmentY === prevYCoord))){
+                        continue;
+                    }
                 }
 
                 //currDiff = Math.abs(yCoordMedian - currSegmentY);
@@ -163,7 +183,9 @@ export function traceEdges(
             }
 
             const bestSegment = segmentQ[closestSegmentIdx];
-            segmentQ.splice(closestSegmentIdx, 1);
+            if (!usedSegments.get(bestSegment)){
+                usedSegments.set(bestSegment, [ source, target ]);
+            }
             return bestSegment;
         }
 
@@ -226,13 +248,16 @@ export function traceEdges(
                 const bestSegment = getNearestSegment(
                     colIdx,
                     prevY,
-                    targetY,
+                    source,
+                    target,
                     resultEdges
                 );
                 if (!bestSegment){
                     throw new Error("Could not find viable path for edge");
                 }
                 const [ [ bsX, bsY ], [ beX, beY ] ] = bestSegment;
+                // const origSrcTrg = usedSegments.get(bestSegment);
+                // const isReusedSource = origSrcTrg[0] === source && origSrcTrg[1] !== target;
                 vertices.push([ bsX - nodeEdgeLedgeWidths[0], bsY ]);
                 vertices.push([ beX + nodeEdgeLedgeWidths[1], beY ]);
                 prevY = beY;
@@ -250,6 +275,7 @@ export function traceEdges(
     let res;
     let tracedEdges = null;
     let attempts = 0;
+
     while (!tracedEdges && attempts < 5){
         res = buildVisibilityGraph(4 + attempts);
         try {

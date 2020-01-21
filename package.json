@@ -11,8 +11,9 @@
   },
   "scripts": {
     "test": "eslint src && jasmine",
-    "build": "rm -rf ./dist/* && rm -rf ./es/* && gulp build",
-    "dev": "rm -rf ./dist/* && gulp watch"
+    "clean" : "rm -rf ./dist/* && rm -rf ./es/*",
+    "build": "npm run clean && gulp build",
+    "dev": "npm run clean && gulp watch"
   },
   "keywords": [
     "CWL",

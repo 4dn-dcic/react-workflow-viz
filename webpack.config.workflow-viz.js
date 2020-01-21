@@ -84,7 +84,8 @@ webPlugins.push(new webpack.DefinePlugin({
 const primaryConf = {
     mode: mode,
     entry: {
-        "react-workflow-viz" : path.resolve(__dirname, 'src')
+        // Build from /es directory, not src
+        "react-workflow-viz" : path.resolve(__dirname, 'es')
     },
     target: "web",
     output: {
