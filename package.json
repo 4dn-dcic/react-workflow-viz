@@ -11,7 +11,7 @@
   },
   "scripts": {
     "test": "eslint src && jasmine",
-    "clean" : "rm -rf ./dist/* && rm -rf ./es/*",
+    "clean": "rm -rf ./dist/* && rm -rf ./es/*",
     "build": "npm run clean && gulp build",
     "dev": "npm run clean && gulp watch"
   },
@@ -51,7 +51,7 @@
     "react-transition-group": "^4.2.0",
     "source-map-support": "^0.5.11",
     "string-replace-loader": "^1.0.0",
-    "terser-webpack-plugin": "^1.2.2",
+    "terser-webpack-plugin": "^2.3.2",
     "webpack": "4.28.4"
   },
   "peerDependencies": {
