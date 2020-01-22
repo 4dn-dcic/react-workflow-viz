@@ -22,6 +22,13 @@ When it completes, load `file:///path-to-your-checkout/react-workflow-viz/index.
 ## Changelog
 _Side Note -_ Is there a way to auto-generate a `CHANGELOG.md` file out of releases' content?
 
+#### 2020-01-21
+- Important glitch fixes, including typo and intersection counting.
+- PROTOTYPE / NOT ENABLED: Reuse horizontal edge segments (to reduce # of lines; noise) if:
+  - Segment is on same Y coordinate as previous segment (or source node, if first segment) _and_ has common source node. This prevents a path from a single node from prematuraly splitting into many separate paths.
+  - Segment is leading to a common target node. This allows paths to converge if beneficial.
+  - This could be better tested; perhaps reused segments should be treated differently in regard to intersections (at least excluded).
+
 #### 2019-10-06
 
 - Improved ordering of terminal reference file input nodes.

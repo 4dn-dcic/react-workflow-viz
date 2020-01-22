@@ -102,7 +102,7 @@ export function traceEdges(
             let closestSegmentDiff = Infinity;
             let closestSegmentIdx = -1;
             let currSegment = null, currSegmentY = 0, currExistingSegmentNodes = null, currDiff = null;
-            let i, j, prevEdge, prevVs, intersections = 0;
+            let i, j, prevEdge, prevVs, multiplier = 1, intersections = 0;
             for (i = 0; i < segmentQLen; i++){
                 currSegment = segmentQ[i];
                 currSegmentY = currSegment[0][1];
@@ -114,9 +114,11 @@ export function traceEdges(
                 // Skip used segments unless (going to same target node) or (from same source node and on same Y coord).
                 currExistingSegmentNodes = usedSegments.get(currSegment);
                 if (currExistingSegmentNodes){
-                    if (!(currExistingSegmentNodes[1] === target || (currExistingSegmentNodes[0] === source && currSegmentY === prevYCoord))){
-                        continue;
-                    }
+                    continue;
+                    // Use below for experiment with converging / shared path for common source/target nodes.
+                    // if (!(currExistingSegmentNodes[1] === target || (currExistingSegmentNodes[0] === source && currSegmentY === prevYCoord))){
+                    //     continue;
+                    // }
                 }
 
                 //currDiff = Math.abs(yCoordMedian - currSegmentY);
@@ -124,7 +126,10 @@ export function traceEdges(
                     currDiff = currSegmentY - upperY;
                 } else if (currSegmentY < lowerY){
                     currDiff = lowerY - currSegmentY;
+                } else if (currExistingSegmentNodes) {
+                    currDiff = -0.01;
                 } else {
+                //{
                     // Any path between lower and upper bound is fine.
                     // Favor those closer to prev edge
                     //currDiff = Math.abs(targetYCoord - currSegmentY) * 0.01;
@@ -137,24 +142,33 @@ export function traceEdges(
                     prevEdge = previousEdges[j];
                     if (Array.isArray(prevEdge.vertices)){
                         prevVs = prevEdge.vertices;
+                        multiplier = 2;
                     } else {
                         prevVs = [
                             [ prevEdge.source.x + columnWidth, prevEdge.source.y ],
                             [ prevEdge.target.x, prevEdge.target.y ]
                         ];
+                        multiplier = 1;
                     }
 
                     prevVs.reduce(function(prevV, v){
                         if (!prevV) return v; // First V
-                        if (!(prevV[0] + nodeEdgeLedgeWidths[0] < startXForCol && v[0] >= startXForCol)){
+
+                        if (!(prevV[0] + nodeEdgeLedgeWidths[0] < startXForCol && v[0] >= startXForCol - nodeEdgeLedgeWidths[0])){
                             return v;
                         }
+                        // if (source.name === "chromsize" && columnIdx === 2) {
+                        //     console.log('TTTX\n', v, '\n', prevV, '\n', columnIdx, intersections);
+                        // }
                         if (
                             (v[1] > currSegmentY && prevV[1] < prevYCoord) ||
                             (v[1] < currSegmentY && prevV[1] > prevYCoord)
                         ) {
-                            if (intersections === 0) intersections += 2;
-                            intersections++;
+                            // Boost 'any' intersections
+                            // Multiplier allows us to try to avoid intersecting
+                            // bigger lines moreso than smaller ones
+                            if (intersections === 0) intersections += 2 * multiplier;
+                            intersections += multiplier;
                             //if (startXForCol> 1400 && startXForCol < 1600){
                             //    console.log('X', v[0], v[1], '<-', prevV[0], prevV[1]);
                             //}
@@ -163,6 +177,10 @@ export function traceEdges(
                     }, null);
 
                 }
+
+                // if (source.name === "chromsize" && columnIdx === 2) {
+                //     console.log('TTT', previousEdges.slice(), columnIdx, currSegmentY, intersections);
+                // }
 
                 currDiff += (intersections * (rowSpacing * 0.8));
 
@@ -192,8 +210,8 @@ export function traceEdges(
         const originalEdgesSortedByLength = originalEdges.slice(0).sort(function(edgeA, edgeB){
             const { source: sA, target: tA } = edgeA;
             const { source: sB, target: tB } = edgeB;
-            const colDifA = Math.abs(tA.colum - sA.column);
-            const colDifB = Math.abs(tB.colum - sB.column);
+            const colDifA = Math.abs(tA.column - sA.column);
+            const colDifB = Math.abs(tB.column - sB.column);
 
             // If just 1 col dif, move to front for intersection testing (tracing skipped)
             if (colDifA === 1 && colDifB === 1){
@@ -216,8 +234,8 @@ export function traceEdges(
             const yDistA = Math.abs(tA.y - sA.y);
             const yDistB = Math.abs(tB.y - sB.y);
 
-            if (yDistA < yDistB) return -1;
-            if (yDistA > yDistB) return 1;
+            if (yDistA > yDistB) return -1;
+            if (yDistA < yDistB) return 1;
 
             return 0;
         });
