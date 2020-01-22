@@ -234,8 +234,8 @@ export function traceEdges(
             const yDistA = Math.abs(tA.y - sA.y);
             const yDistB = Math.abs(tB.y - sB.y);
 
-            if (yDistA > yDistB) return -1;
-            if (yDistA < yDistB) return 1;
+            if (yDistA > yDistB) return 1;
+            if (yDistA < yDistB) return -1;
 
             return 0;
         });
