@@ -1,4 +1,4 @@
-export const STEPS = [
+[
     {
         "name":"/workflow-runs-awsem/5c7c29ea-5ce1-42fc-a09d-a8f9f80626b4/",
         "meta":{
@@ -3026,4 +3026,4 @@ export const STEPS = [
             }
         ]
     }
-];
+]

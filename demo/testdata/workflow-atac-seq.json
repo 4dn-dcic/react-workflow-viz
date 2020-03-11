@@ -1,4 +1,4 @@
-export const STEPS = [
+[
     {
         "meta":{
             "software_used":[
@@ -369,4 +369,4 @@ export const STEPS = [
             }
         ]
     }
-];
+]

@@ -71,5 +71,8 @@ module.exports = [{
     resolve : {
         extensions : [".webpack.js", ".web.js", ".js", ".json", ".jsx"],
     },
-    devtool: 'eval'
+    devtool: 'eval',
+    // Inform our code of what build we're on.
+    // This works via a find-replace.
+    plugins: [ new webpack.DefinePlugin({ 'BUILDTYPE' : JSON.stringify(env) }) ]
 }];

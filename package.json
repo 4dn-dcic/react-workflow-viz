@@ -62,6 +62,7 @@
     "react-transition-group": "^4.2.0"
   },
   "dependencies": {
+    "http-server": "^0.12.1",
     "memoize-one": "^5.0.1",
     "underscore": "^1.9.1"
   }

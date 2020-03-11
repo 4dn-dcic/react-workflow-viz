@@ -6,16 +6,8 @@ import url from 'url';
 // Loaded on index.html, defined as an external in webpack.config.demo.js
 import Graph, { GraphParser } from 'react-workflow-viz';
 
-// TODO: Load via AJAX or something, replace 'steps' with a 'href', ..
-
-import { STEPS as testWorkflowBedToBedDB } from './testdata/workflow-bedtobeddb';
-import { STEPS as testWorkflowAtacSeq } from './testdata/workflow-atac-seq';
-import { STEPS as testFileProcessed4DNFI9WF1Y8W } from './testdata/provenance-file-processed-4DNFI9WF1Y8W';
-import { STEPS as testFileProcessedGAPFIWCFWBCO } from './testdata/provenance-file-processed-GAPFIWCFWBCO';
-import { STEPS as testExpset4DNESUJC9Y83 } from './testdata/provenance-expset-4DNESUJC9Y83';
-import { STEPS as testExpset4DNES54YB6TQ } from './testdata/provenance-expset-4DNES54YB6TQ';
-
-
+// eslint-disable-next-line no-undef
+const BASE_HREF = (typeof BUILDTYPE === "string" && BUILDTYPE === "development") ? "http://localhost:8100/demo/testdata/" : "https://unpkg.com/@hms-dbmi-bgm/react-workflow-viz/demo/testdata/"
 
 const workflowOpts = {
     //"showReferenceFiles": true,
@@ -29,39 +21,44 @@ class DemoApp extends Component {
             {
                 "name" : "File Processed - 4DNFI9WF1Y8W",
                 "description" : null,
-                "steps" : testFileProcessed4DNFI9WF1Y8W,
-                // todo:
-                //"href" : "https://unpkg.com/@hms-dbmi-bgm/react-workflow-viz/demo/testdata/provenance-file-processed-4DNFI9WF1Y8W.json",
+                "href" : url.resolve(BASE_HREF, "provenance-file-processed-4DNFI9WF1Y8W.json"),
                 "opts" : {}
             },
             {
                 "name" : "File Processed - GAPFIWCFWBCO",
                 "description" : null,
-                "steps" : testFileProcessedGAPFIWCFWBCO,
+                "href" : url.resolve(BASE_HREF, "provenance-file-processed-GAPFIWCFWBCO.json"),
+                "opts" : {}
+            },
+            {
+                "name" : "File Processed - GAPFIRPF7X1K",
+                "description" : null,
+                "href" : url.resolve(BASE_HREF, "provenance-file-processed-GAPFIRPF7X1K.json"),
                 "opts" : {}
             },
             {
                 "name" : "Experiment Set - 4DNES54YB6TQ",
                 "description" : null,
-                "steps" : testExpset4DNES54YB6TQ,
+                "href" : url.resolve(BASE_HREF, "provenance-expset-4DNES54YB6TQ.json"),
                 "opts" : {}
             },
+            
             {
                 "name" : "Experiment Set - 4DNESUJC9Y83",
                 "description" : null,
-                "steps" : testExpset4DNESUJC9Y83,
+                "href" : url.resolve(BASE_HREF, "provenance-expset-4DNESUJC9Y83.json"),
                 "opts" : {}
             },
             {
                 "name" : "CWL Workflow - ATAC-SEQ",
                 "description" : null,
-                "steps" : testWorkflowAtacSeq,
+                "href" : url.resolve(BASE_HREF, "workflow-atac-seq.json"),
                 "opts" : workflowOpts
             },
             {
                 "name" : "CWL Workflow - BED to BEDDB",
                 "description" : null,
-                "steps" : testWorkflowBedToBedDB,
+                "href" : url.resolve(BASE_HREF, "workflow-bedtobeddb.json"),
                 "opts" : workflowOpts
             }
         ]
@@ -74,15 +71,20 @@ class DemoApp extends Component {
         this.handleDemoChange = this.handleDemoChange.bind(this);
         this.loadDemoData = this.loadDemoData.bind(this);
         this.state = {
-            currentDemoIdx: 1,
+            currentDemoIdx: 0,
             parsingOptions: {
                 showReferenceFiles: true,
                 showParameters: false,
                 showIndirectFiles: false,
                 parseBasicIO: false
             },
+            loadedSteps: {},
             rowSpacingType: "compact"
         };
+    }
+
+    componentDidMount(){
+        this.loadDemoData();
     }
 
     handleParsingOptChange(evt){
@@ -116,30 +118,40 @@ class DemoApp extends Component {
 
     loadDemoData(){
         const { testData } = this.props;
-        const { currentDemoIdx } = this.state;
+        const { currentDemoIdx, loadedSteps } = this.state;
         const currDemoInfo = testData[currentDemoIdx];
         const { name, href } = currDemoInfo;
-        const existingSteps = currDemoInfo.steps || this.state['loadedStepsFor: ' + name];
+
+        const existingSteps = currDemoInfo.steps || loadedSteps[name];
+
         if (!Array.isArray(existingSteps)) {
-            this.setState({ loadingSteps: true },()=>{
+            this.setState({ loadingSteps: true }, ()=>{
                 window.fetch(url.resolve(window.location.href, href)).then((resp)=>{
-                    return JSON.parse(resp);
+                    return resp.json();
                 }).then((resp)=>{
-                    this.setState({ ['loadedStepsFor: ' + name] : resp, loadingSteps: false });
+                    this.setState(function({ loadedSteps: prevSteps }){
+                        return {
+                            loadedSteps: { ...prevSteps, [name] : resp },
+                            loadingSteps: false
+                        };
+                    });
                 });
             });
         }
+
     }
 
     render(){
         const { testData } = this.props;
-        const { currentDemoIdx, parsingOptions, rowSpacingType } = this.state;
-        const { name, description, steps, opts: overrideOpts } = testData[currentDemoIdx];
+        const { currentDemoIdx, parsingOptions, rowSpacingType, loadedSteps, loadingSteps } = this.state;
+        const { name, description, steps: preloadedSteps, opts: overrideOpts } = testData[currentDemoIdx];
         const fullParseOpts = { ...parsingOptions, ...overrideOpts };
+
+        const steps = preloadedSteps || loadedSteps[name];
 
         return (
             <div className="demo-app-container">
-                <TestDataSelect {...{ currentDemoIdx, testData }} onChange={this.handleDemoChange} />
+                <TestDataSelect {...{ currentDemoIdx, testData, loadingSteps }} onChange={this.handleDemoChange} />
                 <ParsingOptsCheckboxes {...parsingOptions} dataOpts={overrideOpts}
                     onChange={this.handleParsingOptChange} onChangeBasicIO={this.handleChangeBasicIO} />
                 <RowSpacingTypeSelect rowSpacingType={rowSpacingType} onChange={this.handleRowSpacingTypeChange} />
@@ -154,7 +166,7 @@ class DemoApp extends Component {
 
 
 function TestDataSelect(props){
-    const { currentDemoIdx, testData, onChange } = props;
+    const { currentDemoIdx, testData, onChange, loadingSteps = false } = props;
     const { name: currDemoName } = testData[currentDemoIdx];
     const optionItems = testData.map(function({ name, steps, description }, idx){
         return <option name={idx} key={idx}>{ name }</option>;
@@ -162,8 +174,8 @@ function TestDataSelect(props){
     return (
         <div className="row-spacing-type-container options-container">
             <label>
-                <h5>Test Data</h5>
-                <select onChange={onChange} value={currDemoName}>
+                <h5>Test Data { loadingSteps ? <small>(loading...)</small> : null }</h5>
+                <select onChange={onChange} value={currDemoName} disabled={loadingSteps}>
                 { optionItems }
                 </select>
             </label>

@@ -91,17 +91,25 @@ function doWatchESModules(done){
     });
 }
 
+function doRunLocalServer(done){
+    const subP = spawn("http-server", ["-a",  "127.0.0.1", "-p", "8100"], { stdio: "inherit" });
+    subP.on("close", (code)=>{
+        done();
+    });
+}
+
 
 function performSassBuild(done, options = {}){
     const {
         action = 'render',
         cssOutputLocation = './dist/react-workflow-viz.min.css',
+        sourceMapLocation = './dist/react-workflow-viz.min.css.map',
         ...otherOpts
     } = options;
 
     const useOpts = { // Defaults, overriden by otherOpts
         file: './src/styles.scss',
-        outFile: './dist/react-workflow-viz.map.css', // sourceMap location
+        outFile: cssOutputLocation, // sourceMap location
         outputStyle: 'compressed',
         sourceMap: true,
         ...otherOpts
@@ -118,12 +126,28 @@ function performSassBuild(done, options = {}){
             console.log("Finished compiling SCSS in", result.stats.duration, "ms");
             console.log("Writing to", cssOutputLocation);
 
+            let countCompleted = 0;
+
             fs.writeFile(cssOutputLocation, result.css.toString(), function(err){
                 if (err){
                     return console.error(err);
                 }
                 console.log("Wrote " + cssOutputLocation);
-                done();
+                countCompleted++;
+                if (countCompleted === 2){
+                    done();
+                }
+            });
+
+            fs.writeFile(sourceMapLocation, result.map.toString(), null, function(err){
+                if (err){
+                    return console.error(err);
+                }
+                console.log("Wrote " + sourceMapLocation);
+                countCompleted++;
+                if (countCompleted === 2){
+                    done();
+                }
             });
         }
     });
@@ -138,7 +162,9 @@ function doWatchScss(done){
         "./src/styles.scss",
         "./dist/react-workflow-viz.min.css",
         "--watch",
-        "--recursive"
+        "--recursive",
+        "--source-map",
+        "--source-map-embed"
     ], { stdio: "inherit" });
 
     subP.on("close", (code)=>{
@@ -160,7 +186,8 @@ gulp.task('watch',
             doWatchScss,
             doWatchESModules,
             watch,
-            watchDemo
+            watchDemo,
+            doRunLocalServer
         )
     )
 );
