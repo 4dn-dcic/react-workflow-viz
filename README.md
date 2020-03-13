@@ -22,18 +22,19 @@ When it completes, load `file:///path-to-your-checkout/react-workflow-viz/index.
 ## Changelog
 _Side Note -_ Is there a way to auto-generate a `CHANGELOG.md` file out of releases' content?
 
-#### 2020-03-13
+#### 2020-03-13 (v0.1.3, v0.1.4)
 - Improvements in path plotting - do not diverge into separate paths unless necessary.
 - Demo updates.
+- Minor patch: move http-server to devDependencies.
 
-#### 2020-01-21
+#### 2020-01-21 (v0.1.2)
 - Important glitch fixes, including typo and intersection counting.
 - PROTOTYPE / NOT ENABLED: Reuse horizontal edge segments (to reduce # of lines; noise) if:
   - Segment is on same Y coordinate as previous segment (or source node, if first segment) _and_ has common source node. This prevents a path from a single node from prematuraly splitting into many separate paths.
   - Segment is leading to a common target node. This allows paths to converge if beneficial.
   - This could be better tested; perhaps reused segments should be treated differently in regard to intersections (at least excluded).
 
-#### 2019-10-06
+#### 2019-10-06 (v0.1.1)
 
 - Improved ordering of terminal reference file input nodes.
   - Now compares distance of closest step that is being input into; those which go into further steps get pushed to bottom.
@@ -41,7 +42,7 @@ _Side Note -_ Is there a way to auto-generate a `CHANGELOG.md` file out of relea
 - Including comments in ESM build output.
 
 
-## Things to do before NPM release
+## Things to do
 
 - Add & export a script/function to convert a unidirectional CWL into bidirectonal structure needed for this viz tool.
 - Add complete example of CWL being visualized (including usage of script/function above to do so).
