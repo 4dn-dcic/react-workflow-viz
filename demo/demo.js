@@ -2,12 +2,13 @@ import { Component } from 'react';
 import ReactDOM from 'react-dom';
 import _ from 'underscore';
 import url from 'url';
+import { default as packageJSON } from './../package.json';
 
 // Loaded on index.html, defined as an external in webpack.config.demo.js
 import Graph, { GraphParser } from 'react-workflow-viz';
 
 // eslint-disable-next-line no-undef
-const BASE_HREF = (typeof BUILDTYPE === "string" && BUILDTYPE === "development") ? "http://localhost:8100/demo/testdata/" : "https://unpkg.com/@hms-dbmi-bgm/react-workflow-viz/demo/testdata/"
+const BASE_HREF = (typeof BUILDTYPE === "string" && BUILDTYPE === "development") ? "http://localhost:8100/demo/testdata/" : `https://unpkg.com/@hms-dbmi-bgm/react-workflow-viz@${packageJSON.version}/demo/testdata/`
 
 const workflowOpts = {
     //"showReferenceFiles": true,
