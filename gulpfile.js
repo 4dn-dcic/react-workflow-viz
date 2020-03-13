@@ -162,9 +162,7 @@ function doWatchScss(done){
         "./src/styles.scss",
         "./dist/react-workflow-viz.min.css",
         "--watch",
-        "--recursive",
-        "--source-map",
-        "--source-map-embed"
+        "--recursive"
     ], { stdio: "inherit" });
 
     subP.on("close", (code)=>{

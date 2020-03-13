@@ -22,6 +22,10 @@ When it completes, load `file:///path-to-your-checkout/react-workflow-viz/index.
 ## Changelog
 _Side Note -_ Is there a way to auto-generate a `CHANGELOG.md` file out of releases' content?
 
+#### 2020-03-13
+- Improvements in path plotting - do not diverge into separate paths unless necessary.
+- Demo updates.
+
 #### 2020-01-21
 - Important glitch fixes, including typo and intersection counting.
 - PROTOTYPE / NOT ENABLED: Reuse horizontal edge segments (to reduce # of lines; noise) if:
