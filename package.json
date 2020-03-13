@@ -1,6 +1,6 @@
 {
   "name": "@hms-dbmi-bgm/react-workflow-viz",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "React component for visualizing CWL-like workflows and provenance graphs.",
   "main": "./dist/react-workflow-viz.min.js",
   "unpkg": "./dist/react-workflow-viz.min.js",
@@ -42,6 +42,7 @@
     "eslint-plugin-react": "^7.16.0",
     "fancy-log": "^1.3.3",
     "gulp": "^4.0.0",
+    "http-server": "^0.12.1",
     "jasmine": "^3.5.0",
     "node-sass": "^4.11.0",
     "plugin-error": "^1.0.1",
@@ -62,7 +63,6 @@
     "react-transition-group": "^4.2.0"
   },
   "dependencies": {
-    "http-server": "^0.12.1",
     "memoize-one": "^5.0.1",
     "underscore": "^1.9.1"
   }
