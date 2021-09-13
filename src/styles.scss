@@ -1,3 +1,5 @@
+@use 'sass:math';
+
 /************************/
 /**** Workflow Chart ****/
 /************************/
@@ -186,7 +188,7 @@ $workflow-node-color-type-global-context:           #ffb3b3 !default;
     }
 
     &.node-type-step {
-        margin-top: - ($workflow-step-node-height / 2);
+        margin-top: - math.div($workflow-step-node-height, 2);
         outline: 3px solid transparent;
         outline-offset: 4px;
         transition: top .5s ease-out, left .5s ease-out, width .5s ease-out, opacity .5s ease-out, outline-color .2s;
@@ -222,7 +224,7 @@ $workflow-node-color-type-global-context:           #ffb3b3 !default;
     &.node-type-input-group,
     &.node-type-output-group {
         
-        margin-top: - ($workflow-io-node-height / 2);
+        margin-top: - math.div($workflow-io-node-height, 2);
 
         /*
         &:before, &:after {
@@ -399,7 +401,7 @@ $workflow-node-color-type-global-context:           #ffb3b3 !default;
     }
     &.node-type-input-group,
     &.node-type-output-group {
-        margin-top: - (($workflow-io-node-height * 1.8) / 2);
+        margin-top: - math.div(($workflow-io-node-height * 1.8), 2);
         > .inner {
             font-weight: 500;
             .node-visible-element {

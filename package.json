@@ -44,26 +44,26 @@
     "gulp": "^4.0.0",
     "http-server": "^0.12.1",
     "jasmine": "^3.5.0",
-    "node-sass": "^4.11.0",
+    "sass": "^1.39.0",
     "plugin-error": "^1.0.1",
     "prop-types": "^15.7.2",
-    "react": "^16.8.0",
-    "react-dom": "^16.8.0",
-    "react-transition-group": "^4.2.0",
-    "source-map-support": "^0.5.11",
-    "string-replace-loader": "^1.0.0",
-    "terser-webpack-plugin": "^2.3.2",
-    "webpack": "4.28.4"
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0",
+    "react-transition-group": "^4.4.1",
+    "source-map-support": "^0.5.19",
+    "string-replace-loader": "^2.3.0",
+    "terser-webpack-plugin": "^4.2.3",
+    "webpack": "4.44.2"
   },
   "peerDependencies": {
-    "d3": "^5.9.0",
-    "prop-types": "^15.7.2",
-    "react": "^16.8.0",
-    "react-dom": "^16.8.0",
-    "react-transition-group": "^4.2.0"
+    "d3": ">=5.9.0",
+    "prop-types": ">=15.7.2",
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0",
+    "react-transition-group": ">=4.2.0"
   },
   "dependencies": {
-    "memoize-one": "^5.0.1",
-    "underscore": "^1.9.1"
+    "memoize-one": "^5.1.1",
+    "underscore": "^1.10.2"
   }
 }

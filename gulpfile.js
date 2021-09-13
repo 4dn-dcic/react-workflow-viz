@@ -2,10 +2,11 @@ const gulp = require('gulp');
 const PluginError = require('plugin-error');
 const log = require('fancy-log');
 const webpack = require('webpack');
-const sass = require('node-sass');
+const sass = require('sass');
 const fs = require('fs');
 const { spawn } = require('child_process');
 const path = require("path");
+const http = require('http');
 
 
 
@@ -91,9 +92,43 @@ function doWatchESModules(done){
     });
 }
 
+
 function doRunLocalServer(done){
-    const subP = spawn("http-server", ["-a",  "127.0.0.1", "-p", "8100"], { stdio: "inherit" });
-    subP.on("close", (code)=>{
+
+    const httpServer = http.createServer(function(request, response){
+
+        let filePath = '.' + request.url;
+        if (filePath == './') {
+            filePath = './index.html';
+        }
+
+        const extname = String(path.extname(filePath)).toLowerCase();
+        const mimeTypes = {
+            '.html': 'text/html',
+            '.js': 'text/javascript',
+            '.css': 'text/css',
+            '.json': 'application/json',
+            '.png': 'image/png',
+            '.jpg': 'image/jpg',
+            '.gif': 'image/gif',
+            '.svg': 'image/svg+xml',
+            '.woff': 'application/font-woff',
+            '.ttf': 'application/font-ttf',
+            '.eot': 'application/vnd.ms-fontobject',
+            '.otf': 'application/font-otf',
+        };
+
+        const contentType = mimeTypes[extname] || 'text/html';
+
+        fs.readFile(filePath, function(error, content) {
+            response.writeHead(200, { 'Content-Type': contentType, 'Cache-Control': 'no-cache' });
+            response.end(content, 'utf-8');
+        });
+    });
+
+    httpServer.listen(8100);
+    console.log("Serving on port 8100");
+    httpServer.on("close", function(){
         done();
     });
 }
@@ -158,11 +193,10 @@ function doBuildScss(done){
 }
 
 function doWatchScss(done){
-    const subP = spawn("node-sass", [
+    const subP = spawn("sass", [
         "./src/styles.scss",
         "./dist/react-workflow-viz.min.css",
-        "--watch",
-        "--recursive"
+        "--watch"
     ], { stdio: "inherit" });
 
     subP.on("close", (code)=>{

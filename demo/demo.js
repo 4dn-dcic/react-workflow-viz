@@ -61,6 +61,18 @@ class DemoApp extends Component {
                 "description" : null,
                 "href" : url.resolve(BASE_HREF, "workflow-bedtobeddb.json"),
                 "opts" : workflowOpts
+            },
+            {
+                "name" : "WorkflowRunAWSEM (hi-c-processing-bam) - Previous Version (no scatter)",
+                "description" : null,
+                "href" : url.resolve(BASE_HREF, "previous-hi-c-worfklowrunawsem.json"),
+                "opts" : workflowOpts
+            },
+            {
+                "name" : "WorkflowRunAWSEM (hi-c-processing-bam) - Next Version (scatter)",
+                "description" : null,
+                "href" : url.resolve(BASE_HREF, "for-development-hi-c-workflowrunawsem.json"),
+                "opts" : workflowOpts
             }
         ]
     };

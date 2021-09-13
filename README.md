@@ -18,9 +18,18 @@ npm run build
 ```
 
 When it completes, load `file:///path-to-your-checkout/react-workflow-viz/index.html`.
+New testdata won't show with `npm run build` unless is already present in unpkg/npm. For local development, do the following
+
+### For Development
+
+For local development (watches file, serves on localhost:8100), run `npm run dev`.
+
 
 ## Changelog
 _Side Note -_ Is there a way to auto-generate a `CHANGELOG.md` file out of releases' content?
+
+#### 2021-09-13 (v0.1.3, v0.1.4)
+- Added couple of new demo files for development.
 
 #### 2020-03-13 (v0.1.3, v0.1.4)
 - Improvements in path plotting - do not diverge into separate paths unless necessary.
