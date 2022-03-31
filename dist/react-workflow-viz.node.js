@@ -3128,12 +3128,25 @@ index_default_._ = index_default_;
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+var safeIsNaN = Number.isNaN ||
+    function ponyfill(value) {
+        return typeof value === 'number' && value !== value;
+    };
+function isEqual(first, second) {
+    if (first === second) {
+        return true;
+    }
+    if (safeIsNaN(first) && safeIsNaN(second)) {
+        return true;
+    }
+    return false;
+}
 function areInputsEqual(newInputs, lastInputs) {
     if (newInputs.length !== lastInputs.length) {
         return false;
     }
     for (var i = 0; i < newInputs.length; i++) {
-        if (newInputs[i] !== lastInputs[i]) {
+        if (!isEqual(newInputs[i], lastInputs[i])) {
             return false;
         }
     }
@@ -4203,7 +4216,7 @@ function parseAnalysisSteps(analysis_steps) {
       var ioRunData = stepIO.run_data;
       if (!nodeRunData) return false; // AB: Not sure / can't remember why array is always expected here, it might make sense to check if not array and then use [ ioRunData.file ]
 
-      var stepIOFiles = Array.isArray(ioRunData.file) && typeof ioRunData.file !== 'undefined' || [];
+      var stepIOFiles = ioRunData && Array.isArray(ioRunData.file) && ioRunData.file || [];
       return !!(nodeRunData.file && _underscore["default"].any(stepIOFiles, compareTwoFilesByID.bind(null, nodeRunData.file)) || typeof nodeRunData.value !== 'undefined' && ioRunData && typeof ioRunData.value !== 'undefined' && nodeRunData.value === ioRunData.value);
     }
 
