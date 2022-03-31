@@ -544,7 +544,7 @@ export function parseAnalysisSteps(analysis_steps, parsingOptions = {}){
             const { run_data: ioRunData } = stepIO;
             if (!nodeRunData) return false;
             // AB: Not sure / can't remember why array is always expected here, it might make sense to check if not array and then use [ ioRunData.file ]
-            const stepIOFiles = (Array.isArray(ioRunData.file) && ioRunData.file) || [];
+            const stepIOFiles = (Array.isArray(ioRunData.file) && typeof ioRunData.file !== 'undefined') || [];
             return !!(
                 (nodeRunData.file && _.any(stepIOFiles, compareTwoFilesByID.bind(null, nodeRunData.file))) ||
                 (typeof nodeRunData.value !== 'undefined' && ioRunData && typeof ioRunData.value !== 'undefined' && nodeRunData.value === ioRunData.value)

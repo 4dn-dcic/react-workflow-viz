@@ -624,7 +624,7 @@ function parseAnalysisSteps(analysis_steps) {
       var ioRunData = stepIO.run_data;
       if (!nodeRunData) return false; // AB: Not sure / can't remember why array is always expected here, it might make sense to check if not array and then use [ ioRunData.file ]
 
-      var stepIOFiles = Array.isArray(ioRunData.file) && ioRunData.file || [];
+      var stepIOFiles = Array.isArray(ioRunData.file) && typeof ioRunData.file !== 'undefined' || [];
       return !!(nodeRunData.file && _underscore["default"].any(stepIOFiles, compareTwoFilesByID.bind(null, nodeRunData.file)) || typeof nodeRunData.value !== 'undefined' && ioRunData && typeof ioRunData.value !== 'undefined' && nodeRunData.value === ioRunData.value);
     }
 
