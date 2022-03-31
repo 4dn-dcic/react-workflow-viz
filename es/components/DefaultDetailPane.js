@@ -21,11 +21,11 @@ function DefaultDetailPane(props) {
   }
 
   var textContent = JSON.stringify(node.meta, null, 4);
-  return _react["default"].createElement("div", {
+  return /*#__PURE__*/_react["default"].createElement("div", {
     className: "detail-pane"
-  }, _react["default"].createElement("h4", null, "Create your own detail pane component and pass in a ", _react["default"].createElement("code", null, "renderDetailPane"), " prop (function) which returns it."), _react["default"].createElement("h5", null, "Could add ", _react["default"].createElement("code", null, "display: flex"), " & related CSS styling to visualization container & pane to have detail pane show at left or right, if desired."), _react["default"].createElement("div", {
+  }, /*#__PURE__*/_react["default"].createElement("h4", null, "Create your own detail pane component and pass in a ", /*#__PURE__*/_react["default"].createElement("code", null, "renderDetailPane"), " prop (function) which returns it."), /*#__PURE__*/_react["default"].createElement("h5", null, "Could add ", /*#__PURE__*/_react["default"].createElement("code", null, "display: flex"), " & related CSS styling to visualization container & pane to have detail pane show at left or right, if desired."), /*#__PURE__*/_react["default"].createElement("div", {
     className: "detail-pane-body"
-  }, _react["default"].createElement("pre", {
+  }, /*#__PURE__*/_react["default"].createElement("pre", {
     style: {
       fontFamily: "monospace",
       whiteSpace: "pre-wrap"

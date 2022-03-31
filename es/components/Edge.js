@@ -1,9 +1,11 @@
 'use strict';
 
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports["default"] = exports.pathDimensionFunctions = void 0;
+exports.pathDimensionFunctions = exports["default"] = void 0;
 
 var _react = _interopRequireDefault(require("react"));
 
@@ -19,35 +21,43 @@ var _Node = _interopRequireDefault(require("./Node"));
 
 var _parsingFunctions = require("./parsing-functions");
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj["default"] = obj; return newObj; } }
+function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
+
+function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || _typeof(obj) !== "object" && typeof obj !== "function") { return { "default": obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj["default"] = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function (obj) { return typeof obj; }; } else { _typeof = function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 
-function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 
-function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
 
-function _iterableToArrayLimit(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function (o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); Object.defineProperty(subClass, "prototype", { writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function (o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function () { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } else if (call !== void 0) { throw new TypeError("Derived constructors may only return object or undefined"); } return _assertThisInitialized(self); }
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function (o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function (o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -79,9 +89,9 @@ var pathDimensionFunctions = {
     if (nodeXDif > columnSpacing
     /* && Math.abs(endPt.y - startPt.y) <= this.props.rowSpacing * 2*/
     ) {
-        // Draw straight line until last section. Length depending on how close together y-axes are (revert to default bezier if far apart).
-        bezierStartPt.x += Math.max(0, nodeXDif - columnSpacing * (Math.abs(endPt.y - startPt.y) / rowSpacing * 2.5)); //path.lineTo(bezierStartPt.x, bezierStartPt.y);
-      }
+      // Draw straight line until last section. Length depending on how close together y-axes are (revert to default bezier if far apart).
+      bezierStartPt.x += Math.max(0, nodeXDif - columnSpacing * (Math.abs(endPt.y - startPt.y) / rowSpacing * 2.5)); //path.lineTo(bezierStartPt.x, bezierStartPt.y);
+    }
 
     var bezierXDif = Math.abs(bezierStartPt.x - bezierEndPt.x);
     var controlPoints = [{
@@ -162,122 +172,17 @@ var pathDimensionFunctions = {
 };
 exports.pathDimensionFunctions = pathDimensionFunctions;
 
-var Edge =
-/*#__PURE__*/
-function (_React$Component) {
+var Edge = /*#__PURE__*/function (_React$Component) {
   _inherits(Edge, _React$Component);
 
-  _createClass(Edge, null, [{
-    key: "isSelected",
-    value: function isSelected(edge, selectedNode) {
-      return _Node["default"].isSelected(edge.source, selectedNode) || _Node["default"].isSelected(edge.target, selectedNode);
-    }
-  }, {
-    key: "isRelated",
-    value: function isRelated(edge, selectedNode) {
-      return _Node["default"].isRelated(edge.source, selectedNode); // Enable the following later _if_ we go beyond 1 input node deep.
-      //return (
-      //    Node.isRelated(edge.source, selectedNode) ||
-      //    Node.isRelated(edge.target, selectedNode)
-      //);
-    }
-  }, {
-    key: "isDistantlySelected",
-    value: function isDistantlySelected(edge, selectedNode) {
-      if (!selectedNode) return false;
-
-      function checkInput(node) {
-        return _Node["default"].isSelected(edge.target, node);
-      }
-
-      function checkOutput(node) {
-        return _Node["default"].isSelected(edge.source, node);
-      }
-
-      var selectedInputs = selectedNode && (selectedNode.inputNodes || selectedNode.outputOf && [selectedNode.outputOf]) || null;
-
-      if (Array.isArray(selectedInputs) && selectedInputs.length > 0) {
-        var resultsHistory = _underscore["default"].flatten(selectedInputs.map(function (sI) {
-          return (0, _parsingFunctions.traceNodePathAndRun)(sI, checkInput, 'input', selectedNode);
-        }), false);
-
-        if (_underscore["default"].any(resultsHistory)) return true;
-      }
-
-      var selectedOutputs = selectedNode && (selectedNode.outputNodes || selectedNode.inputOf && selectedNode.inputOf) || null;
-
-      if (Array.isArray(selectedOutputs) && selectedOutputs.length > 0) {
-        var resultsFuture = _underscore["default"].flatten(selectedOutputs.map(function (sO) {
-          return (0, _parsingFunctions.traceNodePathAndRun)(sO, checkOutput, 'output', selectedNode);
-        }), false);
-
-        if (_underscore["default"].any(resultsFuture)) return true;
-      }
-
-      return false;
-    }
-  }, {
-    key: "isDisabled",
-    value: function isDisabled(edge) {
-      var isNodeDisabled = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-      if (typeof isNodeDisabled === 'boolean') return isNodeDisabled;
-      return typeof isNodeDisabled === 'function' && (isNodeDisabled(edge.source) || isNodeDisabled(edge.target));
-    }
-  }, {
-    key: "didNodeCoordinatesChange",
-    value: function didNodeCoordinatesChange(nextProps, pastProps) {
-      if (nextProps.startX !== pastProps.startX || nextProps.startY !== pastProps.startY || nextProps.endX !== pastProps.endX || nextProps.endY !== pastProps.endY) return true;
-      return false;
-    }
-  }, {
-    key: "pathArrowsMarkers",
-    value: function pathArrowsMarkers() {
-      return _react["default"].createElement("defs", null, _react["default"].createElement("marker", {
-        id: "pathArrowBlack",
-        viewBox: "0 0 15 15",
-        refX: "0",
-        refY: "5",
-        orient: "auto",
-        markerUnits: "strokeWidth",
-        markerWidth: "6",
-        markerHeight: "5"
-      }, _react["default"].createElement("path", {
-        d: "M 0 0 L 10 5 L 0 10 Z",
-        className: "pathArrow-marker marker-color-black"
-      })), _react["default"].createElement("marker", {
-        id: "pathArrowGray",
-        viewBox: "0 0 15 15",
-        refX: "0",
-        refY: "5",
-        orient: "auto",
-        markerUnits: "strokeWidth",
-        markerWidth: "6",
-        markerHeight: "5"
-      }, _react["default"].createElement("path", {
-        d: "M 0 0 L 10 5 L 0 10 Z",
-        className: "pathArrow-marker marker-color-gray"
-      })), _react["default"].createElement("marker", {
-        id: "pathArrowLightGray",
-        viewBox: "0 0 15 15",
-        refX: "0",
-        refY: "5",
-        orient: "auto",
-        markerUnits: "strokeWidth",
-        markerWidth: "6",
-        markerHeight: "5"
-      }, _react["default"].createElement("path", {
-        d: "M 0 0 L 10 5 L 0 10 Z",
-        className: "pathArrow-marker marker-color-light-gray"
-      })));
-    }
-  }]);
+  var _super = _createSuper(Edge);
 
   function Edge(props) {
     var _this;
 
     _classCallCheck(this, Edge);
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(Edge).call(this, props));
+    _this = _super.call(this, props);
     _this.generatePathDimension = _this.generatePathDimension.bind(_assertThisInitialized(_this));
     _this.transitionPathDimensions = _this.transitionPathDimensions.bind(_assertThisInitialized(_this)); // Create own memoized copy/instance of intensive static functions.
     // Otherwise if left static, will be re-ran each time as many edges call it.
@@ -299,7 +204,7 @@ function (_React$Component) {
     }; // Alternative implementation of transition -
     // adjust pathRef.current `d` attribute manually
 
-    _this.pathRef = _react["default"].createRef();
+    _this.pathRef = /*#__PURE__*/_react["default"].createRef();
     return _this;
   }
 
@@ -368,7 +273,8 @@ function (_React$Component) {
           {
             'x': endX,
             'y': endY
-          }];
+          } // StartB
+          ];
 
           if (edge.vertices && pastProps.edge.vertices && edge.vertices.length === pastProps.edge.vertices.length) {
             this.transitionPathDimensions.apply(this, startEndPtCoords.concat([pastProps.edge.vertices, edge.vertices]));
@@ -582,7 +488,7 @@ function (_React$Component) {
         markerEnd = 'pathArrowGray';
       }
 
-      return _react["default"].createElement("path", {
+      return /*#__PURE__*/_react["default"].createElement("path", {
         d: pathDimension,
         ref: this.pathRef,
         className: "edge-path" + (disabled ? ' disabled' : ''),
@@ -593,6 +499,109 @@ function (_React$Component) {
         style: style,
         markerEnd: markerEnd && "url(#" + markerEnd + ")"
       });
+    }
+  }], [{
+    key: "isSelected",
+    value: function isSelected(edge, selectedNode) {
+      return _Node["default"].isSelected(edge.source, selectedNode) || _Node["default"].isSelected(edge.target, selectedNode);
+    }
+  }, {
+    key: "isRelated",
+    value: function isRelated(edge, selectedNode) {
+      return _Node["default"].isRelated(edge.source, selectedNode); // Enable the following later _if_ we go beyond 1 input node deep.
+      //return (
+      //    Node.isRelated(edge.source, selectedNode) ||
+      //    Node.isRelated(edge.target, selectedNode)
+      //);
+    }
+  }, {
+    key: "isDistantlySelected",
+    value: function isDistantlySelected(edge, selectedNode) {
+      if (!selectedNode) return false;
+
+      function checkInput(node) {
+        return _Node["default"].isSelected(edge.target, node);
+      }
+
+      function checkOutput(node) {
+        return _Node["default"].isSelected(edge.source, node);
+      }
+
+      var selectedInputs = selectedNode && (selectedNode.inputNodes || selectedNode.outputOf && [selectedNode.outputOf]) || null;
+
+      if (Array.isArray(selectedInputs) && selectedInputs.length > 0) {
+        var resultsHistory = _underscore["default"].flatten(selectedInputs.map(function (sI) {
+          return (0, _parsingFunctions.traceNodePathAndRun)(sI, checkInput, 'input', selectedNode);
+        }), false);
+
+        if (_underscore["default"].any(resultsHistory)) return true;
+      }
+
+      var selectedOutputs = selectedNode && (selectedNode.outputNodes || selectedNode.inputOf && selectedNode.inputOf) || null;
+
+      if (Array.isArray(selectedOutputs) && selectedOutputs.length > 0) {
+        var resultsFuture = _underscore["default"].flatten(selectedOutputs.map(function (sO) {
+          return (0, _parsingFunctions.traceNodePathAndRun)(sO, checkOutput, 'output', selectedNode);
+        }), false);
+
+        if (_underscore["default"].any(resultsFuture)) return true;
+      }
+
+      return false;
+    }
+  }, {
+    key: "isDisabled",
+    value: function isDisabled(edge) {
+      var isNodeDisabled = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+      if (typeof isNodeDisabled === 'boolean') return isNodeDisabled;
+      return typeof isNodeDisabled === 'function' && (isNodeDisabled(edge.source) || isNodeDisabled(edge.target));
+    }
+  }, {
+    key: "didNodeCoordinatesChange",
+    value: function didNodeCoordinatesChange(nextProps, pastProps) {
+      if (nextProps.startX !== pastProps.startX || nextProps.startY !== pastProps.startY || nextProps.endX !== pastProps.endX || nextProps.endY !== pastProps.endY) return true;
+      return false;
+    }
+  }, {
+    key: "pathArrowsMarkers",
+    value: function pathArrowsMarkers() {
+      return /*#__PURE__*/_react["default"].createElement("defs", null, /*#__PURE__*/_react["default"].createElement("marker", {
+        id: "pathArrowBlack",
+        viewBox: "0 0 15 15",
+        refX: "0",
+        refY: "5",
+        orient: "auto",
+        markerUnits: "strokeWidth",
+        markerWidth: "6",
+        markerHeight: "5"
+      }, /*#__PURE__*/_react["default"].createElement("path", {
+        d: "M 0 0 L 10 5 L 0 10 Z",
+        className: "pathArrow-marker marker-color-black"
+      })), /*#__PURE__*/_react["default"].createElement("marker", {
+        id: "pathArrowGray",
+        viewBox: "0 0 15 15",
+        refX: "0",
+        refY: "5",
+        orient: "auto",
+        markerUnits: "strokeWidth",
+        markerWidth: "6",
+        markerHeight: "5"
+      }, /*#__PURE__*/_react["default"].createElement("path", {
+        d: "M 0 0 L 10 5 L 0 10 Z",
+        className: "pathArrow-marker marker-color-gray"
+      })), /*#__PURE__*/_react["default"].createElement("marker", {
+        id: "pathArrowLightGray",
+        viewBox: "0 0 15 15",
+        refX: "0",
+        refY: "5",
+        orient: "auto",
+        markerUnits: "strokeWidth",
+        markerWidth: "6",
+        markerHeight: "5"
+      }, /*#__PURE__*/_react["default"].createElement("path", {
+        d: "M 0 0 L 10 5 L 0 10 Z",
+        className: "pathArrow-marker marker-color-light-gray"
+      })));
     }
   }]);
 

@@ -3,17 +3,17 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.parseAnalysisSteps = parseAnalysisSteps;
-exports.traceNodePathAndRun = traceNodePathAndRun;
+exports.DEFAULT_PARSING_OPTIONS = void 0;
 exports.correctColumnAssignments = correctColumnAssignments;
-exports.parseBasicIOAnalysisSteps = parseBasicIOAnalysisSteps;
+exports.filterOutIndirectFilesFromGraphData = filterOutIndirectFilesFromGraphData;
 exports.filterOutParametersFromGraphData = filterOutParametersFromGraphData;
 exports.filterOutReferenceFilesFromGraphData = filterOutReferenceFilesFromGraphData;
-exports.filterOutIndirectFilesFromGraphData = filterOutIndirectFilesFromGraphData;
-exports.nodesPreSortFxn = nodesPreSortFxn;
-exports.nodesInColumnSortFxn = nodesInColumnSortFxn;
 exports.nodesInColumnPostSortFxn = nodesInColumnPostSortFxn;
-exports.DEFAULT_PARSING_OPTIONS = void 0;
+exports.nodesInColumnSortFxn = nodesInColumnSortFxn;
+exports.nodesPreSortFxn = nodesPreSortFxn;
+exports.parseAnalysisSteps = parseAnalysisSteps;
+exports.parseBasicIOAnalysisSteps = parseBasicIOAnalysisSteps;
+exports.traceNodePathAndRun = traceNodePathAndRun;
 
 var _underscore = _interopRequireDefault(require("underscore"));
 
@@ -21,27 +21,31 @@ var _memoizeOne = _interopRequireDefault(require("memoize-one"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 
-function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
 
-function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
 
-function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 
-function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 
-function _iterableToArrayLimit(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function (obj) { return typeof obj; }; } else { _typeof = function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
 
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(source, true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -177,7 +181,7 @@ exports.DEFAULT_PARSING_OPTIONS = DEFAULT_PARSING_OPTIONS;
 function parseAnalysisSteps(analysis_steps) {
   var parsingOptions = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-  var parsingOpts = _objectSpread({}, DEFAULT_PARSING_OPTIONS, {}, parsingOptions);
+  var parsingOpts = _objectSpread(_objectSpread({}, DEFAULT_PARSING_OPTIONS), parsingOptions);
   /*************
    ** Outputs **
    *************/
@@ -444,7 +448,7 @@ function parseAnalysisSteps(analysis_steps) {
         if (!val) console.error('No value(s) on', value_list, stepNode);
         var id = generatedNodeName + '.'; // Create a run_data representing just this 1 file.
 
-        var run_data = _objectSpread({}, stepIORunData, {
+        var run_data = _objectSpread(_objectSpread({}, stepIORunData), {}, {
           'meta': runDataMeta && runDataMeta[idx] || null
         });
 
@@ -460,7 +464,7 @@ function parseAnalysisSteps(analysis_steps) {
         } //console.log('RUNDATA', run_data);
 
 
-        var ioForRunDataItem = _objectSpread({}, stepIOArgument, {
+        var ioForRunDataItem = _objectSpread(_objectSpread({}, stepIOArgument), {}, {
           id: id,
           run_data: run_data,
           'name': generatedNodeName
@@ -788,7 +792,7 @@ function parseAnalysisSteps(analysis_steps) {
           } // Sub-Step 2: Extend the node we did match with any new relevant information from input definition on next step (available from new node we created but are throwing out).
 
 
-          var combinedMeta = _objectSpread({}, n.meta, {}, inNode.meta, {
+          var combinedMeta = _objectSpread(_objectSpread(_objectSpread({}, n.meta), inNode.meta), {}, {
             'global': n.meta.global || inNode.meta.global || false,
             // true if either is true.
             // Preserve initial node's type when possible -- 'output' supersedes 'input' when node is both an output and input)
@@ -1182,7 +1186,7 @@ function parseBasicIOAnalysisSteps(analysis_steps, workflowItem, parsingOptions)
     }) || false;
   }
 
-  return parseAnalysisSteps([_objectSpread({}, workflowItem, {
+  return parseAnalysisSteps([_objectSpread(_objectSpread({}, workflowItem), {}, {
     inputs: _underscore["default"].filter(_underscore["default"].flatten(_underscore["default"].pluck(analysis_steps, 'inputs'), true), checkIfGlobal),
     outputs: _underscore["default"].filter(_underscore["default"].flatten(_underscore["default"].pluck(analysis_steps, 'outputs'), true), checkIfGlobal)
   })], parsingOptions);

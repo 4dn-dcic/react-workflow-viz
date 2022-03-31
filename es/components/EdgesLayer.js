@@ -1,10 +1,12 @@
 'use strict';
 
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.traceEdges = traceEdges;
 exports["default"] = void 0;
+exports.traceEdges = traceEdges;
 
 var _react = _interopRequireDefault(require("react"));
 
@@ -22,45 +24,51 @@ var _Edge = _interopRequireDefault(require("./Edge"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 
-function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
 
-function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
-
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function (obj) { return typeof obj; }; } else { _typeof = function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
 
 function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function (o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); Object.defineProperty(subClass, "prototype", { writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function (o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function () { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(source, true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } else if (call !== void 0) { throw new TypeError("Derived constructors may only return object or undefined"); } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function (o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 
-function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 
-function _iterableToArrayLimit(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
@@ -381,7 +389,7 @@ function traceEdges(originalEdges, nodes, columnWidth, columnSpacing, rowSpacing
 
       vertices.push([targetX, targetY]); // console.log("EDGE", edge);
 
-      resultEdges.push(_objectSpread({}, edge, {
+      resultEdges.push(_objectSpread(_objectSpread({}, edge), {}, {
         vertices: vertices
       }));
     });
@@ -416,52 +424,17 @@ function traceEdges(originalEdges, nodes, columnWidth, columnSpacing, rowSpacing
   };
 }
 
-var EdgesLayer =
-/*#__PURE__*/
-function (_React$PureComponent) {
+var EdgesLayer = /*#__PURE__*/function (_React$PureComponent) {
   _inherits(EdgesLayer, _React$PureComponent);
 
-  _createClass(EdgesLayer, null, [{
-    key: "sortedEdges",
-
-    /**
-     * Move selected edges to top, and disabled ones to bottom, because CSS z-index doesn't work for SVG elements.
-     */
-    value: function sortedEdges(edges, selectedNode, isNodeDisabled) {
-      return edges.slice(0).sort(function (a, b) {
-        var isASelected = _Edge["default"].isSelected(a, selectedNode, isNodeDisabled);
-
-        var isBSelected = _Edge["default"].isSelected(b, selectedNode, isNodeDisabled);
-
-        if (isASelected && !isBSelected) {
-          return 1;
-        } else if (!isASelected && isBSelected) {
-          return -1;
-        } else {
-          return 0;
-        }
-      }).sort(function (a, b) {
-        var isADisabled = _Edge["default"].isDisabled(a, isNodeDisabled);
-
-        var isBDisabled = _Edge["default"].isDisabled(b, isNodeDisabled);
-
-        if (isADisabled && !isBDisabled) {
-          return -1;
-        } else if (!isADisabled && isBDisabled) {
-          return 1;
-        } else {
-          return 0;
-        }
-      });
-    }
-  }]);
+  var _super = _createSuper(EdgesLayer);
 
   function EdgesLayer(props) {
     var _this;
 
     _classCallCheck(this, EdgesLayer);
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(EdgesLayer).call(this, props));
+    _this = _super.call(this, props);
 
     _defineProperty(_assertThisInitialized(_this), "sortedEdges", (0, _memoizeOne["default"])(function (edges, selectedNodes, isNodeDisabled) {
       var nextEdges = EdgesLayer.sortedEdges(edges, selectedNodes, isNodeDisabled); // Create new list of refs each time we're updated.
@@ -481,7 +454,7 @@ function (_React$PureComponent) {
 
   _createClass(EdgesLayer, [{
     key: "pathArrows",
-    // Experimentation with transitioning multiple edges at once within requestAnimationFrame.
+    value: // Experimentation with transitioning multiple edges at once within requestAnimationFrame.
     // Need to rethink design of this, an array for this.edgeRefs won't work as we need to keep
     // state.source.x, state.source.y cached in state and associated w/ each edge.
     // Possibly can use object keyed by 'key' string (as determined in render method).
@@ -492,7 +465,7 @@ function (_React$PureComponent) {
     //        return ref && ref.current && ref.current.pathRef && ref.current.pathRef.current;
     //    });
     //}
-    value: function pathArrows() {
+    function pathArrows() {
       if (!this.props.pathArrows) return null;
       return _Edge["default"].pathArrowsMarkers();
     }
@@ -528,21 +501,21 @@ function (_React$PureComponent) {
 
       var edgeCount = edges.length;
       var divWidth = Math.max(width, contentWidth);
-      return _react["default"].createElement("div", {
+      return /*#__PURE__*/_react["default"].createElement("div", {
         className: "edges-layer-wrapper",
         style: {
           'width': divWidth,
           'height': outerHeight
         }
-      }, _react["default"].createElement("svg", {
+      }, /*#__PURE__*/_react["default"].createElement("svg", {
         className: "edges-layer",
         width: divWidth,
         height: outerHeight
-      }, this.pathArrows(), _react["default"].createElement(_reactTransitionGroup.TransitionGroup, {
+      }, this.pathArrows(), /*#__PURE__*/_react["default"].createElement(_reactTransitionGroup.TransitionGroup, {
         component: null
       }, _underscore["default"].map(this.sortedEdges(edges, selectedNode, isNodeDisabled), function (edge) {
         var key = (edge.source.id || edge.source.name) + "----" + (edge.target.id || edge.target.name);
-        return _react["default"].createElement(_reactTransitionGroup.Transition, {
+        return /*#__PURE__*/_react["default"].createElement(_reactTransitionGroup.Transition, {
           unmountOnExit: true,
           mountOnEnter: true,
           timeout: 500,
@@ -551,21 +524,53 @@ function (_React$PureComponent) {
           onEntering: EdgesLayer.edgeOnEntering,
           onExit: EdgesLayer.edgeOnExit,
           onEntered: EdgesLayer.edgeOnEntered
-        }, _react["default"].createElement(_Edge["default"], _extends({}, _this2.props, {
+        }, /*#__PURE__*/_react["default"].createElement(_Edge["default"], _extends({}, _this2.props, {
           key: key,
           edge: edge,
-          edgeCount: edgeCount
-        }, {
+          edgeCount: edgeCount,
           startX: edge.source.x,
           startY: edge.source.y,
           endX: edge.target.x,
           endY: edge.target.y
         })));
-      })), _react["default"].createElement(DebugVizGraphLayer, {
+      })), /*#__PURE__*/_react["default"].createElement(DebugVizGraphLayer, {
         segments: horizontalSegments
       })));
     }
   }], [{
+    key: "sortedEdges",
+    value:
+    /**
+     * Move selected edges to top, and disabled ones to bottom, because CSS z-index doesn't work for SVG elements.
+     */
+    function sortedEdges(edges, selectedNode, isNodeDisabled) {
+      return edges.slice(0).sort(function (a, b) {
+        var isASelected = _Edge["default"].isSelected(a, selectedNode, isNodeDisabled);
+
+        var isBSelected = _Edge["default"].isSelected(b, selectedNode, isNodeDisabled);
+
+        if (isASelected && !isBSelected) {
+          return 1;
+        } else if (!isASelected && isBSelected) {
+          return -1;
+        } else {
+          return 0;
+        }
+      }).sort(function (a, b) {
+        var isADisabled = _Edge["default"].isDisabled(a, isNodeDisabled);
+
+        var isBDisabled = _Edge["default"].isDisabled(b, isNodeDisabled);
+
+        if (isADisabled && !isBDisabled) {
+          return -1;
+        } else if (!isADisabled && isBDisabled) {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
+    }
+  }, {
     key: "edgeOnEnter",
     value: function edgeOnEnter(elem) {
       elem.style.opacity = 0;
@@ -593,7 +598,7 @@ function (_React$PureComponent) {
 
 exports["default"] = EdgesLayer;
 
-var DebugVizGraphLayer = _react["default"].memo(function (_ref3) {
+var DebugVizGraphLayer = /*#__PURE__*/_react["default"].memo(function (_ref3) {
   var segments = _ref3.segments,
       _ref3$enabled = _ref3.enabled,
       enabled = _ref3$enabled === void 0 ? false : _ref3$enabled;
@@ -604,12 +609,12 @@ var DebugVizGraphLayer = _react["default"].memo(function (_ref3) {
     path.lineTo.apply(path, _toConsumableArray(seg[1]));
     return path.toString();
   }).map(function (pathStr, idx) {
-    return _react["default"].createElement("path", {
+    return /*#__PURE__*/_react["default"].createElement("path", {
       d: pathStr,
       key: idx
     });
   });
-  return _react["default"].createElement("g", {
+  return /*#__PURE__*/_react["default"].createElement("g", {
     className: "vis-debug-graph"
   }, paths);
 });

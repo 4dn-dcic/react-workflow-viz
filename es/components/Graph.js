@@ -1,9 +1,11 @@
 'use strict';
 
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.GraphParser = exports["default"] = void 0;
+exports["default"] = exports.GraphParser = void 0;
 
 var _react = _interopRequireDefault(require("react"));
 
@@ -29,37 +31,45 @@ var _Node = require("./Node");
 
 var _parsingFunctions = require("./parsing-functions");
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj["default"] = obj; return newObj; } }
+function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
+
+function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || _typeof(obj) !== "object" && typeof obj !== "function") { return { "default": obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj["default"] = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function (obj) { return typeof obj; }; } else { _typeof = function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 
-function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 
-function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
 
-function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
-function _iterableToArrayLimit(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
+function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function (o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); Object.defineProperty(subClass, "prototype", { writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function (o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function () { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } else if (call !== void 0) { throw new TypeError("Derived constructors may only return object or undefined"); } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function (o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -80,12 +90,121 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
  * @prop {number}       [rowSpacing=56]         Adjust vertical spacing between node centers (NOT between their bottom/top).
  * @prop {function}     [nodeTitle]             Optional function to supply to get node title, before is passed to visible Node element. Useful if want to display some meta sub-property rather than technical title.
  */
-var Graph =
-/*#__PURE__*/
-function (_React$Component) {
+var Graph = /*#__PURE__*/function (_React$Component) {
   _inherits(Graph, _React$Component);
 
-  _createClass(Graph, null, [{
+  var _super = _createSuper(Graph);
+
+  function Graph(props) {
+    var _this;
+
+    _classCallCheck(this, Graph);
+
+    _this = _super.call(this, props);
+    _this.height = _this.height.bind(_assertThisInitialized(_this));
+    _this.nodesWithCoordinates = _this.nodesWithCoordinates.bind(_assertThisInitialized(_this));
+    _this.state = {
+      'mounted': false
+    };
+    _this.memoized = {
+      getHeightFromNodes: (0, _memoizeOne["default"])(Graph.getHeightFromNodes),
+      getScrollableWidthFromNodes: (0, _memoizeOne["default"])(Graph.getScrollableWidthFromNodes),
+      getNodesWithCoordinates: (0, _memoizeOne["default"])(Graph.getNodesWithCoordinates)
+    };
+    return _this;
+  }
+
+  _createClass(Graph, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      this.setState({
+        'mounted': true
+      });
+    }
+  }, {
+    key: "height",
+    value: function height() {
+      var _this$props = this.props,
+          nodes = _this$props.nodes,
+          nodesPreSortFxn = _this$props.nodesPreSortFxn,
+          rowSpacing = _this$props.rowSpacing;
+      return this.memoized.getHeightFromNodes(nodes, nodesPreSortFxn, rowSpacing);
+    }
+  }, {
+    key: "scrollableWidth",
+    value: function scrollableWidth() {
+      var _this$props2 = this.props,
+          nodes = _this$props2.nodes,
+          columnWidth = _this$props2.columnWidth,
+          columnSpacing = _this$props2.columnSpacing,
+          innerMargin = _this$props2.innerMargin;
+      return this.memoized.getScrollableWidthFromNodes(nodes, columnWidth, columnSpacing, innerMargin);
+    }
+  }, {
+    key: "nodesWithCoordinates",
+    value: function nodesWithCoordinates(viewportWidth, contentWidth, contentHeight) {
+      var _this$props3 = this.props,
+          nodes = _this$props3.nodes,
+          innerMargin = _this$props3.innerMargin,
+          rowSpacingType = _this$props3.rowSpacingType,
+          rowSpacing = _this$props3.rowSpacing,
+          columnWidth = _this$props3.columnWidth,
+          columnSpacing = _this$props3.columnSpacing,
+          isNodeCurrentContext = _this$props3.isNodeCurrentContext;
+      return this.memoized.getNodesWithCoordinates(nodes, viewportWidth, contentWidth, contentHeight, innerMargin, rowSpacingType, rowSpacing, columnWidth, columnSpacing, isNodeCurrentContext);
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var _this$props4 = this.props,
+          width = _this$props4.width,
+          innerMargin = _this$props4.innerMargin,
+          edges = _this$props4.edges,
+          minimumHeight = _this$props4.minimumHeight;
+      var mounted = this.state.mounted;
+      var innerHeight = this.height();
+      var contentWidth = this.scrollableWidth();
+      var innerWidth = width;
+
+      if (!mounted) {
+        return /*#__PURE__*/_react["default"].createElement("div", {
+          key: "outer"
+        }, /*#__PURE__*/_react["default"].createElement("div", null, "\xA0"));
+      }
+
+      if (innerMargin && (innerMargin.left || innerMargin.right)) {
+        innerWidth -= innerMargin.left || 0;
+        innerWidth -= innerMargin.right || 0;
+      }
+
+      var nodes = this.nodesWithCoordinates(innerWidth, contentWidth, innerHeight);
+      var graphHeight = innerHeight + (innerMargin.top || 0) + (innerMargin.bottom || 0);
+      /* TODO: later
+      var spacerCount = _.reduce(nodes, function(m,n){ if (n.nodeType === 'spacer'){ return m + 1; } else { return m; }}, 0);
+      if (spacerCount){
+          height += (spacerCount * this.props.columnSpacing);
+          graphHeight += (spacerCount * this.props.columnSpacing);
+      }
+      */
+
+      return /*#__PURE__*/_react["default"].createElement("div", {
+        className: "workflow-chart-outer-container",
+        key: "outer"
+      }, /*#__PURE__*/_react["default"].createElement("div", {
+        className: "workflow-chart-inner-container"
+      }, /*#__PURE__*/_react["default"].createElement(_StateContainer["default"], _extends({
+        nodes: nodes,
+        edges: edges,
+        innerWidth: innerWidth,
+        innerHeight: innerHeight,
+        contentWidth: contentWidth,
+        width: width
+      }, _underscore["default"].pick(this.props, 'innerMargin', 'columnWidth', 'columnSpacing', 'pathArrows', 'href', 'onNodeClick', 'renderDetailPane')), /*#__PURE__*/_react["default"].createElement(_ScrollContainer["default"], {
+        outerHeight: graphHeight,
+        minHeight: minimumHeight
+      }, /*#__PURE__*/_react["default"].createElement(_EdgesLayer["default"], _underscore["default"].pick(this.props, 'isNodeDisabled', 'isNodeCurrentContext', 'isNodeSelected', 'edgeStyle', 'rowSpacing', 'columnWidth', 'columnSpacing', 'nodeEdgeLedgeWidths')), /*#__PURE__*/_react["default"].createElement(_NodesLayer["default"], _underscore["default"].pick(this.props, 'renderNodeElement', 'isNodeDisabled', 'isNodeCurrentContext', 'nodeClassName'))))));
+    }
+  }], [{
     key: "getHeightFromNodes",
     value: function getHeightFromNodes(nodes, nodesPreSortFxn, rowSpacing) {
       // Run pre-sort fxn, e.g. to manually pre-arrange nodes into different columns.
@@ -223,117 +342,6 @@ function (_React$Component) {
     }
   }]);
 
-  function Graph(props) {
-    var _this;
-
-    _classCallCheck(this, Graph);
-
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(Graph).call(this, props));
-    _this.height = _this.height.bind(_assertThisInitialized(_this));
-    _this.nodesWithCoordinates = _this.nodesWithCoordinates.bind(_assertThisInitialized(_this));
-    _this.state = {
-      'mounted': false
-    };
-    _this.memoized = {
-      getHeightFromNodes: (0, _memoizeOne["default"])(Graph.getHeightFromNodes),
-      getScrollableWidthFromNodes: (0, _memoizeOne["default"])(Graph.getScrollableWidthFromNodes),
-      getNodesWithCoordinates: (0, _memoizeOne["default"])(Graph.getNodesWithCoordinates)
-    };
-    return _this;
-  }
-
-  _createClass(Graph, [{
-    key: "componentDidMount",
-    value: function componentDidMount() {
-      this.setState({
-        'mounted': true
-      });
-    }
-  }, {
-    key: "height",
-    value: function height() {
-      var _this$props = this.props,
-          nodes = _this$props.nodes,
-          nodesPreSortFxn = _this$props.nodesPreSortFxn,
-          rowSpacing = _this$props.rowSpacing;
-      return this.memoized.getHeightFromNodes(nodes, nodesPreSortFxn, rowSpacing);
-    }
-  }, {
-    key: "scrollableWidth",
-    value: function scrollableWidth() {
-      var _this$props2 = this.props,
-          nodes = _this$props2.nodes,
-          columnWidth = _this$props2.columnWidth,
-          columnSpacing = _this$props2.columnSpacing,
-          innerMargin = _this$props2.innerMargin;
-      return this.memoized.getScrollableWidthFromNodes(nodes, columnWidth, columnSpacing, innerMargin);
-    }
-  }, {
-    key: "nodesWithCoordinates",
-    value: function nodesWithCoordinates(viewportWidth, contentWidth, contentHeight) {
-      var _this$props3 = this.props,
-          nodes = _this$props3.nodes,
-          innerMargin = _this$props3.innerMargin,
-          rowSpacingType = _this$props3.rowSpacingType,
-          rowSpacing = _this$props3.rowSpacing,
-          columnWidth = _this$props3.columnWidth,
-          columnSpacing = _this$props3.columnSpacing,
-          isNodeCurrentContext = _this$props3.isNodeCurrentContext;
-      return this.memoized.getNodesWithCoordinates(nodes, viewportWidth, contentWidth, contentHeight, innerMargin, rowSpacingType, rowSpacing, columnWidth, columnSpacing, isNodeCurrentContext);
-    }
-  }, {
-    key: "render",
-    value: function render() {
-      var _this$props4 = this.props,
-          width = _this$props4.width,
-          innerMargin = _this$props4.innerMargin,
-          edges = _this$props4.edges,
-          minimumHeight = _this$props4.minimumHeight;
-      var mounted = this.state.mounted;
-      var innerHeight = this.height();
-      var contentWidth = this.scrollableWidth();
-      var innerWidth = width;
-
-      if (!mounted) {
-        return _react["default"].createElement("div", {
-          key: "outer"
-        }, _react["default"].createElement("div", null, "\xA0"));
-      }
-
-      if (innerMargin && (innerMargin.left || innerMargin.right)) {
-        innerWidth -= innerMargin.left || 0;
-        innerWidth -= innerMargin.right || 0;
-      }
-
-      var nodes = this.nodesWithCoordinates(innerWidth, contentWidth, innerHeight);
-      var graphHeight = innerHeight + (innerMargin.top || 0) + (innerMargin.bottom || 0);
-      /* TODO: later
-      var spacerCount = _.reduce(nodes, function(m,n){ if (n.nodeType === 'spacer'){ return m + 1; } else { return m; }}, 0);
-      if (spacerCount){
-          height += (spacerCount * this.props.columnSpacing);
-          graphHeight += (spacerCount * this.props.columnSpacing);
-      }
-      */
-
-      return _react["default"].createElement("div", {
-        className: "workflow-chart-outer-container",
-        key: "outer"
-      }, _react["default"].createElement("div", {
-        className: "workflow-chart-inner-container"
-      }, _react["default"].createElement(_StateContainer["default"], _extends({
-        nodes: nodes,
-        edges: edges,
-        innerWidth: innerWidth,
-        innerHeight: innerHeight,
-        contentWidth: contentWidth,
-        width: width
-      }, _underscore["default"].pick(this.props, 'innerMargin', 'columnWidth', 'columnSpacing', 'pathArrows', 'href', 'onNodeClick', 'renderDetailPane')), _react["default"].createElement(_ScrollContainer["default"], {
-        outerHeight: graphHeight,
-        minHeight: minimumHeight
-      }, _react["default"].createElement(_EdgesLayer["default"], _underscore["default"].pick(this.props, 'isNodeDisabled', 'isNodeCurrentContext', 'isNodeSelected', 'edgeStyle', 'rowSpacing', 'columnWidth', 'columnSpacing', 'nodeEdgeLedgeWidths')), _react["default"].createElement(_NodesLayer["default"], _underscore["default"].pick(this.props, 'renderNodeElement', 'isNodeDisabled', 'isNodeCurrentContext', 'nodeClassName'))))));
-    }
-  }]);
-
   return Graph;
 }(_react["default"].Component);
 /**
@@ -393,12 +401,12 @@ _defineProperty(Graph, "defaultProps", {
   'rowSpacingType': 'compact',
   'pathArrows': true,
   'renderDetailPane': function renderDetailPane(selectedNode, props) {
-    return _react["default"].createElement(_DefaultDetailPane.DefaultDetailPane, _extends({}, props, {
+    return /*#__PURE__*/_react["default"].createElement(_DefaultDetailPane.DefaultDetailPane, _extends({}, props, {
       selectedNode: selectedNode
     }));
   },
   'renderNodeElement': function renderNodeElement(node, props) {
-    return _react["default"].createElement(_Node.DefaultNodeElement, _extends({}, props, {
+    return /*#__PURE__*/_react["default"].createElement(_Node.DefaultNodeElement, _extends({}, props, {
       node: node
     }));
   },
@@ -421,17 +429,17 @@ _defineProperty(Graph, "defaultProps", {
   'nodeEdgeLedgeWidths': [3, 5]
 });
 
-var GraphParser =
-/*#__PURE__*/
-function (_React$Component2) {
+var GraphParser = /*#__PURE__*/function (_React$Component2) {
   _inherits(GraphParser, _React$Component2);
+
+  var _super2 = _createSuper(GraphParser);
 
   function GraphParser(props) {
     var _this2;
 
     _classCallCheck(this, GraphParser);
 
-    _this2 = _possibleConstructorReturn(this, _getPrototypeOf(GraphParser).call(this, props));
+    _this2 = _super2.call(this, props);
     _this2.memoized = {
       parseAnalysisSteps: (0, _memoizeOne["default"])(_parsingFunctions.parseAnalysisSteps),
       parseBasicIOAnalysisSteps: (0, _memoizeOne["default"])(_parsingFunctions.parseBasicIOAnalysisSteps)
@@ -457,7 +465,7 @@ function (_React$Component2) {
       }
 
       return _react["default"].Children.map(children, function (child) {
-        return _react["default"].cloneElement(child, graphData);
+        return /*#__PURE__*/_react["default"].cloneElement(child, graphData);
       });
     }
   }]);

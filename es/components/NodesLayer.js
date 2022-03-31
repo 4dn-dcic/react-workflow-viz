@@ -1,5 +1,7 @@
 'use strict';
 
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -17,59 +19,39 @@ var _Node = _interopRequireDefault(require("./Node"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function (obj) { return typeof obj; }; } else { _typeof = function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function (o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); Object.defineProperty(subClass, "prototype", { writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function (o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function () { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } else if (call !== void 0) { throw new TypeError("Derived constructors may only return object or undefined"); } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function (o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-var NodesLayer =
-/*#__PURE__*/
-function (_React$PureComponent) {
+var NodesLayer = /*#__PURE__*/function (_React$PureComponent) {
   _inherits(NodesLayer, _React$PureComponent);
 
-  _createClass(NodesLayer, null, [{
-    key: "sortedNodes",
-    value: function sortedNodes(nodes) {
-      // Sort nodes so on updates, they stay in same(-ish) order and can transition.
-      return _underscore["default"].sortBy(nodes.slice(0), 'id');
-    }
-  }, {
-    key: "countInActiveContext",
-    value: function countInActiveContext(nodes) {
-      return _underscore["default"].reduce(nodes, function (m, n) {
-        return n.isCurrentContext ? ++m : m;
-      }, 0);
-    }
-  }, {
-    key: "lastActiveContextNode",
-    value: function lastActiveContextNode(nodes) {
-      return _underscore["default"].sortBy(_underscore["default"].filter(nodes, function (n) {
-        return n.isCurrentContext;
-      }), 'column').reverse()[0];
-    }
-  }]);
+  var _super = _createSuper(NodesLayer);
 
   function NodesLayer(props) {
     var _this;
 
     _classCallCheck(this, NodesLayer);
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(NodesLayer).call(this, props));
+    _this = _super.call(this, props);
     _this.memoized = {
       sortedNodes: (0, _memoizeOne["default"])(NodesLayer.sortedNodes),
       countInActiveContext: (0, _memoizeOne["default"])(NodesLayer.countInActiveContext),
@@ -108,12 +90,12 @@ function (_React$PureComponent) {
           'className': nodeClassName
         });
 
-        return _react["default"].createElement(_reactTransitionGroup.CSSTransition, {
+        return /*#__PURE__*/_react["default"].createElement(_reactTransitionGroup.CSSTransition, {
           classNames: "workflow-node-transition",
           unmountOnExit: true,
           timeout: 500,
           key: nodeProps.key
-        }, _react["default"].createElement(_Node["default"], nodeProps));
+        }, /*#__PURE__*/_react["default"].createElement(_Node["default"], nodeProps));
       });
     }
   }, {
@@ -129,15 +111,35 @@ function (_React$PureComponent) {
         'width': Math.max(contentWidth, fullWidth),
         'height': outerHeight
       };
-      return _react["default"].createElement("div", {
+      return /*#__PURE__*/_react["default"].createElement("div", {
         className: "nodes-layer-wrapper",
         style: layerStyle
-      }, _react["default"].createElement("div", {
+      }, /*#__PURE__*/_react["default"].createElement("div", {
         className: "nodes-layer",
         style: layerStyle
-      }, _react["default"].createElement(_reactTransitionGroup.TransitionGroup, {
+      }, /*#__PURE__*/_react["default"].createElement(_reactTransitionGroup.TransitionGroup, {
         component: null
       }, this.renderNodeElements())));
+    }
+  }], [{
+    key: "sortedNodes",
+    value: function sortedNodes(nodes) {
+      // Sort nodes so on updates, they stay in same(-ish) order and can transition.
+      return _underscore["default"].sortBy(nodes.slice(0), 'id');
+    }
+  }, {
+    key: "countInActiveContext",
+    value: function countInActiveContext(nodes) {
+      return _underscore["default"].reduce(nodes, function (m, n) {
+        return n.isCurrentContext ? ++m : m;
+      }, 0);
+    }
+  }, {
+    key: "lastActiveContextNode",
+    value: function lastActiveContextNode(nodes) {
+      return _underscore["default"].sortBy(_underscore["default"].filter(nodes, function (n) {
+        return n.isCurrentContext;
+      }), 'column').reverse()[0];
     }
   }]);
 
