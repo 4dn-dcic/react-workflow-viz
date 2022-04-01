@@ -541,7 +541,7 @@ export function parseAnalysisSteps(analysis_steps, parsingOptions = {}){
 
         function areAnyRunDataPresentAndEqual(node, stepIO){
             const { meta: { run_data: nodeRunData } = {} } = node;
-            const { run_data: ioRunData } = stepIO;
+            const { run_data: ioRunData = {} } = stepIO;
             if (!nodeRunData) return false;
             // AB: Not sure / can't remember why array is always expected here, it might make sense to check if not array and then use [ ioRunData.file ]
             const stepIOFiles = (ioRunData && Array.isArray(ioRunData.file) && ioRunData.file) || [];
