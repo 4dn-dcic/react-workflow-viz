@@ -621,7 +621,8 @@ function parseAnalysisSteps(analysis_steps) {
       var _node$meta = node.meta;
       _node$meta = _node$meta === void 0 ? {} : _node$meta;
       var nodeRunData = _node$meta.run_data;
-      var ioRunData = stepIO.run_data;
+      var _stepIO$run_data = stepIO.run_data,
+          ioRunData = _stepIO$run_data === void 0 ? {} : _stepIO$run_data;
       if (!nodeRunData) return false; // AB: Not sure / can't remember why array is always expected here, it might make sense to check if not array and then use [ ioRunData.file ]
 
       var stepIOFiles = ioRunData && Array.isArray(ioRunData.file) && ioRunData.file || [];

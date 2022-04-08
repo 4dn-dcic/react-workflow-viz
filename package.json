@@ -45,7 +45,7 @@
     "babel-loader": "^8.2.3",
     "babel-plugin-minify-dead-code-elimination": "^0.5.1",
     "@babel/cli": "^7.6.0",
-    "d3": "^6.7.0",
+    "d3": ">=5.9.0",
     "eslint": "^8.10.0",
     "eslint-plugin-cypress": "^2.12.1",
     "eslint-plugin-react": "^7.29.2",
@@ -56,8 +56,8 @@
     "sass": "^1.39.0",
     "plugin-error": "^1.0.1",
     "prop-types": "^15.7.2",
-    "react": "^16.14.0",
-    "react-dom": "^16.14.0",
+    "react": ">=16.14.0",
+    "react-dom": ">=16.14.0",
     "react-transition-group": "^4.4.1",
     "source-map-support": "^0.5.19",
     "string-replace-loader": "^2.3.0",
@@ -65,7 +65,7 @@
     "webpack": "^4.46.0"
   },
   "peerDependencies": {
-    "d3": "^6.7.0",
+    "d3": ">=5.9.0",
     "prop-types": ">=15.7.2",
     "react": ">=16.8.0",
     "react-dom": ">=16.8.0",
