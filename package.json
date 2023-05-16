@@ -75,5 +75,8 @@
   "dependencies": {
     "memoize-one": "^5.1.1",
     "underscore": "^1.13.2"
+  },
+  "overrides": {
+    "decode-uri-component@<0.2.2": "^0.2.2"
   }
 }
