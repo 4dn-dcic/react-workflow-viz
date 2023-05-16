@@ -75,5 +75,8 @@
   "dependencies": {
     "memoize-one": "^5.1.1",
     "underscore": "^1.13.2"
+  },
+  "overrides": {
+    "json5@<1.0.2": "^1.0.2"
   }
 }
