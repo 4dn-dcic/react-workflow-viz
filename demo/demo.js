@@ -73,6 +73,12 @@ class DemoApp extends Component {
                 "description" : null,
                 "href" : url.resolve(BASE_HREF, "for-development-hi-c-workflowrunawsem.json"),
                 "opts" : workflowOpts
+            },
+            {
+                "name" : "MetaWorkflowRun - WGS SNV Germline Trio Example",
+                "description": null,
+                "href" : url.resolve(BASE_HREF, "meta-workflow-run-WGS-SNV-Germline-Trio.json"),
+                "opts" : workflowOpts
             }
         ]
     };
