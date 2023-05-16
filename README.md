@@ -5,7 +5,7 @@ This is in alpha/beta phase.
 
 
 Is being used by HMS-DBMI in the [4DN Data Portal](https://data.4dnucleome.org/experiment-set-replicates/4DNESMU2MA2G/#graph-section) to show provenance of analytical pipeline runs.
-Also being used in the CGAP (final name TDB) project for similar purposes.
+Also being used in the [CGAP project](https://cgap.hms.harvard.edu) for similar purposes.
 
 Checkout the current demo at [unpkg.com/@hms-dbmi-bgm/react-workflow-viz/index.html](https://unpkg.com/@hms-dbmi-bgm/react-workflow-viz/index.html), which points to the index.html file in the distributable NPM package (and in this repo).
 
@@ -27,6 +27,18 @@ For local development (watches file, serves on localhost:8100), run `npm run dev
 
 ## Changelog
 _Side Note -_ Is there a way to auto-generate a `CHANGELOG.md` file out of releases' content?
+
+#### 2023-05-16 (v0.1.8)
+- Add new metaworkflow run example to demo page
+
+#### 2022-04-22 (v0.1.6, v0.1.7)
+- Stop tracking `dist` and `es` directories/hide in `.gitignore`
+- Package version updates for `webpack`, `babel` deps, `d3`, and `underscore`
+- Slight improvement to `parsing-functions.js`
+- Updates to `package-lock`
+
+#### 2022-02-22 (v0.1.5)
+- Update `react` and `react-dom` dependencies from v`^16.14.0` to `>=16.14.0`
 
 #### 2021-09-13 (v0.1.3, v0.1.4)
 - Added couple of new demo files for development.
