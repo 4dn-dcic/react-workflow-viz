@@ -1,37 +1,43 @@
 # react-workflow-viz
 React component for visualizing CWL-like workflows (and similar data).
 
-This is in alpha/beta phase.
+This repository is in alpha/beta phase, and is provided with very, very limited support to folks outside of HMS. Hopefully, in the future this will change!
 
-
-This package is being used by HMS-DBMI in the [4DN Data Portal](https://data.4dnucleome.org/experiment-set-replicates/4DNESMU2MA2G/#graph-section) to show provenance of analytical pipeline runs.
+Currently, this package is being used by HMS-DBMI in the [4DN Data Portal](https://data.4dnucleome.org/experiment-set-replicates/4DNESMU2MA2G/#graph-section) to show provenance of analytical pipeline runs.
 Also being used in [CGAP](https://cgap.hms.harvard.edu) for similar purposes.
 
 Check out a live demo at [unpkg.com/@hms-dbmi-bgm/react-workflow-viz/index.html](https://unpkg.com/@hms-dbmi-bgm/react-workflow-viz/index.html). _Note: This link points to the index.html file in the distributable NPM package (and in this repo)._
 
 [![Gif of CWL Workflow Viz](https://i.gyazo.com/0c5e73105b1f284c16a9cca03ec866ed.gif)](https://unpkg.com/@hms-dbmi-bgm/react-workflow-viz/index.html)
 
+<br/>
+<br/>
 
-## Build demo
+## Try Demo Locally
 
-With a checkout of the repo:
+With a local clone and checkout of the repo:
 ```
 npm install
 npm run build
 ```
 
 When it completes, load `file:///path-to-your-checkout/react-workflow-viz/index.html`.
-New testdata won't show with `npm run build` unless is already present in unpkg/npm. For local development, do the following
 
+_Note: New test data won't show with `npm run build` unless it is already present in unpkg/npm._
 
-### For Development
+<br/>
 
-For local development (watches file, serves on localhost:8100), run `npm run dev`.
+### For Contributors/Collaborators
+For local development, run `npm run dev` (watches `/src/` files, serves on `localhost:8100`).
 
+<br/>
+<br/>
 
 ## Changelog
-Changelog has been moved to `CHANGELOG.md` file in root directory. Please check there for updates.
+Changelog has been moved to `CHANGELOG.md` file in [repo's root directory](https://github.com/4dn-dcic/react-workflow-viz/blob/master/CHANGELOG.md). Please check there for updates.
 
+<br/>
+<br/>
 
 ## Things to do
 
