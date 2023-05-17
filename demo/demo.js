@@ -73,6 +73,12 @@ class DemoApp extends Component {
                 "description" : null,
                 "href" : url.resolve(BASE_HREF, "for-development-hi-c-workflowrunawsem.json"),
                 "opts" : workflowOpts
+            },
+            {
+                "name" : "MetaWorkflowRun - WGS SNV Germline Trio Example",
+                "description": null,
+                "href" : url.resolve(BASE_HREF, "meta-workflow-run-WGS-SNV-Germline-Trio.json"),
+                "opts" : workflowOpts
             }
         ]
     };
@@ -92,7 +98,8 @@ class DemoApp extends Component {
                 parseBasicIO: false
             },
             loadedSteps: {},
-            rowSpacingType: "compact"
+            rowSpacingType: "compact",
+            loadingSteps: false,
         };
     }
 
@@ -138,16 +145,20 @@ class DemoApp extends Component {
         const existingSteps = currDemoInfo.steps || loadedSteps[name];
 
         if (!Array.isArray(existingSteps)) {
-            this.setState({ loadingSteps: true }, ()=>{
-                window.fetch(url.resolve(window.location.href, href)).then((resp)=>{
-                    return resp.json();
-                }).then((resp)=>{
+            this.setState({ loadingSteps: true }, () => {
+                window.fetch(url.resolve(window.location.href, href))
+                .then((resp) => resp.json())
+                .then((resp) => {
                     this.setState(function({ loadedSteps: prevSteps }){
                         return {
                             loadedSteps: { ...prevSteps, [name] : resp },
                             loadingSteps: false
                         };
                     });
+                })
+                .catch((err) => {
+                    console.error("Something went wrong while loading data!", err);
+                    this.setState({ loadingSteps: false });
                 });
             });
         }
@@ -223,6 +234,9 @@ function ParsingOptsCheckboxes(props){
     return (
         <div className="parsing-options-container options-container">
             <h5>Parsing Options</h5>
+            <p className="tip-text">
+                Note: updating the viz for some parsing options (such as showing parameters) may take a few seconds to complete for larger test datasets.
+            </p>
             <label>
                 <input type="checkbox" name="showReferenceFiles"
                     checked={dataOpts['showReferenceFiles'] || showReferenceFiles}
