@@ -9,6 +9,8 @@ Also being used in [CGAP](https://cgap.hms.harvard.edu) for similar purposes.
 
 Check out a live demo at [unpkg.com/@hms-dbmi-bgm/react-workflow-viz/index.html](https://unpkg.com/@hms-dbmi-bgm/react-workflow-viz/index.html). _Note: This link points to the index.html file in the distributable NPM package (and in this repo)._
 
+[![Gif of CWL Workflow Viz](https://i.gyazo.com/0c5e73105b1f284c16a9cca03ec866ed.gif)](https://unpkg.com/@hms-dbmi-bgm/react-workflow-viz/index.html)
+
 
 ## Build demo
 
