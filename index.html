@@ -21,6 +21,15 @@
                 margin-bottom: 10px;
             }
 
+            code {
+                background-color: #333;
+                color: #fff;
+                padding-left: 5px;
+                padding-right: 5px;
+                margin-left: 3px;
+                margin-right: 3px;
+            }
+
             #pagetitle {
                 padding-top: 10px;
                 padding-bottom: 10px;
@@ -31,6 +40,11 @@
                 
             }
 
+            .intro {
+                max-width: 700px;
+                margin-bottom: 5px;
+            }
+
             .options-container {
                 margin-bottom: 10px;
             }
@@ -38,6 +52,12 @@
             .parsing-options-container > label {
                 display: inline-block;
                 padding: 5px 10px;
+            }
+
+            .parsing-options-container p {
+                font-size: smaller;
+                font-style: italic;
+                max-width: 700px;
             }
 
             .parsing-options-container > label > input[type="checkbox"] {
@@ -59,8 +79,17 @@
         <h1 id="pagetitle">
             React Workflow Viz Demo
         </h1>
-        <p>
-            One day there will be a description here...
+        <p class="intro">
+            Thanks for trying out <code>react-workflow-viz</code>!
+        </p>
+        <p class="intro"> Here you can play with a some examples of the types of visualizations this package can create. To get started, select the type of data you're most interested in visualizing from the dropdown below:
+            <!-- <ul>
+                <li><strong>File Processed:</strong> @TODO - add a short description of workflow viz + info on what C4 portal this data type is available on</li>
+                <li><strong>Experiment Set:</strong> @TODO - add a short description of workflow viz + info on what C4 portal this data type is available on</li>
+                <li><strong>CWL Workflow:</strong> @TODO - add a short description of workflow viz + info on what C4 portal this data type is available on</li>
+                <li><strong>WorkflowRunAWSEM:</strong> @TODO - add a short description of workflow viz + info on what C4 portal this data type is available on</li>
+                <li><strong>MetaWorkflowRun:</strong> @TODO - add a short description of workflow viz + info on what C4 portal this data type is available on</li>
+            </ul> -->
         </p>
         <hr/>
         <div id="root">
