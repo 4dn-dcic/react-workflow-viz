@@ -4,6 +4,9 @@
 - [View releases on NPM](https://www.npmjs.com/package/@hms-dbmi-bgm/react-workflow-viz?activeTab=versions)
 - [View releases on Unpkg](https://unpkg.com/browse/@hms-dbmi-bgm/react-workflow-viz/)
 
+#### 2023-05-17 (v0.1.9)
+- No changes except `package-lock.json` + `package.json` version (new NPM release)
+
 #### 2023-05-16 (v0.1.8)
 - Add new metaworkflow run example to demo page
 
