@@ -23,7 +23,7 @@ npm run build
 
 When it completes, load `file:///path-to-your-checkout/react-workflow-viz/index.html`.
 
-_Note: New test data won't show with `npm run build` unless it is already present in unpkg/npm._
+_Note: New test data won't show with `npm run build` unless it is already present in unpkg/npm. Similarly, if a new NPM release has not been made to match the current local version specified in `package-lock.json` and `package.json`, no data will load at file:/// path. Run local development server and test that way instead (see below)._
 
 <br/>
 
