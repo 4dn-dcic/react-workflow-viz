@@ -4,6 +4,12 @@
 - [View releases on NPM](https://www.npmjs.com/package/@hms-dbmi-bgm/react-workflow-viz?activeTab=versions)
 - [View releases on Unpkg](https://unpkg.com/browse/@hms-dbmi-bgm/react-workflow-viz/)
 
+#### 2024-04-24 (v0.1.11)
+- Update to use React v18
+
+#### 2023-09-19 (v0.1.10)
+- Dependency updates
+
 #### 2023-05-17 (v0.1.9)
 - No changes except `package-lock.json` + `package.json` version (new NPM release)
 
