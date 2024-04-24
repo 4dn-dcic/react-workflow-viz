@@ -1,5 +1,5 @@
 import { Component } from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import _ from 'underscore';
 import url from 'url';
 import { default as packageJSON } from './../package.json';
@@ -269,6 +269,6 @@ function ParsingOptsCheckboxes(props){
     );
 }
 
-
-ReactDOM.render(<DemoApp />, document.getElementById("root"));
-
+const container = document.getElementById('root');
+const root = createRoot(container);
+root.render(<DemoApp />);
