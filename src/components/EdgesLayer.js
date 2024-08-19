@@ -367,8 +367,6 @@ export default class EdgesLayer extends React.PureComponent {
         this.sortedEdges = this.sortedEdges.bind(this);
         // Create refs for each node
         this.nodeRefs = {};
-        //this.getAllPathElements = this.getAllPathElements.bind(this);
-        //this.edgeRefs = [];
     }
 
     static edgeOnEnter(nodeRef) {
@@ -396,26 +394,9 @@ export default class EdgesLayer extends React.PureComponent {
     }
 
     sortedEdges = memoize(function(edges, selectedNodes, isNodeDisabled){
-        const nextEdges = EdgesLayer.sortedEdges(edges, selectedNodes, isNodeDisabled);
-        // Create new list of refs each time we're updated.
-        //this.edgeRefs = [];
-        //_.forEach(nextEdges, ()=>{
-        //    this.edgeRefs.push(React.createRef());
-        //});
+        const nextEdges = EdgesLayer.sortedEdges(edges, selectedNodes, isNodeDisabled);;
         return nextEdges;
     });
-
-    // Experimentation with transitioning multiple edges at once within requestAnimationFrame.
-    // Need to rethink design of this, an array for this.edgeRefs won't work as we need to keep
-    // state.source.x, state.source.y cached in state and associated w/ each edge.
-    // Possibly can use object keyed by 'key' string (as determined in render method).
-    // Keeping for reference.
-    //
-    //getAllPathElements(){
-    //    return _.map(this.edgeRefs, function(ref){
-    //        return ref && ref.current && ref.current.pathRef && ref.current.pathRef.current;
-    //    });
-    //}
 
     pathArrows(){
         if (!this.props.pathArrows) return null;

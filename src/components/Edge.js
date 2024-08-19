@@ -271,10 +271,6 @@ export default class Edge extends React.Component {
         this.state = {
             'pathDimension' : this.generatePathDimension()
         };
-
-        // Alternative implementation of transition -
-        // adjust pathRef.current `d` attribute manually
-        this.pathRef = React.createRef();
     }
 
     getComputedProperties(props = this.props){
