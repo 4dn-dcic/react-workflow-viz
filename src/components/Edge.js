@@ -390,7 +390,7 @@ export default class Edge extends React.Component {
             });
         }
 
-        const pathElem = this.pathRef.current; // Necessary if using alternate transition approach(es).
+        const pathElem = this.props.forwardedRef.current; // Necessary if using alternate transition approach(es).
         const changeTween = () =>
             (t) => {
                 const nextCoords = [
@@ -463,7 +463,7 @@ export default class Edge extends React.Component {
     }
 
     render(){
-        const { edge, pathArrows, style } = this.props;
+        const { edge, pathArrows, style, forwardedRef } = this.props;
         const { pathDimension } = this.state;
         const { disabled, selected, related, distantlySelected } = this.getComputedProperties();
         let markerEnd;
@@ -479,7 +479,7 @@ export default class Edge extends React.Component {
         }
 
         return (
-            <path d={pathDimension} ref={this.pathRef} className={"edge-path" + (disabled ? ' disabled' : '' )}
+            <path d={pathDimension} ref={forwardedRef} className={"edge-path" + (disabled ? ' disabled' : '' )}
                 data-edge-selected={selected || distantlySelected} data-edge-related={related}
                 data-source={edge.source.name} data-target={edge.target.name} style={style}
                 markerEnd={markerEnd && "url(#" + markerEnd + ")"} />

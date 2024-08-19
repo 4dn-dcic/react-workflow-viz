@@ -327,7 +327,9 @@ export function traceEdges(
     };
 }
 
-
+const ForwardedEdge = React.forwardRef((props, ref) => {
+    return <Edge {...props} forwardedRef={ref} />;
+});
 
 export default class EdgesLayer extends React.PureComponent {
 
@@ -363,14 +365,35 @@ export default class EdgesLayer extends React.PureComponent {
     constructor(props){
         super(props);
         this.sortedEdges = this.sortedEdges.bind(this);
+        // Create refs for each node
+        this.nodeRefs = {};
         //this.getAllPathElements = this.getAllPathElements.bind(this);
         //this.edgeRefs = [];
     }
 
-    static edgeOnEnter(elem)    { elem.style.opacity = 0; }
-    static edgeOnEntering(elem) { elem.style.opacity = 0; }
-    static edgeOnEntered(elem)  { elem.style.opacity = null; /** Allows CSS to override, e.g. .15 opacity for disabled edges */ }
-    static edgeOnExit(elem)     { elem.style.opacity = 0; }
+    static edgeOnEnter(nodeRef) {
+        if (nodeRef.current && nodeRef.current.style) {
+            nodeRef.current.style.opacity = 0;
+        }
+    }
+
+    static edgeOnEntering(nodeRef) {
+        if (nodeRef.current && nodeRef.current.style) {
+            nodeRef.current.style.opacity = 0;
+        }
+    }
+
+    static edgeOnEntered(nodeRef) {
+        if (nodeRef.current && nodeRef.current.style) {
+            nodeRef.current.style.opacity = null;
+        }
+    }
+
+    static edgeOnExit(nodeRef) {
+        if (nodeRef.current && nodeRef.current.style) {
+            nodeRef.current.style.opacity = 0;
+        }
+    }
 
     sortedEdges = memoize(function(edges, selectedNodes, isNodeDisabled){
         const nextEdges = EdgesLayer.sortedEdges(edges, selectedNodes, isNodeDisabled);
@@ -425,13 +448,28 @@ export default class EdgesLayer extends React.PureComponent {
                         {
                             _.map(this.sortedEdges(edges, selectedNode, isNodeDisabled), (edge, index) => {
                                 const key = (edge.source.id || edge.source.name) + "----" + (edge.target.id || edge.target.name);
+                                if (!this.nodeRefs[key]) {
+                                    this.nodeRefs[key] = React.createRef();
+                                }
                                 return (
-                                    <Transition unmountOnExit mountOnEnter timeout={500} key={key}
-                                        onEnter={EdgesLayer.edgeOnEnter} onEntering={EdgesLayer.edgeOnEntering}
-                                        onExit={EdgesLayer.edgeOnExit} onEntered={EdgesLayer.edgeOnEntered}>
-                                        <Edge {...this.props} {...{ key, edge, edgeCount }}
-                                            startX={edge.source.x} startY={edge.source.y}
-                                            endX={edge.target.x} endY={edge.target.y} />
+                                    <Transition
+                                        unmountOnExit
+                                        mountOnEnter
+                                        timeout={500}
+                                        key={key}
+                                        onEnter={() => EdgesLayer.edgeOnEnter(this.nodeRefs[key])}
+                                        onEntering={() => EdgesLayer.edgeOnEntering(this.nodeRefs[key])}
+                                        onEntered={() => EdgesLayer.edgeOnEntered(this.nodeRefs[key])}
+                                        onExit={() => EdgesLayer.edgeOnExit(this.nodeRefs[key])}
+                                        nodeRef={this.nodeRefs[key]}>
+                                        <ForwardedEdge
+                                            {...this.props}
+                                            {...{ key, edge, edgeCount }}
+                                            startX={edge.source.x}
+                                            startY={edge.source.y}
+                                            endX={edge.target.x}
+                                            endY={edge.target.y}
+                                            ref={this.nodeRefs[key]} />
                                     </Transition>
                                 );
                             })
