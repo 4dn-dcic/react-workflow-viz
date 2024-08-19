@@ -96,21 +96,7 @@ export default class Node extends React.Component {
     static isSelected(currentNode, selectedNode){
         if (!selectedNode) return false;
         if (selectedNode === currentNode) return true;
-        /*
-        // We shouldn't need the below and can just rely on a simple reference comparison
-        // Keeping around for now/reference.
-        if (typeof selectedNode.name === 'string' && typeof currentNode.name === 'string') {
-            if (selectedNode.name === currentNode.name){
-                // Case: IO node (which would have add'l self-generated ID to ensure uniqueness)
-                if (typeof selectedNode.id === 'string'){
-                    if (selectedNode.id === currentNode.id) return true;
-                    return false;
-                }
-                return true;
-            }
-            return false;
-        }
-        */
+
         return false;
     }
 
@@ -230,7 +216,7 @@ export default class Node extends React.Component {
     }
 
     render(){
-        var { node, isNodeDisabled, className, columnWidth, renderNodeElement, selectedNode } = this.props,
+        var { node, isNodeDisabled, className, columnWidth, renderNodeElement, selectedNode, forwardedRef } = this.props,
             disabled         = typeof node.disabled !== 'undefined' ? node.disabled : this.isDisabled(node, isNodeDisabled),
             isCurrentContext = typeof node.isCurrentContext !== 'undefined' ? node.isCurrentContext : null,
             classNameList    = ["node", "node-type-" + node.nodeType],
@@ -258,7 +244,7 @@ export default class Node extends React.Component {
                     'left'      : node.x,
                     'width'     : columnWidth || 100,
                     'zIndex'    : 2 + (node.indexInColumn || 0)
-                }}>
+                }} ref={forwardedRef}>
                 <div className="inner" children={renderNodeElement(node, visibleNodeProps)}
                     {..._.pick(this.props, 'onMouseEnter', 'onMouseLeave')} onClick={disabled ? null : this.props.onClick} />
             </div>

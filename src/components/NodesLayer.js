@@ -36,6 +36,7 @@ export default class NodesLayer extends React.PureComponent {
             countInActiveContext: memoize(NodesLayer.countInActiveContext),
             lastActiveContextNode: memoize(NodesLayer.lastActiveContextNode)
         };
+        this.nodeRefs = {};
     }
 
     renderNodeElements(){
@@ -59,9 +60,12 @@ export default class NodesLayer extends React.PureComponent {
                     'className'     : nodeClassName
                 }
             );
+            if (!this.nodeRefs[nodeProps.key]) {
+                this.nodeRefs[nodeProps.key] = React.createRef();
+            }
             return (
-                <CSSTransition classNames="workflow-node-transition" unmountOnExit timeout={500} key={nodeProps.key}>
-                    <Node {...nodeProps} />
+                <CSSTransition classNames="workflow-node-transition" unmountOnExit timeout={500} key={nodeProps.key} nodeRef={this.nodeRefs[nodeProps.key]}>
+                    <ForwardedNode {...nodeProps} ref={this.nodeRefs[nodeProps.key]} />
                 </CSSTransition>
             );
         });
@@ -83,3 +87,7 @@ export default class NodesLayer extends React.PureComponent {
     }
 
 }
+
+const ForwardedNode = React.forwardRef((props, ref) => {
+    return <Node {...props} forwardedRef={ref} />;
+});
