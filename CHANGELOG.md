@@ -4,6 +4,9 @@
 - [View releases on NPM](https://www.npmjs.com/package/@hms-dbmi-bgm/react-workflow-viz?activeTab=versions)
 - [View releases on Unpkg](https://unpkg.com/browse/@hms-dbmi-bgm/react-workflow-viz/)
 
+#### 2024-08-27 (v0.1.11)
+- CSSTransition in Nodes and Edges was throwing the `findDOMNode is deprecated and will be removed in the next major release. Instead, add a ref directly to the element you want to reference.` during animations and transitions. Forwarding the referenced DOM element by nodeRef and ref props solved the issue.
+
 #### 2023-05-17 (v0.1.9)
 - No changes except `package-lock.json` + `package.json` version (new NPM release)
 
