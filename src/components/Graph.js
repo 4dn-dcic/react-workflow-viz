@@ -12,6 +12,7 @@ import NodesLayer from './NodesLayer';
 import EdgesLayer from './EdgesLayer';
 import { DefaultDetailPane } from './DefaultDetailPane';
 import { DefaultNodeElement } from './Node';
+import { ScaleController, ScaleControls } from './ScaleController';
 
 import { parseAnalysisSteps, parseBasicIOAnalysisSteps } from './parsing-functions';
 
@@ -309,8 +310,11 @@ export default class Graph extends React.Component {
                     <StateContainer {...{ nodes, edges, innerWidth, innerHeight, contentWidth, width }}
                         {..._.pick(this.props, 'innerMargin', 'columnWidth', 'columnSpacing', 'pathArrows', 'href', 'onNodeClick', 'renderDetailPane')}>
                         <ScrollContainer outerHeight={graphHeight} minHeight={minimumHeight}>
-                            <EdgesLayer {..._.pick(this.props, 'isNodeDisabled', 'isNodeCurrentContext', 'isNodeSelected', 'edgeStyle', 'rowSpacing', 'columnWidth', 'columnSpacing', 'nodeEdgeLedgeWidths')} />
-                            <NodesLayer {..._.pick(this.props, 'renderNodeElement', 'isNodeDisabled', 'isNodeCurrentContext', 'nodeClassName')} />
+                            <ScaleController {...{ scale: 1, minScale: 0.1, maxScale: 2.0 }}>
+                                <ScaleControls />
+                                <EdgesLayer {..._.pick(this.props, 'isNodeDisabled', 'isNodeCurrentContext', 'isNodeSelected', 'edgeStyle', 'rowSpacing', 'columnWidth', 'columnSpacing', 'nodeEdgeLedgeWidths')} />
+                                <NodesLayer {..._.pick(this.props, 'renderNodeElement', 'isNodeDisabled', 'isNodeCurrentContext', 'nodeClassName')} />
+                            </ScaleController>
                         </ScrollContainer>
                     </StateContainer>
                 </div>
