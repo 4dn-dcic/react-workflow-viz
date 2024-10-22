@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import _ from 'underscore';
 import url from 'url';
 import { default as packageJSON } from './../package.json';
+import '@fortawesome/fontawesome-free/css/all.css';
 
 // Loaded on index.html, defined as an external in webpack.config.demo.js
 import Graph, { GraphParser } from 'react-workflow-viz';
