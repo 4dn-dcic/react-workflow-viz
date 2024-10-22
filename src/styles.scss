@@ -625,3 +625,71 @@ $workflow-node-color-type-global-context:           #ffb3b3 !default;
         }
     }
 }
+
+.zoom-controls-container {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    > .zoom-buttons-row {
+        display: flex;
+        align-items: center;
+        > .zoom-btn,
+        > .zoom-value {
+            box-sizing: content-box;
+            text-align: center;
+            padding: 1px 4px;
+            height: 25px;
+            color: #555;
+            background-color: #fff;
+        }
+        > .zoom-btn {
+            border: 1px solid #999;
+            width: 24px;
+
+            &.zoom-out { // Left btn
+                border-radius: 5px 0 0 5px;
+                border-right-color: #ddd !important;
+            }
+            &.zoom-in { // Right btn
+                border-radius: 0 5px 5px 0;
+                border-left-color : #ddd !important;
+            }
+
+            &:disabled {
+                color: #999;
+                pointer-events: none;
+            }
+            &:hover:not(:disabled),
+            &:focus:not(:disabled), &:active:not(:disabled) {
+                color: #000;
+                border-color: #555;
+                outline: none;
+            }
+            &:focus:not(:disabled), &:active:not(:disabled) {
+                box-shadow: inset 0px 0px 2px 0px #333;
+            }
+        }
+        > .zoom-value {
+            border-top: 1px solid #999999;
+            border-bottom: 1px solid #999999;
+            width: 36px;
+            font-size: 0.875em;
+            line-height: 25px;
+            white-space: nowrap;
+            text-align: right;
+        }
+    }
+    > .zoom-slider {
+        width: 112px;
+        padding-top: 3px;
+        > input[type="range"] {
+            width: inherit;
+            // If we want to make it vertical later:
+            //&[orient="vertical"] {
+            //    writing-mode: bt-lr; /* IE */
+            //    -webkit-appearance: slider-vertical; /* WebKit */
+            //    height: 120px;
+            //}
+        }
+    }
+}
