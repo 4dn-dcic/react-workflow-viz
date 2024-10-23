@@ -70,9 +70,9 @@ export class DefaultNodeElement extends React.PureComponent {
     }
 
     render(){
-        const { node, title, columnWidth } = this.props;
+        const { node, title, columnWidth, scale = 1 } = this.props;
         const style = node.nodeType === 'input' || node.nodeType === 'output' ?
-            { width : (columnWidth || 100) }
+            { width : (columnWidth || 100) * scale }
             : null;
         return (
             <div
@@ -215,21 +215,21 @@ export default class Node extends React.Component {
         return false;
     }
 
-    render(){
-        var { node, isNodeDisabled, className, columnWidth, renderNodeElement, selectedNode, forwardedRef } = this.props,
-            disabled         = typeof node.disabled !== 'undefined' ? node.disabled : this.isDisabled(node, isNodeDisabled),
-            isCurrentContext = typeof node.isCurrentContext !== 'undefined' ? node.isCurrentContext : null,
-            classNameList    = ["node", "node-type-" + node.nodeType],
-            selected         = (!disabled && Node.isSelected(node, selectedNode)) || false,
-            related          = (!disabled && this.isRelated(node, selectedNode)) || false,
-            inSelectionPath  = selected || (!disabled && this.isInSelectionPath(node, selectedNode)) || false;
+    render() {
+        const { node, isNodeDisabled, className, columnWidth, renderNodeElement, selectedNode, forwardedRef, scale = 1 } = this.props;
+        const disabled = typeof node.disabled !== 'undefined' ? node.disabled : this.isDisabled(node, isNodeDisabled);
+        const isCurrentContext = typeof node.isCurrentContext !== 'undefined' ? node.isCurrentContext : null;
+        const classNameList = ["node", "node-type-" + node.nodeType];
+        const selected = (!disabled && Node.isSelected(node, selectedNode)) || false;
+        const related = (!disabled && this.isRelated(node, selectedNode)) || false;
+        const inSelectionPath = selected || (!disabled && this.isInSelectionPath(node, selectedNode)) || false;
 
-        if      (disabled)                        classNameList.push('disabled');
-        if      (isCurrentContext)                classNameList.push('current-context');
-        if      (typeof className === 'function') classNameList.push(className(node));
-        else if (typeof className === 'string'  ) classNameList.push(className);
+        if (disabled) classNameList.push('disabled');
+        if (isCurrentContext) classNameList.push('current-context');
+        if (typeof className === 'function') classNameList.push(className(node));
+        else if (typeof className === 'string') classNameList.push(className);
 
-        var visibleNodeProps = _.extend(
+        const visibleNodeProps = _.extend(
             _.omit(this.props, 'children', 'onMouseEnter', 'onMouseLeave', 'onClick', 'className', 'nodeElement'),
             { disabled, selected, related, isCurrentContext, inSelectionPath }
         );
@@ -240,10 +240,11 @@ export default class Node extends React.Component {
                 data-node-selected={selected} data-node-in-selection-path={inSelectionPath}
                 data-node-related={related} data-node-type-detail={node.ioType && node.ioType.toLowerCase()}
                 data-node-column={node.column} style={{
-                    'top'       : node.y,
-                    'left'      : node.x,
-                    'width'     : columnWidth || 100,
-                    'zIndex'    : 2 + (node.indexInColumn || 0)
+                    top: node.y * scale,
+                    left: node.x * scale,
+                    width: (columnWidth || 100) * scale,
+                    zIndex: 2 + (node.indexInColumn || 0),
+                    transform: `scale(${scale})`
                 }} ref={forwardedRef}>
                 <div className="inner" children={renderNodeElement(node, visibleNodeProps)}
                     {..._.pick(this.props, 'onMouseEnter', 'onMouseLeave')} onClick={disabled ? null : this.props.onClick} />
