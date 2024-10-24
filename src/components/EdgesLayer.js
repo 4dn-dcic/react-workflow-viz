@@ -412,12 +412,12 @@ export default class EdgesLayer extends React.PureComponent {
         const {
             outerHeight, innerWidth, innerMargin, width, edges: origEdges, nodes,
             selectedNode, isNodeDisabled, contentWidth,
-            columnWidth, columnSpacing, rowSpacing, innerHeight
+            columnWidth, columnSpacing, rowSpacing, innerHeight, scale = 1
         } = this.props;
         const {
             edges,
             horizontalSegments
-        } = traceEdges(origEdges, nodes, columnWidth, columnSpacing, rowSpacing, contentWidth, innerHeight, innerMargin);
+        } = traceEdges(origEdges, nodes, columnWidth * scale, columnSpacing * scale, rowSpacing * scale, contentWidth, innerHeight, innerMargin);
         const edgeCount = edges.length;
         const divWidth = Math.max(width, contentWidth);
 
