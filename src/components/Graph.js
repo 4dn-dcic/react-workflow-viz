@@ -13,6 +13,7 @@ import EdgesLayer from './EdgesLayer';
 import { DefaultDetailPane } from './DefaultDetailPane';
 import { DefaultNodeElement } from './Node';
 import { ScaleController, ScaleControls } from './ScaleController';
+import { requestAnimationFrame, cancelAnimationFrame } from '../utilities'
 
 import { parseAnalysisSteps, parseBasicIOAnalysisSteps } from './parsing-functions';
 
@@ -101,7 +102,11 @@ export default class Graph extends React.Component {
             return false;
         },
         'nodeClassName' : function(node){ return ''; },
-        'nodeEdgeLedgeWidths' : [3,5]
+        'nodeEdgeLedgeWidths' : [3,5],
+        //scale
+        'scale': 1,
+        'minScale': 0.75,
+        'maxScale': 1.25
     };
 
     static getHeightFromNodes(nodes, nodesPreSortFxn, rowSpacing){
@@ -149,12 +154,13 @@ export default class Graph extends React.Component {
         rowSpacing           = 75,
         columnWidth          = 150,
         columnSpacing        = 56,
-        isNodeCurrentContext = false
+        isNodeCurrentContext = false,
+        scale                = 1
     ){
 
         /** Vertically centers a single node within a column */
         function centerNode(n){
-            n.y = (contentHeight / 2) + innerMargin.top;
+            n.y = ((contentHeight / 2) + innerMargin.top) * scale;
             n.nodesInColumn = 1;
             n.indexInColumn = 0;
         }
@@ -182,14 +188,14 @@ export default class Graph extends React.Component {
                 else {
                     var padding = Math.max(0, contentHeight - ((countInCol - 1) * rowSpacing)) / 2;
                     _.forEach(nodesInColumn, function(nodeInCol, idx){
-                        nodeInCol.y = ((idx + 0) * rowSpacing) + (innerMargin.top) + padding;
+                        nodeInCol.y = (((idx + 0) * rowSpacing) + innerMargin.top + padding) * scale;
                         nodeInCol.nodesInColumn = countInCol;
                     });
                 }
             } else if (rowSpacingType === 'stacked') {
                 _.forEach(nodesInColumn, function(nodeInCol, idx){
                     if (!nodeInCol) return;
-                    nodeInCol.y = (rowSpacing * idx) + innerMargin.top; //num + (this.props.innerMargin.top + verticalMargin);
+                    nodeInCol.y = ((rowSpacing * idx) + innerMargin.top) * scale;
                     nodeInCol.nodesInColumn = countInCol;
                 });
             } else if (rowSpacingType === 'wide') {
@@ -200,7 +206,7 @@ export default class Graph extends React.Component {
                         function(yCoordinate, idx){
                             var nodeInCol = nodesInColumn[idx];
                             if (!nodeInCol) return;
-                            nodeInCol.y = yCoordinate + innerMargin.top;
+                            nodeInCol.y = (yCoordinate + innerMargin.top) * scale;
                             nodeInCol.nodesInColumn = countInCol;
                         }
                     );
@@ -224,7 +230,7 @@ export default class Graph extends React.Component {
 
         // Set correct X coordinate on each node depending on column and spacing prop.
         _.forEach(nodesWithCoords, (node, i) => {
-            node.x = (node.column * (columnWidth + columnSpacing)) + leftOffset;
+            node.x = ((node.column * (columnWidth + columnSpacing)) + leftOffset) * scale;
         });
 
         // Finally, add boolean `isCurrentContext` flag to each node object if needed.
@@ -241,8 +247,11 @@ export default class Graph extends React.Component {
         super(props);
         this.height = this.height.bind(this);
         this.nodesWithCoordinates = this.nodesWithCoordinates.bind(this);
+        this.setScale = this.setScale.bind(this);
         this.state = {
-            'mounted' : false
+            mounted: false,
+            scale: null,
+            minScale: null
         };
         this.memoized = {
             getHeightFromNodes: memoize(Graph.getHeightFromNodes),
@@ -253,6 +262,62 @@ export default class Graph extends React.Component {
 
     componentDidMount(){
         this.setState({ 'mounted' : true });
+
+        const {
+            containerWidth,
+            containerHeight,
+            minScale: propMinScale,
+            maxScale,
+            graphWidth,
+            graphHeight,
+            zoomToExtentsOnMount = true
+        } = this.props;
+
+        // if (typeof containerWidth !== "number" || typeof containerHeight !== "number") {
+        //     // Maybe will become set in componentDidUpdate later.
+        //     return false;
+        // }
+
+        // if (isNaN(containerWidth) || isNaN(containerHeight)) {
+        //     throw new Error("Width or height is NaN.");
+        // }
+
+        // const minScaleUnbounded = Math.min(
+        //     (containerWidth / graphWidth),
+        //     (containerHeight / graphHeight)
+        // );
+
+        // // Decrease by 5% for scrollbars, etc.
+        // const nextMinScale = Math.floor(
+        //     Math.min(1, maxScale, Math.max(propMinScale, minScaleUnbounded))
+        // * 95) / 100;
+        // const retObj = { minScale: nextMinScale, mounted: true };
+
+        // // First time that we've gotten dimensions -- set scale to fit.
+        // // Also, if nextMinScale > scale or we had scale === minScale before.
+        // // TODO: Maybe do this onMount also
+        // if (zoomToExtentsOnMount) {
+        //     retObj.scale = nextMinScale;
+        // }
+        // requestAnimationFrame(() => {
+        //     this.setState(retObj);
+        // });
+    }
+
+    setScale(scaleToSet, cb){
+        this.setState(function(
+            { minScale: stateMinScale },
+            { minScale: propMinScale, maxScale }
+        ){
+            const scale = Math.max(
+                Math.min(
+                    maxScale,
+                    scaleToSet
+                ),
+                stateMinScale || propMinScale
+            );
+            return { scale };
+        }, cb);
     }
 
     height() {
@@ -267,14 +332,18 @@ export default class Graph extends React.Component {
 
     nodesWithCoordinates(viewportWidth, contentWidth, contentHeight){
         const { nodes, innerMargin, rowSpacingType, rowSpacing, columnWidth, columnSpacing, isNodeCurrentContext } = this.props;
+        const { scale } = this.state;
         return this.memoized.getNodesWithCoordinates(
             nodes, viewportWidth, contentWidth, contentHeight, innerMargin,
-            rowSpacingType, rowSpacing, columnWidth, columnSpacing, isNodeCurrentContext
+            rowSpacingType, rowSpacing, columnWidth, columnSpacing, isNodeCurrentContext, scale || 1
         );
     }
 
     render(){
-        const { width, innerMargin, edges, minimumHeight } = this.props;
+        const {
+            width, innerMargin, edges, minimumHeight,
+            scale: propScale = 1, maxScale: propMaxScale = 1.1, minScale: propMinScale = 0.9
+        } = this.props;
         const { mounted } = this.state;
         const innerHeight = this.height();
         const contentWidth = this.scrollableWidth();
@@ -310,7 +379,7 @@ export default class Graph extends React.Component {
                     <StateContainer {...{ nodes, edges, innerWidth, innerHeight, contentWidth, width }}
                         {..._.pick(this.props, 'innerMargin', 'columnWidth', 'columnSpacing', 'pathArrows', 'href', 'onNodeClick', 'renderDetailPane')}>
                         <ScrollContainer outerHeight={graphHeight} minHeight={minimumHeight}>
-                            <ScaleController {...{ scale: 1, minScale: 0.1, maxScale: 2.0 }}>
+                            <ScaleController {...{ scale: this.state.scale || propScale, minScale: this.state.minScale || propMinScale, maxScale: propMaxScale, setScale: this.setScale }}>
                                 <ScaleControls />
                                 <EdgesLayer {..._.pick(this.props, 'isNodeDisabled', 'isNodeCurrentContext', 'isNodeSelected', 'edgeStyle', 'rowSpacing', 'columnWidth', 'columnSpacing', 'nodeEdgeLedgeWidths')} />
                                 <NodesLayer {..._.pick(this.props, 'renderNodeElement', 'isNodeDisabled', 'isNodeCurrentContext', 'nodeClassName')} />

@@ -1,6 +1,7 @@
 'use strict';
 
 import React from 'react';
+import { requestAnimationFrame, cancelAnimationFrame } from '../utilities'
 
 
 export class ScaleController extends React.PureComponent {
@@ -14,57 +15,52 @@ export class ScaleController extends React.PureComponent {
 
     constructor(props){
         super(props);
-        this.setScale = this.setScale.bind(this);
         this.handleWheelMove = this.handleWheelMove.bind(this);
         this.handleInnerContainerMounted = this.handleInnerContainerMounted.bind(this);
         this.handleInnerContainerWillUnmount = this.handleInnerContainerWillUnmount.bind(this);
-        this.state = {
-            scale: null,
-            minScale: null
-        };
         this.innerElemReference = null;
     }
 
     componentDidMount(){
-        const {
-            containerWidth,
-            containerHeight,
-            minScale: propMinScale,
-            maxScale,
-            graphWidth,
-            graphHeight,
-            zoomToExtentsOnMount = true
-        } = this.props;
+        // const {
+        //     containerWidth,
+        //     containerHeight,
+        //     minScale: propMinScale,
+        //     maxScale,
+        //     graphWidth,
+        //     graphHeight,
+        //     zoomToExtentsOnMount = true
+        // } = this.props;
 
-        if (typeof containerWidth !== "number" || typeof containerHeight !== "number") {
-            // Maybe will become set in componentDidUpdate later.
-            return false;
-        }
+        // if (typeof containerWidth !== "number" || typeof containerHeight !== "number") {
+        //     // Maybe will become set in componentDidUpdate later.
+        //     return false;
+        // }
 
-        if (isNaN(containerWidth) || isNaN(containerHeight)) {
-            throw new Error("Width or height is NaN.");
-        }
+        // if (isNaN(containerWidth) || isNaN(containerHeight)) {
+        //     throw new Error("Width or height is NaN.");
+        // }
 
-        const minScaleUnbounded = Math.min(
-            (containerWidth / graphWidth),
-            (containerHeight / graphHeight)
-        );
+        // const minScaleUnbounded = Math.min(
+        //     (containerWidth / graphWidth),
+        //     (containerHeight / graphHeight)
+        // );
 
-        // Decrease by 5% for scrollbars, etc.
-        const nextMinScale = Math.floor(
-            Math.min(1, maxScale, Math.max(propMinScale, minScaleUnbounded))
-        * 95) / 100;
-        const retObj = { minScale: nextMinScale };
+        // // Decrease by 5% for scrollbars, etc.
+        // const nextMinScale = Math.floor(
+        //     Math.min(1, maxScale, Math.max(propMinScale, minScaleUnbounded))
+        // * 95) / 100;
+        // const retObj = { minScale: nextMinScale };
 
-        // First time that we've gotten dimensions -- set scale to fit.
-        // Also, if nextMinScale > scale or we had scale === minScale before.
-        // TODO: Maybe do this onMount also
-        if (zoomToExtentsOnMount) {
-            retObj.scale = nextMinScale;
-        }
-        requestAnimationFrame(() => {
-            this.setState(retObj);
-        });
+        // // First time that we've gotten dimensions -- set scale to fit.
+        // // Also, if nextMinScale > scale or we had scale === minScale before.
+        // // TODO: Maybe do this onMount also
+        // if (zoomToExtentsOnMount) {
+        //     retObj.scale = nextMinScale;
+        // }
+        // requestAnimationFrame(() => {
+        //     this.setState(retObj);
+        // });
     }
 
     componentDidUpdate(pastProps, pastState){
@@ -79,76 +75,61 @@ export class ScaleController extends React.PureComponent {
             minScale: propMinScale,
             maxScale
         } = this.props;
-        const { scale, minScale: stateMinScale } = this.state;
-        const {
-            enableMouseWheelZoom: pastWheelEnabled,
-            enablePinchZoom: pastPinchEnabled,
-            containerWidth: pastWidth,
-            containerHeight: pastHeight,
-            graphWidth: pastGraphWidth,
-            graphHeight: pastGraphHeight
-        } = pastProps;
+        // const { scale, minScale: stateMinScale } = this.state;
+        // const {
+        //     enableMouseWheelZoom: pastWheelEnabled,
+        //     enablePinchZoom: pastPinchEnabled,
+        //     containerWidth: pastWidth,
+        //     containerHeight: pastHeight,
+        //     graphWidth: pastGraphWidth,
+        //     graphHeight: pastGraphHeight
+        // } = pastProps;
 
-        // Remove or attach listeners if needed.
-        const listenNow = (enableMouseWheelZoom || enablePinchZoom);
-        const listenBefore = (pastWheelEnabled || pastPinchEnabled);
+        // // Remove or attach listeners if needed.
+        // const listenNow = (enableMouseWheelZoom || enablePinchZoom);
+        // const listenBefore = (pastWheelEnabled || pastPinchEnabled);
 
-        if (this.innerElemReference){
-            if (listenNow && !listenBefore){
-                this.innerElemReference.addEventListener("wheel", this.handleWheelMove, { "passive": false, "capture": true });
-            } else if (!listenNow && listenBefore){
-                this.innerElemReference.removeEventListener("wheel", this.handleWheelMove);
-            }
-        }
+        // if (this.innerElemReference){
+        //     if (listenNow && !listenBefore){
+        //         this.innerElemReference.addEventListener("wheel", this.handleWheelMove, { "passive": false, "capture": true });
+        //     } else if (!listenNow && listenBefore){
+        //         this.innerElemReference.removeEventListener("wheel", this.handleWheelMove);
+        //     }
+        // }
 
-        // Update minScale (& possibly scale itself)
-        // We read `pastState` here before updating set
-        // vs using functional updater because want to avoid
-        // React's state change queuing mechanisms / reading
-        // most accurate prev value not important.
-        if (containerWidth !== pastWidth ||
-            containerHeight !== pastHeight ||
-            graphWidth !== pastGraphWidth ||
-            graphHeight !== pastGraphHeight
-        ){
-            const minScaleUnbounded = Math.min(
-                (containerWidth / graphWidth),
-                (containerHeight / graphHeight)
-            );
+        // // Update minScale (& possibly scale itself)
+        // // We read `pastState` here before updating set
+        // // vs using functional updater because want to avoid
+        // // React's state change queuing mechanisms / reading
+        // // most accurate prev value not important.
+        // if (containerWidth !== pastWidth ||
+        //     containerHeight !== pastHeight ||
+        //     graphWidth !== pastGraphWidth ||
+        //     graphHeight !== pastGraphHeight
+        // ){
+        //     const minScaleUnbounded = Math.min(
+        //         (containerWidth / graphWidth),
+        //         (containerHeight / graphHeight)
+        //     );
 
-            // Decrease by 5% for scrollbars, etc.
-            const nextMinScale = Math.floor(
-                Math.min(1, maxScale, Math.max(propMinScale, minScaleUnbounded))
-            * 95) / 100;
-            const retObj = { minScale: nextMinScale };
+        //     // Decrease by 5% for scrollbars, etc.
+        //     const nextMinScale = Math.floor(
+        //         Math.min(1, maxScale, Math.max(propMinScale, minScaleUnbounded))
+        //     * 95) / 100;
+        //     const retObj = { minScale: nextMinScale };
 
-            // First time that we've gotten dimensions -- set scale to fit.
-            // Also, if nextMinScale > scale or we had scale === minScale before.
-            // TODO: Maybe do this onMount also
-            if (nextMinScale > scale || stateMinScale === scale || (zoomToExtentsOnMount && (!pastHeight || !pastWidth))) {
-                retObj.scale = nextMinScale;
-            }
-            requestAnimationFrame(() => {
-                this.setState(retObj);
-            });
-        }
+        //     // First time that we've gotten dimensions -- set scale to fit.
+        //     // Also, if nextMinScale > scale or we had scale === minScale before.
+        //     // TODO: Maybe do this onMount also
+        //     if (nextMinScale > scale || stateMinScale === scale || (zoomToExtentsOnMount && (!pastHeight || !pastWidth))) {
+        //         retObj.scale = nextMinScale;
+        //     }
+        //     requestAnimationFrame(() => {
+        //         this.setState(retObj);
+        //     });
+        // }
     }
 
-    setScale(scaleToSet, cb){
-        this.setState(function(
-            { minScale: stateMinScale },
-            { minScale: propMinScale, maxScale }
-        ){
-            const scale = Math.max(
-                Math.min(
-                    maxScale,
-                    scaleToSet
-                ),
-                stateMinScale || propMinScale
-            );
-            return { scale };
-        }, cb);
-    }
 
     /**
      * If `enableMouseWheelZoom` or `enablePinchZoom` are enabled, will
@@ -157,7 +138,7 @@ export class ScaleController extends React.PureComponent {
      */
     handleWheelMove(evt){
         const { deltaY, deltaX, ctrlKey } = evt;
-        const { enableMouseWheelZoom, enablePinchZoom } = this.props;
+        const { enableMouseWheelZoom, enablePinchZoom, scale, setScale } = this.props;
 
         if (!enableMouseWheelZoom && !enablePinchZoom) {
             return false;
@@ -188,28 +169,7 @@ export class ScaleController extends React.PureComponent {
         // React uses own state change queuing system, which guessing
         // gets bypassed w. raf, so below line might work better, since
         // `state.scale` unchanged.. (vs. functional updater)
-        this.setScale(this.state.scale - (deltaY * deltaMultiplier));
-
-
-        // if (this.nextAnimationFrame !== null){
-        //     caf(this.nextAnimationFrame);
-        // }
-
-        // this.nextAnimationFrame = raf(() => {
-        //     this.setState(function(
-        //         { scale: prevScale = 1, minScale: stateMinScale },
-        //         { minScale: propMinScale, maxScale }
-        //     ){
-        //         const scaleUnbounded = prevScale - (deltaY * deltaMultiplier);
-        //         const scale = Math.min(
-        //             maxScale,
-        //             Math.max(stateMinScale || propMinScale, scaleUnbounded)
-        //         );
-        //         return { scale };
-        //     }, ()=>{
-        //         this.nextAnimationFrame = null;
-        //     });
-        // });
+        setScale(scale - (deltaY * deltaMultiplier));
     }
 
     handleInnerContainerMounted(innerElem){
@@ -243,13 +203,12 @@ export class ScaleController extends React.PureComponent {
     }
 
     render(){
-        const { children, initialScale = null, minScale: propMinScale, ...passProps } = this.props;
-        const { scale, minScale } = this.state;
+        const { children, initialScale = null, scale, setScale, minScale, ...passProps } = this.props;
         const childProps = {
             ...passProps,
-            scale: scale || initialScale || 1,
-            minScale: minScale || propMinScale,
-            setScale: this.setScale,
+            scale: scale || 1,
+            minScale: minScale,
+            setScale: setScale,
             onMount: this.handleInnerContainerMounted,
             onWillUnmount: this.handleInnerContainerWillUnmount
         };
@@ -434,28 +393,4 @@ export function scaledStyle(graphHeight, graphWidth, scale){
         height: (graphHeight * scale),
         transform : "scale3d(" + scale + "," + scale + ",1)"
     };
-}
-
-/**
- * Helper function for window.requestAnimationFrame. Falls back to browser-prefixed versions if default not available, or falls back to setTimeout with 0ms delay if no requestAnimationFrame available at all.
- *
- * @param {function} cb - Callback method.
- * @returns {undefined|string} Undefined or timeout ID if falling back to setTimeout.
- */
-export function requestAnimationFrame(cb){
-    if (/*!isServerSide() && */typeof window !== 'undefined'){
-        if (typeof window.requestAnimationFrame !== 'undefined')        return window.requestAnimationFrame(cb);
-        if (typeof window.webkitRequestAnimationFrame !== 'undefined')  return window.webkitRequestAnimationFrame(cb);
-        if (typeof window.mozRequestAnimationFrame !== 'undefined')     return window.mozRequestAnimationFrame(cb);
-    }
-    return setTimeout(cb, 0); // Mock it for old browsers and server-side.
-}
-
-export function cancelAnimationFrame(identifier){
-    if (/*!isServerSide() && */typeof window !== 'undefined'){
-        if (typeof window.cancelAnimationFrame !== 'undefined')        return window.cancelAnimationFrame(identifier);
-        if (typeof window.webkitCancelAnimationFrame !== 'undefined')  return window.webkitCancelAnimationFrame(identifier);
-        if (typeof window.mozCancelAnimationFrame !== 'undefined')     return window.mozCancelAnimationFrame(identifier);
-    }
-    return clearTimeout(identifier); // Mock it for old browsers and server-side.
 }
