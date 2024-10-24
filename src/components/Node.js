@@ -240,8 +240,8 @@ export default class Node extends React.Component {
                 data-node-selected={selected} data-node-in-selection-path={inSelectionPath}
                 data-node-related={related} data-node-type-detail={node.ioType && node.ioType.toLowerCase()}
                 data-node-column={node.column} style={{
-                    top: node.y * scale,
-                    left: node.x * scale,
+                    top: node.y,
+                    left: node.x,
                     width: (columnWidth || 100) * scale,
                     zIndex: 2 + (node.indexInColumn || 0),
                     transform: `scale(${scale})`
