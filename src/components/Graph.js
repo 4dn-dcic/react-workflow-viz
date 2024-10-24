@@ -250,8 +250,8 @@ export default class Graph extends React.Component {
         this.setScale = this.setScale.bind(this);
         this.state = {
             mounted: false,
-            scale: null,
-            minScale: null
+            scale: props.scale,
+            minScale: props.minScale
         };
         this.memoized = {
             getHeightFromNodes: memoize(Graph.getHeightFromNodes),
@@ -322,12 +322,14 @@ export default class Graph extends React.Component {
 
     height() {
         const { nodes, nodesPreSortFxn, rowSpacing } = this.props;
-        return this.memoized.getHeightFromNodes(nodes, nodesPreSortFxn, rowSpacing);
+        const { scale } = this.state;
+        return this.memoized.getHeightFromNodes(nodes, nodesPreSortFxn, rowSpacing * scale);
     }
 
     scrollableWidth(){
         const { nodes, columnWidth, columnSpacing, innerMargin } = this.props;
-        return this.memoized.getScrollableWidthFromNodes(nodes, columnWidth, columnSpacing, innerMargin);
+        const { scale } = this.state;
+        return this.memoized.getScrollableWidthFromNodes(nodes, columnWidth * scale, columnSpacing * scale, innerMargin);
     }
 
     nodesWithCoordinates(viewportWidth, contentWidth, contentHeight){
