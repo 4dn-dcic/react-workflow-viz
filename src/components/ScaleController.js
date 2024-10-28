@@ -1,7 +1,7 @@
 'use strict';
 
 import React from 'react';
-import { requestAnimationFrame, cancelAnimationFrame } from '../utilities'
+import { requestAnimationFrame, cancelAnimationFrame, roundScaled } from '../utilities'
 
 
 export class ScaleController extends React.PureComponent {
@@ -389,8 +389,8 @@ export class ScaleControls extends React.PureComponent {
 
 export function scaledStyle(graphHeight, graphWidth, scale){
     return {
-        width: (graphWidth * scale),
-        height: (graphHeight * scale),
+        width: roundScaled(graphWidth, scale),
+        height: roundScaled(graphHeight, scale),
         transform : "scale3d(" + scale + "," + scale + ",1)"
     };
 }

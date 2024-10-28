@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import memoize from 'memoize-one';
 import _ from 'underscore';
 import { traceNodePathAndRun } from './parsing-functions';
+import { roundScaled } from '../utilities';
 
 
 /** @todo separate methods out into functional components */
@@ -72,7 +73,7 @@ export class DefaultNodeElement extends React.PureComponent {
     render(){
         const { node, title, columnWidth, scale = 1 } = this.props;
         const style = node.nodeType === 'input' || node.nodeType === 'output' ?
-            { width : (columnWidth || 100) * scale }
+            { width : roundScaled((columnWidth || 100), scale) }
             : null;
         return (
             <div
@@ -242,7 +243,7 @@ export default class Node extends React.Component {
                 data-node-column={node.column} style={{
                     top: node.y,
                     left: node.x,
-                    width: (columnWidth || 100) * scale,
+                    width: roundScaled((columnWidth || 100), scale),
                     zIndex: 2 + (node.indexInColumn || 0),
                     transform: `scale(${scale})`
                 }} ref={forwardedRef}>

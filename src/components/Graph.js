@@ -13,7 +13,7 @@ import EdgesLayer from './EdgesLayer';
 import { DefaultDetailPane } from './DefaultDetailPane';
 import { DefaultNodeElement } from './Node';
 import { ScaleController, ScaleControls } from './ScaleController';
-import { requestAnimationFrame, cancelAnimationFrame } from '../utilities'
+import { requestAnimationFrame, cancelAnimationFrame, roundScaled } from '../utilities'
 
 import { parseAnalysisSteps, parseBasicIOAnalysisSteps } from './parsing-functions';
 
@@ -160,7 +160,7 @@ export default class Graph extends React.Component {
 
         /** Vertically centers a single node within a column */
         function centerNode(n){
-            n.y = ((contentHeight / 2) + innerMargin.top) * scale;
+            n.y = roundScaled((contentHeight / 2) + innerMargin.top, scale);
             n.nodesInColumn = 1;
             n.indexInColumn = 0;
         }
@@ -188,14 +188,14 @@ export default class Graph extends React.Component {
                 else {
                     var padding = Math.max(0, contentHeight - ((countInCol - 1) * rowSpacing)) / 2;
                     _.forEach(nodesInColumn, function(nodeInCol, idx){
-                        nodeInCol.y = (((idx + 0) * rowSpacing) + innerMargin.top + padding) * scale;
+                        nodeInCol.y = roundScaled(((idx + 0) * rowSpacing) + innerMargin.top + padding, scale);
                         nodeInCol.nodesInColumn = countInCol;
                     });
                 }
             } else if (rowSpacingType === 'stacked') {
                 _.forEach(nodesInColumn, function(nodeInCol, idx){
                     if (!nodeInCol) return;
-                    nodeInCol.y = ((rowSpacing * idx) + innerMargin.top) * scale;
+                    nodeInCol.y = roundScaled((rowSpacing * idx) + innerMargin.top, scale);
                     nodeInCol.nodesInColumn = countInCol;
                 });
             } else if (rowSpacingType === 'wide') {
@@ -206,7 +206,7 @@ export default class Graph extends React.Component {
                         function(yCoordinate, idx){
                             var nodeInCol = nodesInColumn[idx];
                             if (!nodeInCol) return;
-                            nodeInCol.y = (yCoordinate + innerMargin.top) * scale;
+                            nodeInCol.y = roundScaled(yCoordinate + innerMargin.top, scale);
                             nodeInCol.nodesInColumn = countInCol;
                         }
                     );
@@ -230,7 +230,7 @@ export default class Graph extends React.Component {
 
         // Set correct X coordinate on each node depending on column and spacing prop.
         _.forEach(nodesWithCoords, (node, i) => {
-            node.x = ((node.column * (columnWidth + columnSpacing)) + leftOffset) * scale;
+            node.x = roundScaled((node.column * (columnWidth + columnSpacing)) + leftOffset, scale);
         });
 
         // Finally, add boolean `isCurrentContext` flag to each node object if needed.
@@ -323,13 +323,13 @@ export default class Graph extends React.Component {
     height() {
         const { nodes, nodesPreSortFxn, rowSpacing } = this.props;
         const { scale } = this.state;
-        return this.memoized.getHeightFromNodes(nodes, nodesPreSortFxn, rowSpacing * scale);
+        return this.memoized.getHeightFromNodes(nodes, nodesPreSortFxn, roundScaled(rowSpacing, scale));
     }
 
     scrollableWidth(){
         const { nodes, columnWidth, columnSpacing, innerMargin } = this.props;
         const { scale } = this.state;
-        return this.memoized.getScrollableWidthFromNodes(nodes, columnWidth * scale, columnSpacing * scale, innerMargin);
+        return this.memoized.getScrollableWidthFromNodes(nodes, roundScaled(columnWidth, scale), roundScaled(columnSpacing, scale), innerMargin);
     }
 
     nodesWithCoordinates(viewportWidth, contentWidth, contentHeight){
