@@ -26,3 +26,6 @@ export function cancelAnimationFrame(identifier){
     return clearTimeout(identifier); // Mock it for old browsers and server-side.
 }
 
+export function roundScaled(value, scale, round = 2) {
+    return parseFloat((value * scale).toFixed(round));
+}
