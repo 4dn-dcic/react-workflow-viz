@@ -410,14 +410,23 @@ export default class EdgesLayer extends React.PureComponent {
      */
     render(){
         const {
-            outerHeight, innerWidth, innerMargin, width, edges: origEdges, nodes,
+            outerHeight, innerWidth, innerMargin: propInnerMargin, width, edges: origEdges, nodes,
             selectedNode, isNodeDisabled, contentWidth,
-            columnWidth, columnSpacing, rowSpacing, innerHeight, scale = 1
+            columnWidth: propColumnWidth, columnSpacing: propColumnSpacing, rowSpacing: propRowSpacing, innerHeight, scale = 1
         } = this.props;
+        const columnWidth = propColumnWidth * scale;
+        const columnSpacing = propColumnSpacing * scale;
+        const rowSpacing = propRowSpacing * scale;
+        const innerMargin = { 
+            top: propInnerMargin.top * scale,
+            right: propInnerMargin.right * scale,
+            bottom: propInnerMargin.bottom * scale,
+            left: propInnerMargin.left * scale,
+        };
         const {
             edges,
             horizontalSegments
-        } = traceEdges(origEdges, nodes, columnWidth * scale, columnSpacing * scale, rowSpacing * scale, contentWidth, innerHeight, innerMargin);
+        } = traceEdges(origEdges, nodes, columnWidth, columnSpacing, rowSpacing, contentWidth, innerHeight, innerMargin);
         const edgeCount = edges.length;
         const divWidth = Math.max(width, contentWidth);
 
@@ -444,8 +453,8 @@ export default class EdgesLayer extends React.PureComponent {
                                         onExit={() => EdgesLayer.edgeOnExit(this.nodeRefs[key])}
                                         nodeRef={this.nodeRefs[key]}>
                                         <ForwardedEdge
-                                            {...this.props}
-                                            {...{ key, edge, edgeCount }}
+                                            {..._.omit(this.props, 'columnWidth')}
+                                            {...{ key, edge, edgeCount, columnWidth }}
                                             startX={edge.source.x}
                                             startY={edge.source.y}
                                             endX={edge.target.x}
