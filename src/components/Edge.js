@@ -423,7 +423,7 @@ export default class Edge extends React.Component {
         if (distantlySelected)      endOffset -= 2;
         if (edge.source.isCurrentContext) startOffset += 5;
         if (edge.target.isCurrentContext) endOffset -= 5;
-        return { startOffset: startOffset * scale, endOffset: endOffset * scale };
+        return { startOffset, endOffset };
     }
 
     generatePathDimension(startPtOverride = null, endPtOverride = null, edgeVerticesOverride = null){
@@ -445,6 +445,7 @@ export default class Edge extends React.Component {
 
         if (customEdgeVertices || edgeVerticesOverride){
             return this.memoized.d.drawBezierEdgeVertices(startPt, endPt, edgeVerticesOverride || customEdgeVertices, nodeEdgeLedgeWidths);
+            // return null;
         }
 
         if (edgeStyle === 'straight'){

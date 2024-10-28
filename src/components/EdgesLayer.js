@@ -8,7 +8,6 @@ import { TransitionGroup, Transition } from 'react-transition-group';
 import { path as d3Path } from 'd3';
 
 import Edge from './Edge';
-import { roundScaled } from '../utilities';
 
 
 
@@ -411,19 +410,10 @@ export default class EdgesLayer extends React.PureComponent {
      */
     render(){
         const {
-            outerHeight, innerWidth, innerMargin: propInnerMargin, width, edges: origEdges, nodes,
+            outerHeight, innerWidth, innerMargin, width, edges: origEdges, nodes,
             selectedNode, isNodeDisabled, contentWidth,
-            columnWidth: propColumnWidth, columnSpacing: propColumnSpacing, rowSpacing: propRowSpacing, innerHeight, scale = 1
+            columnWidth, columnSpacing, rowSpacing, innerHeight
         } = this.props;
-        const columnWidth = roundScaled(propColumnWidth, scale);
-        const columnSpacing = roundScaled(propColumnSpacing, scale);
-        const rowSpacing = roundScaled(propRowSpacing, scale);
-        const innerMargin = { 
-            top: roundScaled(propInnerMargin.top, scale),
-            right: roundScaled(propInnerMargin.right, scale),
-            bottom: roundScaled(propInnerMargin.bottom, scale),
-            left: roundScaled(propInnerMargin.left, scale),
-        };
         const {
             edges,
             horizontalSegments

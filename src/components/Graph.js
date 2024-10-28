@@ -154,13 +154,11 @@ export default class Graph extends React.Component {
         rowSpacing           = 75,
         columnWidth          = 150,
         columnSpacing        = 56,
-        isNodeCurrentContext = false,
-        scale                = 1
+        isNodeCurrentContext = false
     ){
-
         /** Vertically centers a single node within a column */
         function centerNode(n){
-            n.y = roundScaled((contentHeight / 2) + innerMargin.top, scale);
+            n.y = (contentHeight / 2) + innerMargin.top;
             n.nodesInColumn = 1;
             n.indexInColumn = 0;
         }
@@ -188,14 +186,14 @@ export default class Graph extends React.Component {
                 else {
                     var padding = Math.max(0, contentHeight - ((countInCol - 1) * rowSpacing)) / 2;
                     _.forEach(nodesInColumn, function(nodeInCol, idx){
-                        nodeInCol.y = roundScaled(((idx + 0) * rowSpacing) + innerMargin.top + padding, scale);
+                        nodeInCol.y = ((idx + 0) * rowSpacing) + innerMargin.top + padding;
                         nodeInCol.nodesInColumn = countInCol;
                     });
                 }
             } else if (rowSpacingType === 'stacked') {
                 _.forEach(nodesInColumn, function(nodeInCol, idx){
                     if (!nodeInCol) return;
-                    nodeInCol.y = roundScaled((rowSpacing * idx) + innerMargin.top, scale);
+                    nodeInCol.y = (rowSpacing * idx) + innerMargin.top;
                     nodeInCol.nodesInColumn = countInCol;
                 });
             } else if (rowSpacingType === 'wide') {
@@ -206,7 +204,7 @@ export default class Graph extends React.Component {
                         function(yCoordinate, idx){
                             var nodeInCol = nodesInColumn[idx];
                             if (!nodeInCol) return;
-                            nodeInCol.y = roundScaled(yCoordinate + innerMargin.top, scale);
+                            nodeInCol.y = yCoordinate + innerMargin.top;
                             nodeInCol.nodesInColumn = countInCol;
                         }
                     );
@@ -230,7 +228,7 @@ export default class Graph extends React.Component {
 
         // Set correct X coordinate on each node depending on column and spacing prop.
         _.forEach(nodesWithCoords, (node, i) => {
-            node.x = roundScaled((node.column * (columnWidth + columnSpacing)) + leftOffset, scale);
+            node.x = node.column * (columnWidth + columnSpacing) + leftOffset;
         });
 
         // Finally, add boolean `isCurrentContext` flag to each node object if needed.
@@ -337,21 +335,35 @@ export default class Graph extends React.Component {
         const { scale } = this.state;
         return this.memoized.getNodesWithCoordinates(
             nodes, viewportWidth, contentWidth, contentHeight, innerMargin,
-            rowSpacingType, rowSpacing, columnWidth, columnSpacing, isNodeCurrentContext, scale || 1
+            rowSpacingType, 
+            roundScaled(rowSpacing, scale), roundScaled(columnWidth, scale), roundScaled(columnSpacing, scale),
+            isNodeCurrentContext, scale || 1
         );
     }
 
     render(){
         const {
-            width, innerMargin, edges, minimumHeight,
+            width, innerMargin: propInnerMargin, edges, minimumHeight,
+            columnSpacing: propColumnSpacing, rowSpacing: propRowSpacing, columnWidth: propColumnWidth, 
             scale: propScale = 1, maxScale: propMaxScale = 1.1, minScale: propMinScale = 0.9
         } = this.props;
-        const { mounted } = this.state;
+        const { mounted, scale: stateScale } = this.state;
+        const scale = stateScale || propScale;
         const innerHeight = this.height();
         const contentWidth = this.scrollableWidth();
         let innerWidth = width;
 
-        if (!mounted){
+        const columnSpacing = roundScaled(propColumnSpacing, scale);
+        const rowSpacing = roundScaled(propRowSpacing, scale);
+        const columnWidth = roundScaled(propColumnWidth, scale);
+        const innerMargin = {
+            top: roundScaled(propInnerMargin.top, scale),
+            right: roundScaled(propInnerMargin.right, scale),
+            bottom: roundScaled(propInnerMargin.bottom, scale),
+            left: roundScaled(propInnerMargin.left, scale),
+        };
+
+        if (!mounted) {
             return (
                 <div key="outer">
                     <div>&nbsp;</div>
@@ -378,12 +390,13 @@ export default class Graph extends React.Component {
         return (
             <div className="workflow-chart-outer-container" key="outer">
                 <div className="workflow-chart-inner-container">
-                    <StateContainer {...{ nodes, edges, innerWidth, innerHeight, contentWidth, width }}
-                        {..._.pick(this.props, 'innerMargin', 'columnWidth', 'columnSpacing', 'pathArrows', 'href', 'onNodeClick', 'renderDetailPane')}>
+                    <StateContainer {...{ nodes, edges, innerWidth, innerHeight, contentWidth, width, columnSpacing, columnWidth, innerMargin }}
+                        {..._.pick(this.props, 'pathArrows', 'href', 'onNodeClick', 'renderDetailPane')}>
                         <ScrollContainer outerHeight={graphHeight} minHeight={minimumHeight}>
-                            <ScaleController {...{ scale: this.state.scale || propScale, minScale: this.state.minScale || propMinScale, maxScale: propMaxScale, setScale: this.setScale }}>
+                            <ScaleController {...{ scale, minScale: this.state.minScale || propMinScale, maxScale: propMaxScale, setScale: this.setScale }}>
                                 <ScaleControls />
-                                <EdgesLayer {..._.pick(this.props, 'isNodeDisabled', 'isNodeCurrentContext', 'isNodeSelected', 'edgeStyle', 'rowSpacing', 'columnWidth', 'columnSpacing', 'nodeEdgeLedgeWidths')} />
+                                <EdgesLayer {...{ rowSpacing, columnWidth, columnSpacing }}
+                                    {..._.pick(this.props, 'isNodeDisabled', 'isNodeCurrentContext', 'isNodeSelected', 'edgeStyle', 'nodeEdgeLedgeWidths')} />
                                 <NodesLayer {..._.pick(this.props, 'renderNodeElement', 'isNodeDisabled', 'isNodeCurrentContext', 'nodeClassName')} />
                             </ScaleController>
                         </ScrollContainer>
