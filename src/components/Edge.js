@@ -416,14 +416,14 @@ export default class Edge extends React.Component {
     }
 
     getPathOffsets(startOffset = 5, endOffset = -5, props = this.props){
-        const { edge, pathArrows } = props;
+        const { edge, pathArrows, scale } = props;
         const { disabled, selected, related, distantlySelected } = this.getComputedProperties(props);
         if (pathArrows)             endOffset -= 10;
         if (selected || related)    endOffset -= 5;
         if (distantlySelected)      endOffset -= 2;
         if (edge.source.isCurrentContext) startOffset += 5;
         if (edge.target.isCurrentContext) endOffset -= 5;
-        return { startOffset, endOffset };
+        return { startOffset: startOffset * scale, endOffset: endOffset * scale };
     }
 
     generatePathDimension(startPtOverride = null, endPtOverride = null, edgeVerticesOverride = null){
