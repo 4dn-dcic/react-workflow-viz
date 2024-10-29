@@ -181,7 +181,7 @@ class DemoApp extends Component {
                     onChange={this.handleParsingOptChange} onChangeBasicIO={this.handleChangeBasicIO} />
                 <RowSpacingTypeSelect rowSpacingType={rowSpacingType} onChange={this.handleRowSpacingTypeChange} />
                 <GraphParser parsingOptions={fullParseOpts} parentItem={{ name }} steps={steps}>
-                    <Graph rowSpacingType={rowSpacingType} minimumHeight={300} />
+                    <Graph rowSpacingType={rowSpacingType} minimumHeight={300} showZoomControls={true} />
                 </GraphParser>
             </div>
         );

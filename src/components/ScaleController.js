@@ -212,7 +212,7 @@ export class ScaleController extends React.PureComponent {
             onMount: this.handleInnerContainerMounted,
             onWillUnmount: this.handleInnerContainerWillUnmount
         };
-        return React.Children.map(children, (child) => React.cloneElement(child, childProps) );
+        return React.Children.map(children, (child) => child && React.cloneElement(child, childProps) );
     }
 
 }

@@ -72,7 +72,12 @@ export default class Graph extends React.Component {
             'capacity'          : PropTypes.string
         })).isRequired,
         'nodeTitle'         : PropTypes.func,
-        'rowSpacingType'    : PropTypes.oneOf([ 'compact', 'wide', 'stacked' ])
+        'rowSpacingType'    : PropTypes.oneOf([ 'compact', 'wide', 'stacked' ]),
+        //scale
+        'showZoomControls': PropTypes.bool,
+        'scale': PropTypes.number,
+        'minScale': PropTypes.number,
+        'maxScale': PropTypes.number
     };
 
     static defaultProps = {
@@ -104,6 +109,7 @@ export default class Graph extends React.Component {
         'nodeClassName' : function(node){ return ''; },
         'nodeEdgeLedgeWidths' : [3,5],
         //scale
+        'showZoomControls': true,
         'scale': 1,
         'minScale': 0.75,
         'maxScale': 1.25
@@ -358,7 +364,8 @@ export default class Graph extends React.Component {
         const {
             width, innerMargin: propInnerMargin, edges, minimumHeight,
             columnSpacing: propColumnSpacing, rowSpacing: propRowSpacing, columnWidth: propColumnWidth, 
-            scale: propScale = 1, maxScale: propMaxScale = 1.1, minScale: propMinScale = 0.9
+            scale: propScale = 1, maxScale: propMaxScale = 1.1, minScale: propMinScale = 0.9,
+            showZoomControls
         } = this.props;
         const { mounted, scale: stateScale } = this.state;
         const scale = stateScale || propScale;
@@ -407,7 +414,9 @@ export default class Graph extends React.Component {
                         {..._.pick(this.props, 'pathArrows', 'href', 'onNodeClick', 'renderDetailPane')}>
                         <ScrollContainer outerHeight={graphHeight} minHeight={minimumHeight}>
                             <ScaleController {...{ scale, minScale: this.state.minScale || propMinScale, maxScale: propMaxScale, setScale: this.setScale }}>
-                                <ScaleControls />
+                                {showZoomControls && typeof this.setScale === "function" ?
+                                    <ScaleControls />
+                                    : null}
                                 <EdgesLayer {...{ rowSpacing, columnWidth, columnSpacing }}
                                     {..._.pick(this.props, 'isNodeDisabled', 'isNodeCurrentContext', 'isNodeSelected', 'edgeStyle', 'nodeEdgeLedgeWidths')} />
                                 <NodesLayer {..._.pick(this.props, 'renderNodeElement', 'isNodeDisabled', 'isNodeCurrentContext', 'nodeClassName')} />
