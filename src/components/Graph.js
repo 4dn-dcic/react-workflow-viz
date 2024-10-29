@@ -406,21 +406,22 @@ export default class Graph extends React.Component {
             graphHeight += (spacerCount * this.props.columnSpacing);
         }
         */
-
+        let scaleControls = null;
+        if (showZoomControls && typeof this.setScale === "function") {
+            const scaleProps = { scale, minScale: this.state.minScale || propMinScale, maxScale: propMaxScale, setScale: this.setScale };
+            scaleControls = <ScaleControls {...scaleProps} />;
+        }
+       
         return (
             <div className="workflow-chart-outer-container" key="outer">
                 <div className="workflow-chart-inner-container">
                     <StateContainer {...{ nodes, edges, innerWidth, innerHeight, contentWidth, width, columnSpacing, columnWidth, innerMargin }}
                         {..._.pick(this.props, 'pathArrows', 'href', 'onNodeClick', 'renderDetailPane')}>
+                        {scaleControls}
                         <ScrollContainer outerHeight={graphHeight} minHeight={minimumHeight}>
-                            <ScaleController {...{ scale, minScale: this.state.minScale || propMinScale, maxScale: propMaxScale, setScale: this.setScale }}>
-                                {showZoomControls && typeof this.setScale === "function" ?
-                                    <ScaleControls />
-                                    : null}
-                                <EdgesLayer {...{ rowSpacing, columnWidth, columnSpacing }}
-                                    {..._.pick(this.props, 'isNodeDisabled', 'isNodeCurrentContext', 'isNodeSelected', 'edgeStyle', 'nodeEdgeLedgeWidths')} />
-                                <NodesLayer {..._.pick(this.props, 'renderNodeElement', 'isNodeDisabled', 'isNodeCurrentContext', 'nodeClassName')} />
-                            </ScaleController>
+                            <EdgesLayer {...{ rowSpacing, columnWidth, columnSpacing }}
+                                {..._.pick(this.props, 'isNodeDisabled', 'isNodeCurrentContext', 'isNodeSelected', 'edgeStyle', 'nodeEdgeLedgeWidths')} />
+                            <NodesLayer {..._.pick(this.props, 'renderNodeElement', 'isNodeDisabled', 'isNodeCurrentContext', 'nodeClassName')} />
                         </ScrollContainer>
                     </StateContainer>
                 </div>
