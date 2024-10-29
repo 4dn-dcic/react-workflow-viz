@@ -347,12 +347,7 @@ export class ScaleControls extends React.PureComponent {
     }
 
     render(){
-        const {
-            scale = null,
-            setScale = null,
-            minScale = 0.1,
-            maxScale = 1
-        } = this.props;
+        const { scale, setScale, minScale, maxScale } = this.props;
 
         if (typeof setScale !== "function" || typeof scale !== "number" || isNaN(scale)) {
             return null;
