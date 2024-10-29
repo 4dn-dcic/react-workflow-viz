@@ -4,6 +4,9 @@ import React from 'react';
 import { requestAnimationFrame, cancelAnimationFrame, roundScaled } from '../utilities'
 
 
+/**
+ * @deprecated Moved most of the functionality into Graph
+ */
 export class ScaleController extends React.PureComponent {
 
     static defaultProps = {
