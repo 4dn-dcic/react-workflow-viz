@@ -536,7 +536,7 @@ $workflow-node-color-type-global-context:           #ffb3b3 !default;
             }
 
             .scroll-container {
-
+                display: flex;
                 position: relative;
                 box-sizing: content-box;
                 transition:
@@ -627,12 +627,15 @@ $workflow-node-color-type-global-context:           #ffb3b3 !default;
 }
 
 .zoom-controls-container {
+    display: flex;
     position: absolute;
+    z-index: 999;
     top: 8px;
-    left: 8px;
+    left: 50%;
+    transform: translateX(-50%);
     > .zoom-buttons-row {
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         > .zoom-btn,
         > .zoom-value {
             box-sizing: content-box;
