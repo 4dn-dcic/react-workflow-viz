@@ -319,24 +319,37 @@ export default class Graph extends React.Component {
     }
 
     height() {
-        const { nodes, nodesPreSortFxn, rowSpacing } = this.props;
+        const { nodes, nodesPreSortFxn, rowSpacing: propRowSpacing } = this.props;
         const { scale } = this.state;
-        return this.memoized.getHeightFromNodes(nodes, nodesPreSortFxn, roundScaled(rowSpacing, scale));
+
+        const rowSpacing = roundScaled(propRowSpacing, scale);
+        return this.memoized.getHeightFromNodes(nodes, nodesPreSortFxn, rowSpacing);
     }
 
     scrollableWidth(){
-        const { nodes, columnWidth, columnSpacing, innerMargin } = this.props;
+        const { nodes, columnWidth: propColumnWidth, columnSpacing: propColumnSpacing, innerMargin } = this.props;
         const { scale } = this.state;
-        return this.memoized.getScrollableWidthFromNodes(nodes, roundScaled(columnWidth, scale), roundScaled(columnSpacing, scale), innerMargin);
+
+        const columnWidth = roundScaled(propColumnWidth, scale);
+        const columnSpacing = roundScaled(propColumnSpacing, scale);
+        return this.memoized.getScrollableWidthFromNodes(nodes, columnWidth, columnSpacing, innerMargin);
     }
 
     nodesWithCoordinates(viewportWidth, contentWidth, contentHeight){
-        const { nodes, innerMargin, rowSpacingType, rowSpacing, columnWidth, columnSpacing, isNodeCurrentContext } = this.props;
+        const { 
+            nodes, innerMargin, 
+            rowSpacingType, rowSpacing: propRowSpacing, columnWidth: propColumnWidth, columnSpacing: propColumnSpacing,
+            isNodeCurrentContext
+        } = this.props;
         const { scale } = this.state;
+        
+        const rowSpacing = roundScaled(propRowSpacing, scale);
+        const columnWidth = roundScaled(propColumnWidth, scale);
+        const columnSpacing = roundScaled(propColumnSpacing, scale);
+        
         return this.memoized.getNodesWithCoordinates(
             nodes, viewportWidth, contentWidth, contentHeight, innerMargin,
-            rowSpacingType, 
-            roundScaled(rowSpacing, scale), roundScaled(columnWidth, scale), roundScaled(columnSpacing, scale),
+            rowSpacingType, rowSpacing, columnWidth, columnSpacing,
             isNodeCurrentContext, scale || 1
         );
     }
