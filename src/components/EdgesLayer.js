@@ -444,8 +444,8 @@ export default class EdgesLayer extends React.PureComponent {
                                         onExit={() => EdgesLayer.edgeOnExit(this.nodeRefs[key])}
                                         nodeRef={this.nodeRefs[key]}>
                                         <ForwardedEdge
-                                            {..._.omit(this.props, 'columnWidth')}
-                                            {...{ key, edge, edgeCount, columnWidth }}
+                                            {...this.props}
+                                            {...{ key, edge, edgeCount }}
                                             startX={edge.source.x}
                                             startY={edge.source.y}
                                             endX={edge.target.x}
