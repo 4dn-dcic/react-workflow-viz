@@ -416,7 +416,7 @@ export default class Edge extends React.Component {
     }
 
     getPathOffsets(startOffset = 5, endOffset = -5, props = this.props){
-        const { edge, pathArrows, scale } = props;
+        const { edge, pathArrows } = props;
         const { disabled, selected, related, distantlySelected } = this.getComputedProperties(props);
         if (pathArrows)             endOffset -= 10;
         if (selected || related)    endOffset -= 5;
@@ -445,7 +445,6 @@ export default class Edge extends React.Component {
 
         if (customEdgeVertices || edgeVerticesOverride){
             return this.memoized.d.drawBezierEdgeVertices(startPt, endPt, edgeVerticesOverride || customEdgeVertices, nodeEdgeLedgeWidths);
-            // return null;
         }
 
         if (edgeStyle === 'straight'){
