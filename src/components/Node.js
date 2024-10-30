@@ -73,7 +73,7 @@ export class DefaultNodeElement extends React.PureComponent {
     render(){
         const { node, title, columnWidth, scale = 1 } = this.props;
         const style = node.nodeType === 'input' || node.nodeType === 'output' ?
-            { width : columnWidth || roundScaled(100, scale) }
+            { width : 150 /*columnWidth || roundScaled(100, scale)*/ }
             : null;
         return (
             <div
@@ -242,10 +242,10 @@ export default class Node extends React.Component {
                 data-node-related={related} data-node-type-detail={node.ioType && node.ioType.toLowerCase()}
                 data-node-column={node.column} style={{
                     top: node.y,
-                    left: node.x,
-                    width: columnWidth || roundScaled(100, scale),
+                    left: node.x + ((scale - 1) * 75),
+                    width: 150, //columnWidth || roundScaled(100, scale),
                     zIndex: 2 + (node.indexInColumn || 0),
-                    //transform: `scale(${scale})`
+                    transform: `scale(${scale})`
                 }} ref={forwardedRef}>
                 <div className="inner" children={renderNodeElement(node, visibleNodeProps)}
                     {..._.pick(this.props, 'onMouseEnter', 'onMouseLeave')} onClick={disabled ? null : this.props.onClick} />

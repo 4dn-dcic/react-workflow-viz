@@ -415,7 +415,7 @@ export default class Graph extends React.Component {
         return (
             <div className="workflow-chart-outer-container" key="outer">
                 <div className="workflow-chart-inner-container">
-                    <StateContainer {...{ nodes, edges, innerWidth, innerHeight, contentWidth, width, columnSpacing, columnWidth, innerMargin }}
+                    <StateContainer {...{ nodes, edges, innerWidth, innerHeight, contentWidth, width, scale, columnSpacing, columnWidth, innerMargin }}
                         {..._.pick(this.props, 'pathArrows', 'href', 'onNodeClick', 'renderDetailPane')}>
                         {scaleControls}
                         <ScrollContainer outerHeight={graphHeight} minHeight={minimumHeight}>
