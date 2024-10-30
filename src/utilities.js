@@ -26,6 +26,11 @@ export function cancelAnimationFrame(identifier){
     return clearTimeout(identifier); // Mock it for old browsers and server-side.
 }
 
-export function roundScaled(value, scale, round = 2) {
-    return parseFloat((value * scale).toFixed(round));
+export function roundScaled(value, scale, decimals = 2) {
+    //shortcut - useful for most cases
+    if (scale === 1) return value;
+
+    const factor = Math.pow(10, decimals);
+    const result = value * scale;
+    return Math.round(result * factor) / factor;
 }
