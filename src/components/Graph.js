@@ -111,8 +111,8 @@ export default class Graph extends React.Component {
         //scale
         'showZoomControls': true,
         'scale': 1,
-        'minScale': 0.75,
-        'maxScale': 1.25
+        'minScale': 0.50,
+        'maxScale': 1.50
     };
 
     static getHeightFromNodes(nodes, nodesPreSortFxn, rowSpacing){
@@ -415,9 +415,9 @@ export default class Graph extends React.Component {
         return (
             <div className="workflow-chart-outer-container" key="outer">
                 <div className="workflow-chart-inner-container">
+                    {scaleControls}
                     <StateContainer {...{ nodes, edges, innerWidth, innerHeight, contentWidth, width }}
                         {..._.pick(this.props, 'pathArrows', 'href', 'onNodeClick', 'renderDetailPane')}>
-                        {scaleControls}
                         <ScrollContainer outerHeight={graphHeight} minHeight={minimumHeight}>
                             <EdgesLayer {...{ scale, columnWidth: propColumnWidth, columnSpacing: propColumnSpacing, rowSpacing: propRowSpacing, innerMargin: propInnerMargin }}
                                 {..._.pick(this.props, 'isNodeDisabled', 'isNodeCurrentContext', 'isNodeSelected', 'edgeStyle', 'nodeEdgeLedgeWidths')} />

@@ -685,6 +685,7 @@ $workflow-node-color-type-global-context:           #ffb3b3 !default;
     > .zoom-slider {
         width: 112px;
         padding-top: 3px;
+        padding-left: 3px;
         > input[type="range"] {
             width: inherit;
             // If we want to make it vertical later:
@@ -694,5 +695,8 @@ $workflow-node-color-type-global-context:           #ffb3b3 !default;
             //    height: 120px;
             //}
         }
+    }
+    + div.state-container {
+        margin-top: 40px;
     }
 }
