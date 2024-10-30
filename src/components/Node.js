@@ -71,9 +71,9 @@ export class DefaultNodeElement extends React.PureComponent {
     }
 
     render(){
-        const { node, title, columnWidth, scale = 1 } = this.props;
+        const { node, title, columnWidth } = this.props;
         const style = node.nodeType === 'input' || node.nodeType === 'output' ?
-            { width : 150 /*columnWidth || roundScaled(100, scale)*/ }
+            { width : columnWidth || 100 }
             : null;
         return (
             <div
@@ -188,9 +188,12 @@ export default class Node extends React.Component {
     componentDidMount(){
         const {
             countInActiveContext, lastActiveContextNode,
-            node, scrollContainerWrapperElement, columnWidth, columnSpacing
+            node, scrollContainerWrapperElement, scale, columnWidth: propColumnWidth, columnSpacing: propColumnSpacing
         } = this.props;
         const sw = scrollContainerWrapperElement;
+
+        const columnWidth = roundScaled(propColumnWidth, scale);
+        const columnSpacing = roundScaled(propColumnSpacing, scale);
 
         if (
             node.isCurrentContext && sw &&
@@ -242,8 +245,8 @@ export default class Node extends React.Component {
                 data-node-related={related} data-node-type-detail={node.ioType && node.ioType.toLowerCase()}
                 data-node-column={node.column} style={{
                     top: node.y,
-                    left: node.x + ((scale - 1) * 75),
-                    width: 150, //columnWidth || roundScaled(100, scale),
+                    left: node.x + ((scale - 1) * columnWidth) / 2,
+                    width: columnWidth || 100,
                     zIndex: 2 + (node.indexInColumn || 0),
                     transform: `scale(${scale})`
                 }} ref={forwardedRef}>

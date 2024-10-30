@@ -415,13 +415,14 @@ export default class Graph extends React.Component {
         return (
             <div className="workflow-chart-outer-container" key="outer">
                 <div className="workflow-chart-inner-container">
-                    <StateContainer {...{ nodes, edges, innerWidth, innerHeight, contentWidth, width, scale, columnSpacing, columnWidth, innerMargin }}
+                    <StateContainer {...{ nodes, edges, innerWidth, innerHeight, contentWidth, width }}
                         {..._.pick(this.props, 'pathArrows', 'href', 'onNodeClick', 'renderDetailPane')}>
                         {scaleControls}
                         <ScrollContainer outerHeight={graphHeight} minHeight={minimumHeight}>
-                            <EdgesLayer {...{ rowSpacing, columnWidth, columnSpacing }}
+                            <EdgesLayer {...{ scale, columnWidth, columnSpacing, rowSpacing, innerMargin }}
                                 {..._.pick(this.props, 'isNodeDisabled', 'isNodeCurrentContext', 'isNodeSelected', 'edgeStyle', 'nodeEdgeLedgeWidths')} />
-                            <NodesLayer {..._.pick(this.props, 'renderNodeElement', 'isNodeDisabled', 'isNodeCurrentContext', 'nodeClassName')} />
+                            <NodesLayer {...{ scale, columnSpacing: propColumnSpacing, columnWidth: propColumnWidth, innerMargin: propInnerMargin }}
+                                {..._.pick(this.props, 'renderNodeElement', 'isNodeDisabled', 'isNodeCurrentContext', 'nodeClassName')} />
                         </ScrollContainer>
                     </StateContainer>
                 </div>

@@ -6,6 +6,7 @@ import memoize from 'memoize-one';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
 
 import Node from './Node';
+import { roundScaled } from '../utilities';
 
 
 export default class NodesLayer extends React.PureComponent {
@@ -73,9 +74,17 @@ export default class NodesLayer extends React.PureComponent {
     }
 
     render(){
-        var { innerMargin, innerWidth, outerHeight, contentWidth } = this.props,
-            fullWidth = innerWidth + innerMargin.left + innerMargin.right,
-            layerStyle = { 'width' : Math.max(contentWidth, fullWidth), 'height' : outerHeight };
+        const { innerMargin: propInnerMargin, innerWidth, outerHeight, contentWidth, scale } = this.props;
+
+        const innerMargin = {
+            top: roundScaled(propInnerMargin.top, scale),
+            right: roundScaled(propInnerMargin.right, scale),
+            bottom: roundScaled(propInnerMargin.bottom, scale),
+            left: roundScaled(propInnerMargin.left, scale),
+        };
+
+        const fullWidth = innerWidth + innerMargin.left + innerMargin.right;
+        const layerStyle = { 'width': Math.max(contentWidth, fullWidth), 'height': outerHeight };
 
         return (
             <div className="nodes-layer-wrapper" style={layerStyle}>
