@@ -411,7 +411,7 @@ export default class EdgesLayer extends React.PureComponent {
         const {
             outerHeight, innerWidth, innerHeight, width, edges: origEdges, nodes,
             selectedNode, isNodeDisabled, contentWidth,
-            scale, columnWidth: propColumnWidth, columnSpacing: propColumnSpacing, rowSpacing: propRowSpacing, innerMargin: propInnerMargin 
+            scale = 1, columnWidth: propColumnWidth, columnSpacing: propColumnSpacing, rowSpacing: propRowSpacing, innerMargin: propInnerMargin 
         } = this.props;
 
         // scaling

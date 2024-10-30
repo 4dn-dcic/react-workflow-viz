@@ -188,7 +188,7 @@ export default class Node extends React.Component {
     componentDidMount(){
         const {
             countInActiveContext, lastActiveContextNode,
-            node, scrollContainerWrapperElement, scale, columnWidth: propColumnWidth, columnSpacing: propColumnSpacing
+            node, scrollContainerWrapperElement, scale = 1, columnWidth: propColumnWidth, columnSpacing: propColumnSpacing
         } = this.props;
         const sw = scrollContainerWrapperElement;
 

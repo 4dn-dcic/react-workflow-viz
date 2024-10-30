@@ -430,7 +430,7 @@ export default class Edge extends React.Component {
     generatePathDimension(startPtOverride = null, endPtOverride = null, edgeVerticesOverride = null){
         const {
             edgeStyle, startX, startY, endX, endY, curveRadius,
-            scale, columnWidth: propColumnWidth, columnSpacing: propColumnSpacing, rowSpacing: propRowSpacing,
+            scale = 1, columnWidth: propColumnWidth, columnSpacing: propColumnSpacing, rowSpacing: propRowSpacing,
             nodeEdgeLedgeWidths, edge: { vertices: customEdgeVertices = null }
         } = this.props;
         
