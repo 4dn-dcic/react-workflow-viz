@@ -419,9 +419,9 @@ export default class Graph extends React.Component {
                         {..._.pick(this.props, 'pathArrows', 'href', 'onNodeClick', 'renderDetailPane')}>
                         {scaleControls}
                         <ScrollContainer outerHeight={graphHeight} minHeight={minimumHeight}>
-                            <EdgesLayer {...{ scale, columnWidth, columnSpacing, rowSpacing, innerMargin }}
+                            <EdgesLayer {...{ scale, columnWidth: propColumnWidth, columnSpacing: propColumnSpacing, rowSpacing: propRowSpacing, innerMargin: propInnerMargin }}
                                 {..._.pick(this.props, 'isNodeDisabled', 'isNodeCurrentContext', 'isNodeSelected', 'edgeStyle', 'nodeEdgeLedgeWidths')} />
-                            <NodesLayer {...{ scale, columnSpacing: propColumnSpacing, columnWidth: propColumnWidth, innerMargin: propInnerMargin }}
+                            <NodesLayer {...{ scale, columnWidth: propColumnWidth, columnSpacing: propColumnSpacing, innerMargin: propInnerMargin }}
                                 {..._.pick(this.props, 'renderNodeElement', 'isNodeDisabled', 'isNodeCurrentContext', 'nodeClassName')} />
                         </ScrollContainer>
                     </StateContainer>

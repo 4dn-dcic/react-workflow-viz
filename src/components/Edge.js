@@ -8,6 +8,7 @@ import * as d3 from 'd3';
 
 import Node from './Node';
 import { traceNodePathAndRun } from './parsing-functions';
+import { roundScaled } from '../utilities';
 
 
 export const pathDimensionFunctions = {
@@ -428,10 +429,16 @@ export default class Edge extends React.Component {
 
     generatePathDimension(startPtOverride = null, endPtOverride = null, edgeVerticesOverride = null){
         const {
-            edgeStyle, startX, startY, endX, endY, columnWidth,
-            curveRadius, columnSpacing, rowSpacing, nodeEdgeLedgeWidths,
-            edge: { vertices: customEdgeVertices = null }
+            edgeStyle, startX, startY, endX, endY, curveRadius,
+            scale, columnWidth: propColumnWidth, columnSpacing: propColumnSpacing, rowSpacing: propRowSpacing,
+            nodeEdgeLedgeWidths, edge: { vertices: customEdgeVertices = null }
         } = this.props;
+        
+        // scaling
+        const columnWidth = roundScaled(propColumnWidth, scale);
+        const columnSpacing = roundScaled(propColumnSpacing, scale);
+        const rowSpacing = roundScaled(propRowSpacing, scale);
+        
         const { startOffset, endOffset } = this.getPathOffsets();
 
         const startPt = {
