@@ -398,6 +398,25 @@ $workflow-node-color-type-global-context:           #ffb3b3 !default;
                 background-color: $workflow-node-color-type-input-file-reference;
             }
         }
+
+        // Node whose page we currently are on (input-side cases).
+        &.current-context{
+            &:before {
+                background-color: $workflow-node-color-type-global-context;
+                transition: outline-offset .5s;
+            }
+            &:not([data-node-selected="true"]):not(:hover){
+                &:before {
+                    outline-offset: 9px;
+                    outline-color: rgba(0,0,0,0.75);
+                    outline-style: dotted;
+                    outline-width: 1px;
+                }
+            }
+            .node-name {
+                font-weight: 600;
+            }
+        }
     }
     &.node-type-input-group,
     &.node-type-output-group {
@@ -428,6 +447,13 @@ $workflow-node-color-type-global-context:           #ffb3b3 !default;
             &:before {
                 background-color: $workflow-node-color-disabled;
             }
+        }
+    }
+
+    // Extra emphasis for current context regardless of node type.
+    &.current-context {
+        > .inner .node-visible-element {
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.3);
         }
     }
 
@@ -628,6 +654,8 @@ $workflow-node-color-type-global-context:           #ffb3b3 !default;
 
 .zoom-controls-container {
     display: flex;
+    align-items: center;
+    gap: 8px;
     position: absolute;
     z-index: 999;
     top: 8px;
@@ -635,7 +663,12 @@ $workflow-node-color-type-global-context:           #ffb3b3 !default;
     transform: translateX(-50%);
     > .zoom-buttons-row {
         display: flex;
-        align-items: flex-start;
+        align-items: center;
+        gap: 0;
+        border: 1px solid #999;
+        border-radius: 7px;
+        overflow: hidden;
+        background: #fff;
         > .zoom-btn,
         > .zoom-value {
             box-sizing: content-box;
@@ -644,18 +677,25 @@ $workflow-node-color-type-global-context:           #ffb3b3 !default;
             height: 25px;
             color: #555;
             background-color: #fff;
+            margin: 0;
+            border: 0;
+        }
+        > .zoom-btn,
+        > .zoom-value {
+            border-right: 1px solid #d2d6dc;
+        }
+        > .zoom-btn:last-child,
+        > .zoom-value:last-child {
+            border-right: 0;
         }
         > .zoom-btn {
-            border: 1px solid #999;
             width: 24px;
 
             &.zoom-out { // Left btn
-                border-radius: 5px 0 0 5px;
-                border-right-color: #ddd !important;
+                border-radius: 0;
             }
             &.zoom-in { // Right btn
-                border-radius: 0 5px 5px 0;
-                border-left-color : #ddd !important;
+                border-radius: 0;
             }
 
             &:disabled {
@@ -673,19 +713,19 @@ $workflow-node-color-type-global-context:           #ffb3b3 !default;
             }
         }
         > .zoom-value {
-            border-top: 1px solid #999999;
-            border-bottom: 1px solid #999999;
             width: 36px;
             font-size: 0.875em;
             line-height: 25px;
             white-space: nowrap;
-            text-align: right;
+            text-align: center;
         }
     }
     > .zoom-slider {
         width: 112px;
-        padding-top: 3px;
-        padding-left: 3px;
+        padding-top: 0;
+        padding-left: 0;
+        display: flex;
+        align-items: center;
         > input[type="range"] {
             width: inherit;
             // If we want to make it vertical later:

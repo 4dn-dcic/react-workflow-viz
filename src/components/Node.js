@@ -97,6 +97,10 @@ export default class Node extends React.Component {
     static isSelected(currentNode, selectedNode){
         if (!selectedNode) return false;
         if (selectedNode === currentNode) return true;
+        const selectedCompacted = Array.isArray(selectedNode._compactedNodes) ? selectedNode._compactedNodes : [];
+        if (selectedCompacted.indexOf(currentNode) > -1) return true;
+        const currentCompacted = Array.isArray(currentNode._compactedNodes) ? currentNode._compactedNodes : [];
+        if (currentCompacted.indexOf(selectedNode) > -1) return true;
 
         return false;
     }
@@ -146,9 +150,17 @@ export default class Node extends React.Component {
     static isRelated(currentNode, selectedNode) {
 
         if (!selectedNode) return false;
+        const selectedNameSet = new Set(
+            [selectedNode]
+                .concat(Array.isArray(selectedNode._compactedNodes) ? selectedNode._compactedNodes : [])
+                .map(function(n){ return n && n.name; })
+                .filter(function(n){ return typeof n === 'string' && n.length > 0; })
+        );
+        const hasMatchingName = selectedNameSet.has(currentNode.name)
+            || _.any((currentNode._source || []).concat(currentNode._target || []), function(s){ return selectedNameSet.has(s && s.name); });
 
         // Ensure that an argument name (as appears on a step input/output arg) matches selectedNode name.
-        if (selectedNode.name === currentNode.name || _.any((currentNode._source || []).concat(currentNode._target || []), function(s){ return s.name === selectedNode.name; })) {
+        if (hasMatchingName) {
             if (currentNode.nodeType === 'input' || currentNode.nodeType === 'output') { // An output node may be an input of another node.
                 return Node.isInputOfSameStep(currentNode, selectedNode);
             }

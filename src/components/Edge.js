@@ -157,12 +157,10 @@ export default class Edge extends React.Component {
     }
 
     static isRelated(edge, selectedNode){
-        return Node.isRelated(edge.source, selectedNode);
-        // Enable the following later _if_ we go beyond 1 input node deep.
-        //return (
-        //    Node.isRelated(edge.source, selectedNode) ||
-        //    Node.isRelated(edge.target, selectedNode)
-        //);
+        return (
+            Node.isRelated(edge.source, selectedNode) ||
+            Node.isRelated(edge.target, selectedNode)
+        );
     }
 
     static isDistantlySelected(edge, selectedNode){

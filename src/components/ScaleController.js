@@ -350,14 +350,14 @@ export class ScaleControls extends React.PureComponent {
     }
 
     render(){
-        const { scale, setScale, minScale, maxScale } = this.props;
+        const { scale, setScale, minScale, maxScale, className } = this.props;
 
         if (typeof setScale !== "function" || typeof scale !== "number" || isNaN(scale)) {
             return null;
         }
 
         return (
-            <div className="zoom-controls-container">
+            <div className={["zoom-controls-container", className].filter(Boolean).join(" ")}>
                 <div className="zoom-buttons-row">
                     <button type="button" className="zoom-btn zoom-out"
                         onMouseDown={this.onZoomOutDown} onMouseUp={this.onZoomOutUp}

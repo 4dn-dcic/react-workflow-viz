@@ -2,6 +2,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import ReactDOM from 'react-dom';
 import _ from 'underscore';
 import * as d3 from 'd3';
 import memoize from 'memoize-one';
@@ -78,6 +79,8 @@ export default class Graph extends React.Component {
         'scale': PropTypes.number,
         'minScale': PropTypes.number,
         'maxScale': PropTypes.number
+        ,
+        'zoomControlsPortalSelector': PropTypes.string
     };
 
     static defaultProps = {
@@ -113,6 +116,8 @@ export default class Graph extends React.Component {
         'scale': 1,
         'minScale': 0.50,
         'maxScale': 1.50
+        ,
+        'zoomControlsPortalSelector': null
     };
 
     static getHeightFromNodes(nodes, nodesPreSortFxn, rowSpacing){
@@ -224,17 +229,32 @@ export default class Graph extends React.Component {
         nodesWithCoords = _.reduce(nodesByColumnPairs, function(m, [ columnNumber, nodesInColumn ]){
             return m.concat(nodesInColumn);
         }, []);
+        const columnCount = nodesByColumnPairs.length;
 
         leftOffset = innerMargin.left;
 
-        // Center graph contents horizontally if needed.
-        if (contentWidth && viewportWidth && contentWidth < viewportWidth){
+        // If there is extra viewport width, spread columns horizontally
+        // to better use canvas before falling back to centered-cluster layout.
+        let xColumnSpacing = columnSpacing;
+        if (viewportWidth && columnCount > 1){
+            const availableForColumns = Math.max(
+                0,
+                viewportWidth - innerMargin.left - innerMargin.right - (columnCount * columnWidth)
+            );
+            const baseGapTotal = (columnCount - 1) * columnSpacing;
+            if (availableForColumns > baseGapTotal){
+                xColumnSpacing = availableForColumns / (columnCount - 1);
+                leftOffset = innerMargin.left;
+            } else if (contentWidth && contentWidth < viewportWidth){
+                leftOffset += (viewportWidth - contentWidth) / 2;
+            }
+        } else if (contentWidth && viewportWidth && contentWidth < viewportWidth){
             leftOffset += (viewportWidth - contentWidth) / 2;
         }
 
         // Set correct X coordinate on each node depending on column and spacing prop.
         _.forEach(nodesWithCoords, (node, i) => {
-            node.x = node.column * (columnWidth + columnSpacing) + leftOffset;
+            node.x = node.column * (columnWidth + xColumnSpacing) + leftOffset;
         });
 
         // Finally, add boolean `isCurrentContext` flag to each node object if needed.
@@ -252,10 +272,12 @@ export default class Graph extends React.Component {
         this.height = this.height.bind(this);
         this.nodesWithCoordinates = this.nodesWithCoordinates.bind(this);
         this.setScale = this.setScale.bind(this);
+        this.applyScaleBounds = this.applyScaleBounds.bind(this);
         this.state = {
             mounted: false,
             scale: props.scale,
-            minScale: props.minScale
+            minScale: props.minScale,
+            hasUserAdjustedScale: false
         };
         this.memoized = {
             getHeightFromNodes: memoize(Graph.getHeightFromNodes),
@@ -265,52 +287,66 @@ export default class Graph extends React.Component {
     }
 
     componentDidMount(){
-        this.setState({ 'mounted' : true });
-
-        const {
-            containerWidth,
-            containerHeight,
-            minScale: propMinScale,
-            maxScale,
-            graphWidth,
-            graphHeight,
-            zoomToExtentsOnMount = true
-        } = this.props;
-
-        // if (typeof containerWidth !== "number" || typeof containerHeight !== "number") {
-        //     // Maybe will become set in componentDidUpdate later.
-        //     return false;
-        // }
-
-        // if (isNaN(containerWidth) || isNaN(containerHeight)) {
-        //     throw new Error("Width or height is NaN.");
-        // }
-
-        // const minScaleUnbounded = Math.min(
-        //     (containerWidth / graphWidth),
-        //     (containerHeight / graphHeight)
-        // );
-
-        // // Decrease by 5% for scrollbars, etc.
-        // const nextMinScale = Math.floor(
-        //     Math.min(1, maxScale, Math.max(propMinScale, minScaleUnbounded))
-        // * 95) / 100;
-        // const retObj = { minScale: nextMinScale, mounted: true };
-
-        // // First time that we've gotten dimensions -- set scale to fit.
-        // // Also, if nextMinScale > scale or we had scale === minScale before.
-        // // TODO: Maybe do this onMount also
-        // if (zoomToExtentsOnMount) {
-        //     retObj.scale = nextMinScale;
-        // }
-        // requestAnimationFrame(() => {
-        //     this.setState(retObj);
-        // });
+        this.setState({ 'mounted' : true }, () => {
+            this.applyScaleBounds(true);
+        });
     }
 
-    setScale(scaleToSet, cb){
+    componentDidUpdate(prevProps){
+        if (
+            prevProps.width !== this.props.width ||
+            prevProps.nodes !== this.props.nodes ||
+            prevProps.columnWidth !== this.props.columnWidth ||
+            prevProps.columnSpacing !== this.props.columnSpacing ||
+            prevProps.rowSpacing !== this.props.rowSpacing ||
+            prevProps.innerMargin !== this.props.innerMargin
+        ){
+            this.applyScaleBounds(false);
+        }
+    }
+
+    applyScaleBounds(isInitialMount = false){
+        const {
+            width,
+            minimumHeight,
+            minScale: propMinScale = 0.9,
+            maxScale = 1.1,
+            zoomToExtentsOnMount = true
+        } = this.props;
+        const { hasUserAdjustedScale } = this.state;
+        if (typeof width !== 'number' || width <= 0) return;
+
+        const graphWidth = this.scrollableWidth();
+        const graphHeight = this.height() + ((this.props.innerMargin && this.props.innerMargin.top) || 0) + ((this.props.innerMargin && this.props.innerMargin.bottom) || 0);
+        const viewportWidth = width;
+        const viewportHeight = Math.max(minimumHeight || 0, graphHeight);
+
+        const fitScaleWidth = viewportWidth / Math.max(graphWidth, 1);
+        const fitScaleHeight = viewportHeight / Math.max(graphHeight, 1);
+        const fitScale = Math.min(fitScaleWidth, fitScaleHeight);
+
+        // Keep some breathing room for controls/scrollbars and avoid tiny zoom jumps.
+        const boundedMin = Math.min(
+            1,
+            maxScale,
+            Math.max(propMinScale, Math.floor(fitScale * 95) / 100)
+        );
+
+        this.setState((prevState) => {
+            const nextState = { minScale: boundedMin };
+            if (isInitialMount && zoomToExtentsOnMount && !hasUserAdjustedScale){
+                nextState.scale = boundedMin;
+            } else if (typeof prevState.scale === 'number' && prevState.scale < boundedMin){
+                nextState.scale = boundedMin;
+            }
+            return nextState;
+        });
+    }
+
+    setScale(scaleToSet, cb, options = {}){
+        const { userInitiated = true } = options;
         this.setState(function(
-            { minScale: stateMinScale },
+            { minScale: stateMinScale, hasUserAdjustedScale: prevUserAdjusted },
             { minScale: propMinScale, maxScale }
         ){
             const scale = Math.max(
@@ -320,7 +356,7 @@ export default class Graph extends React.Component {
                 ),
                 stateMinScale || propMinScale
             );
-            return { scale };
+            return { scale, hasUserAdjustedScale: userInitiated ? true : prevUserAdjusted };
         }, cb);
     }
 
@@ -365,7 +401,7 @@ export default class Graph extends React.Component {
             width, innerMargin: propInnerMargin, edges, minimumHeight,
             columnSpacing: propColumnSpacing, rowSpacing: propRowSpacing, columnWidth: propColumnWidth, 
             scale: propScale = 1, maxScale: propMaxScale = 1.1, minScale: propMinScale = 0.9,
-            showZoomControls
+            showZoomControls, zoomControlsPortalSelector
         } = this.props;
         const { mounted, scale: stateScale } = this.state;
         const scale = stateScale || propScale;
@@ -407,9 +443,20 @@ export default class Graph extends React.Component {
         }
         */
         let scaleControls = null;
+        let portalScaleControls = null;
         if (showZoomControls && typeof this.setScale === "function") {
             const scaleProps = { scale, minScale: this.state.minScale || propMinScale, maxScale: propMaxScale, setScale: this.setScale };
-            scaleControls = <ScaleControls {...scaleProps} />;
+            const scaleControlsElement = <ScaleControls {...scaleProps} className="portal-mounted" />;
+            if (zoomControlsPortalSelector && typeof document !== 'undefined'){
+                const portalTarget = document.querySelector(zoomControlsPortalSelector);
+                if (portalTarget){
+                    portalScaleControls = ReactDOM.createPortal(scaleControlsElement, portalTarget);
+                } else {
+                    scaleControls = scaleControlsElement;
+                }
+            } else {
+                scaleControls = scaleControlsElement;
+            }
         }
        
         return (
@@ -426,6 +473,7 @@ export default class Graph extends React.Component {
                         </ScrollContainer>
                     </StateContainer>
                 </div>
+                { portalScaleControls }
             </div>
         );
     }
