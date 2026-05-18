@@ -273,16 +273,17 @@ export default class Edge extends React.Component {
     }
 
     getComputedProperties(props = this.props){
-        const { edge, selectedNode, isNodeDisabled } = props;
+        const { edge, selectedNode, hoveredNode, isNodeDisabled } = props;
+        const activeNode = hoveredNode || selectedNode;
         const disabled = this.memoized.isDisabled(edge, isNodeDisabled);
 
-        if (disabled || !selectedNode) {
+        if (disabled || !activeNode) {
             return { disabled, 'selected' : false, 'related' : false };
         }
 
-        const selected = Edge.isSelected(edge, selectedNode);
-        const related = this.memoized.isRelated(edge, selectedNode);
-        const distantlySelected = selected || (selectedNode && this.memoized.isDistantlySelected(edge, selectedNode, disabled)) || false;
+        const selected = Edge.isSelected(edge, activeNode);
+        const related = this.memoized.isRelated(edge, activeNode);
+        const distantlySelected = selected || this.memoized.isDistantlySelected(edge, activeNode, disabled) || false;
 
         return { disabled, selected, related, distantlySelected };
     }

@@ -80,7 +80,10 @@ export default class Graph extends React.Component {
         'minScale': PropTypes.number,
         'maxScale': PropTypes.number
         ,
-        'zoomControlsPortalSelector': PropTypes.string
+        'zoomControlsPortalSelector': PropTypes.string,
+        'dimNonPathOnSelect': PropTypes.bool,
+        'onNodeMouseEnter': PropTypes.func,
+        'onNodeMouseLeave': PropTypes.func
     };
 
     static defaultProps = {
@@ -117,7 +120,10 @@ export default class Graph extends React.Component {
         'minScale': 0.50,
         'maxScale': 1.50
         ,
-        'zoomControlsPortalSelector': null
+        'zoomControlsPortalSelector': null,
+        'dimNonPathOnSelect': true,
+        'onNodeMouseEnter': null,
+        'onNodeMouseLeave': null
     };
 
     static getHeightFromNodes(nodes, nodesPreSortFxn, rowSpacing){
@@ -464,12 +470,12 @@ export default class Graph extends React.Component {
                 <div className="workflow-chart-inner-container">
                     {scaleControls}
                     <StateContainer {...{ nodes, edges, innerWidth, innerHeight, contentWidth, width }}
-                        {..._.pick(this.props, 'pathArrows', 'href', 'onNodeClick', 'renderDetailPane')}>
+                        {..._.pick(this.props, 'pathArrows', 'href', 'onNodeClick', 'renderDetailPane', 'dimNonPathOnSelect')}>
                         <ScrollContainer outerHeight={graphHeight} minHeight={minimumHeight}>
                             <EdgesLayer {...{ scale, columnWidth: propColumnWidth, columnSpacing: propColumnSpacing, rowSpacing: propRowSpacing, innerMargin: propInnerMargin }}
                                 {..._.pick(this.props, 'isNodeDisabled', 'isNodeCurrentContext', 'isNodeSelected', 'edgeStyle', 'nodeEdgeLedgeWidths')} />
                             <NodesLayer {...{ scale, columnWidth: propColumnWidth, columnSpacing: propColumnSpacing, innerMargin: propInnerMargin }}
-                                {..._.pick(this.props, 'renderNodeElement', 'isNodeDisabled', 'isNodeCurrentContext', 'nodeClassName')} />
+                                {..._.pick(this.props, 'renderNodeElement', 'isNodeDisabled', 'isNodeCurrentContext', 'nodeClassName', 'onNodeMouseEnter', 'onNodeMouseLeave')} />
                         </ScrollContainer>
                     </StateContainer>
                 </div>

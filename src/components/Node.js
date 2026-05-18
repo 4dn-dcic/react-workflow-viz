@@ -232,13 +232,17 @@ export default class Node extends React.Component {
     }
 
     render() {
-        const { node, isNodeDisabled, className, columnWidth, renderNodeElement, selectedNode, forwardedRef, scale = 1 } = this.props;
+        const {
+            node, isNodeDisabled, className, columnWidth, renderNodeElement,
+            selectedNode, hoveredNode, forwardedRef, scale = 1
+        } = this.props;
         const disabled = typeof node.disabled !== 'undefined' ? node.disabled : this.isDisabled(node, isNodeDisabled);
         const isCurrentContext = typeof node.isCurrentContext !== 'undefined' ? node.isCurrentContext : null;
         const classNameList = ["node", "node-type-" + node.nodeType];
-        const selected = (!disabled && Node.isSelected(node, selectedNode)) || false;
-        const related = (!disabled && this.isRelated(node, selectedNode)) || false;
-        const inSelectionPath = selected || (!disabled && this.isInSelectionPath(node, selectedNode)) || false;
+        const activeNode = hoveredNode || selectedNode;
+        const selected = (!disabled && Node.isSelected(node, activeNode)) || false;
+        const related = (!disabled && this.isRelated(node, activeNode)) || false;
+        const inSelectionPath = selected || (!disabled && this.isInSelectionPath(node, activeNode)) || false;
 
         if (disabled) classNameList.push('disabled');
         if (isCurrentContext) classNameList.push('current-context');
@@ -263,7 +267,8 @@ export default class Node extends React.Component {
                     transform: `scale(${scale})`
                 }} ref={forwardedRef}>
                 <div className="inner" children={renderNodeElement(node, visibleNodeProps)}
-                    {..._.pick(this.props, 'onMouseEnter', 'onMouseLeave')} onClick={disabled ? null : this.props.onClick} />
+                    {..._.pick(this.props, 'onMouseEnter', 'onMouseLeave')}
+                    onClick={disabled ? null : this.props.onClick} />
             </div>
         );
     }

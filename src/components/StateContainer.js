@@ -19,6 +19,9 @@ const memoizedFindNode = memoize(function(nodes, name, nodeType, id=null){
 export default class StateContainer extends React.PureComponent {
 
     static getDerivedStateFromProps(props, state){
+        const stateUpdates = {};
+        let hasUpdates = false;
+
         if (state.selectedNode){
             const foundNode = memoizedFindNode(
                 props.nodes,
@@ -27,21 +30,37 @@ export default class StateContainer extends React.PureComponent {
                 state.selectedNode.id || null
             );
             if (foundNode){
-                return { 'selectedNode' : foundNode };
+                stateUpdates.selectedNode = foundNode;
             } else {
-                return { 'selectedNode' : null };
+                stateUpdates.selectedNode = null;
             }
+            hasUpdates = true;
         }
-        return null;
+
+        if (state.hoveredNode){
+            const foundHovered = memoizedFindNode(
+                props.nodes,
+                state.hoveredNode.name,
+                state.hoveredNode.nodeType,
+                state.hoveredNode.id || null
+            );
+            stateUpdates.hoveredNode = foundHovered || null;
+            hasUpdates = true;
+        }
+
+        return hasUpdates ? stateUpdates : null;
     }
 
     constructor(props){
         super(props);
         this.defaultOnNodeClick = this.defaultOnNodeClick.bind(this);
         this.handleNodeClick = this.handleNodeClick.bind(this);
+        this.handleNodeMouseEnter = this.handleNodeMouseEnter.bind(this);
+        this.handleNodeMouseLeave = this.handleNodeMouseLeave.bind(this);
         this.deselectNode = this.deselectNode.bind(this);
         this.state = {
-            'selectedNode' : null
+            'selectedNode' : null,
+            'hoveredNode' : null
         };
     }
 
@@ -69,9 +88,18 @@ export default class StateContainer extends React.PureComponent {
         this.setState({ selectedNode: null });
     }
 
+    handleNodeMouseEnter(node){
+        this.setState({ hoveredNode: node || null });
+    }
+
+    handleNodeMouseLeave(){
+        this.setState({ hoveredNode: null });
+    }
+
     render(){
         const { children, renderDetailPane, ...passProps } = this.props;
-        const { selectedNode } = this.state;
+        const { selectedNode, hoveredNode } = this.state;
+        const { dimNonPathOnSelect = true } = this.props;
         let detailPane = null;
         if (typeof renderDetailPane === 'function'){
             detailPane = renderDetailPane(selectedNode, {
@@ -79,10 +107,20 @@ export default class StateContainer extends React.PureComponent {
             });
         }
         return (
-            <div className="state-container" data-is-node-selected={!!(selectedNode)}>
+            <div
+                className="state-container"
+                data-is-node-selected={!!(selectedNode)}
+                data-is-node-hovered={!!(hoveredNode)}
+                data-dim-non-path-on-select={dimNonPathOnSelect ? "true" : "false"}>
                 {
                     React.Children.map(children, (child) =>
-                        React.cloneElement(child, { ...passProps, ...this.state, onNodeClick : this.handleNodeClick })
+                        React.cloneElement(child, {
+                            ...passProps,
+                            ...this.state,
+                            onNodeClick : this.handleNodeClick,
+                            onNodeMouseEnter: this.handleNodeMouseEnter,
+                            onNodeMouseLeave: this.handleNodeMouseLeave
+                        })
                     )
                 }
                 { detailPane }
