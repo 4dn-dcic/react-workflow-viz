@@ -562,19 +562,10 @@ $workflow-node-color-type-global-context:           #ffb3b3 !default;
                 }
             }
 
-            /* Make selected path easier to track, even with popup mode. */
+            /* Keep original node border/outline behavior; only adjust opacity on hover/select context. */
             .nodes-layer-wrapper .nodes-layer .node[data-node-in-selection-path="true"]:not([data-node-selected="true"]),
             .nodes-layer-wrapper .nodes-layer .node[data-node-related="true"]:not([data-node-selected="true"]) {
                 opacity: 1;
-                > .inner .node-visible-element {
-                    box-shadow: 0 0 0 2px rgba(17, 24, 39, 0.18);
-                }
-            }
-
-            .nodes-layer-wrapper .nodes-layer .node[data-node-selected="true"] {
-                > .inner .node-visible-element {
-                    box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.35);
-                }
             }
 
             .scroll-container-wrapper {
