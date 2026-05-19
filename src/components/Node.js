@@ -50,7 +50,9 @@ export class DefaultNodeElement extends React.PureComponent {
 
         // Node Type
         if (node.nodeType === 'step'){
-            output += '<small>Step ' + ((node.column - 1) / 2 + 1) + '</small>';
+            const hasColumn = typeof node.column === 'number' && Number.isFinite(node.column);
+            const stepLabel = hasColumn ? ('Step ' + (((node.column - 1) / 2) + 1)) : 'Workflow Step';
+            output += '<small>' + stepLabel + '</small>';
         } else {
             var nodeType = node.nodeType;
             nodeType = nodeType.charAt(0).toUpperCase() + nodeType.slice(1);
