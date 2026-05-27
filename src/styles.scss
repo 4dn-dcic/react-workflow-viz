@@ -189,18 +189,19 @@ $workflow-node-color-type-global-context:           #ffb3b3 !default;
 
     &.node-type-step {
         margin-top: - math.div($workflow-step-node-height, 2);
-        outline: 3px solid transparent;
-        outline-offset: 4px;
-        transition: top .5s ease-out, left .5s ease-out, width .5s ease-out, opacity .5s ease-out, outline-color .2s;
+        transition: top .5s ease-out, left .5s ease-out, width .5s ease-out, opacity .5s ease-out;
 
         > .inner {
-            
+
             .node-visible-element {
                 height : $workflow-step-node-height;
 
                 background-color: $workflow-node-color-type-step;
                 border-radius: 2px;
                 border: 1px solid rgba(0,0,0,0.2);
+                outline: 3px solid transparent;
+                outline-offset: 4px;
+                transition: outline-color .2s;
                 > .innermost > .node-name,
                 > .node-name {
                     padding-left: 10px;
@@ -209,11 +210,11 @@ $workflow-node-color-type-global-context:           #ffb3b3 !default;
             }
         }
 
-        &:hover{
+        &:hover > .inner .node-visible-element {
             outline-color: #ddd;
         }
 
-        &[data-node-selected="true"]{
+        &[data-node-selected="true"] > .inner .node-visible-element {
             outline-color: #000;
         }
 

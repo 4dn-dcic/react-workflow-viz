@@ -608,6 +608,15 @@ export function parseAnalysisSteps(analysis_steps, parsingOptions = {}){
                             return true;
                         }
 
+                        // Match by file @id when step reference exists but argument names differ (e.g. MWFR-style graphs where
+                        // input arg "input_file_bam" connects to output arg "output_file_cram" of the same physical file).
+                        // Requires s.step to be the step that produced n, and run_data to confirm it's the same file.
+                        if (s.step && s.for_file && n.argNamesOnSteps[s.step] !== undefined) {
+                            if (areAnyRunDataPresentAndEqual(n, stepIO)) {
+                                return true;
+                            }
+                        }
+
                         /**** EXTRA NON-CWL THINGS ****/
 
                         // Match Groups (will become deprecated)
@@ -845,7 +854,7 @@ export function parseAnalysisSteps(analysis_steps, parsingOptions = {}){
         ioNodes.forEach(function(n){
             if (!Array.isArray(n[targetPropertyName])) return;
             n[targetPropertyName].forEach(function(t){
-                if (typeof t.step === 'string'){
+                if (t.step != null){
                     const matchedStep = _.findWhere(analysis_steps, { 'name' : t.step });
                     if (matchedStep) {
                         nextSteps.add(matchedStep);
