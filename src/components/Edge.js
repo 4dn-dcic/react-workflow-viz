@@ -8,6 +8,7 @@ import * as d3 from 'd3';
 
 import Node from './Node';
 import { traceNodePathAndRun } from './parsing-functions';
+import { roundScaled } from '../utilities';
 
 
 export const pathDimensionFunctions = {
@@ -156,12 +157,10 @@ export default class Edge extends React.Component {
     }
 
     static isRelated(edge, selectedNode){
-        return Node.isRelated(edge.source, selectedNode);
-        // Enable the following later _if_ we go beyond 1 input node deep.
-        //return (
-        //    Node.isRelated(edge.source, selectedNode) ||
-        //    Node.isRelated(edge.target, selectedNode)
-        //);
+        return (
+            Node.isRelated(edge.source, selectedNode) ||
+            Node.isRelated(edge.target, selectedNode)
+        );
     }
 
     static isDistantlySelected(edge, selectedNode){
@@ -274,16 +273,17 @@ export default class Edge extends React.Component {
     }
 
     getComputedProperties(props = this.props){
-        const { edge, selectedNode, isNodeDisabled } = props;
+        const { edge, selectedNode, hoveredNode, isNodeDisabled } = props;
+        const activeNode = hoveredNode || selectedNode;
         const disabled = this.memoized.isDisabled(edge, isNodeDisabled);
 
-        if (disabled || !selectedNode) {
+        if (disabled || !activeNode) {
             return { disabled, 'selected' : false, 'related' : false };
         }
 
-        const selected = Edge.isSelected(edge, selectedNode);
-        const related = this.memoized.isRelated(edge, selectedNode);
-        const distantlySelected = selected || (selectedNode && this.memoized.isDistantlySelected(edge, selectedNode, disabled)) || false;
+        const selected = Edge.isSelected(edge, activeNode);
+        const related = this.memoized.isRelated(edge, activeNode);
+        const distantlySelected = selected || this.memoized.isDistantlySelected(edge, activeNode, disabled) || false;
 
         return { disabled, selected, related, distantlySelected };
     }
@@ -428,10 +428,16 @@ export default class Edge extends React.Component {
 
     generatePathDimension(startPtOverride = null, endPtOverride = null, edgeVerticesOverride = null){
         const {
-            edgeStyle, startX, startY, endX, endY, columnWidth,
-            curveRadius, columnSpacing, rowSpacing, nodeEdgeLedgeWidths,
-            edge: { vertices: customEdgeVertices = null }
+            edgeStyle, startX, startY, endX, endY, curveRadius,
+            scale = 1, columnWidth: propColumnWidth, columnSpacing: propColumnSpacing, rowSpacing: propRowSpacing,
+            nodeEdgeLedgeWidths, edge: { vertices: customEdgeVertices = null }
         } = this.props;
+        
+        // scaling
+        const columnWidth = roundScaled(propColumnWidth, scale);
+        const columnSpacing = roundScaled(propColumnSpacing, scale);
+        const rowSpacing = roundScaled(propRowSpacing, scale);
+        
         const { startOffset, endOffset } = this.getPathOffsets();
 
         const startPt = {

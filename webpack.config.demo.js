@@ -64,6 +64,22 @@ module.exports = [{
                         loader: 'babel-loader'
                     }
                 ]
+            },
+            {
+                test: /\.css$/,
+                use: ['style-loader', 'css-loader']
+            },
+            {
+                test: /\.(woff|woff2|eot|ttf|otf|svg)$/,
+                use: [
+                    {
+                        loader: 'file-loader',
+                        options: {
+                            name: '[name].[ext]',
+                            outputPath: 'webfonts/',
+                        }
+                    }
+                ]
             }
         ]
     },

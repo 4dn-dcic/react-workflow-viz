@@ -1,4 +1,5 @@
 demo/demo.js
+demo/webfonts/*
 node_modules
 src/components
 src/index.js

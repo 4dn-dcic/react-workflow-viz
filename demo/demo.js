@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import _ from 'underscore';
 import url from 'url';
 import { default as packageJSON } from './../package.json';
+import '@fortawesome/fontawesome-free/css/all.css';
 
 // Loaded on index.html, defined as an external in webpack.config.demo.js
 import Graph, { GraphParser } from 'react-workflow-viz';
@@ -180,7 +181,7 @@ class DemoApp extends Component {
                     onChange={this.handleParsingOptChange} onChangeBasicIO={this.handleChangeBasicIO} />
                 <RowSpacingTypeSelect rowSpacingType={rowSpacingType} onChange={this.handleRowSpacingTypeChange} />
                 <GraphParser parsingOptions={fullParseOpts} parentItem={{ name }} steps={steps}>
-                    <Graph rowSpacingType={rowSpacingType} minimumHeight={300} />
+                    <Graph rowSpacingType={rowSpacingType} minimumHeight={300} showZoomControls={true} />
                 </GraphParser>
             </div>
         );

@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import memoize from 'memoize-one';
 import _ from 'underscore';
 import { traceNodePathAndRun } from './parsing-functions';
+import { roundScaled } from '../utilities';
 
 
 /** @todo separate methods out into functional components */
@@ -49,7 +50,9 @@ export class DefaultNodeElement extends React.PureComponent {
 
         // Node Type
         if (node.nodeType === 'step'){
-            output += '<small>Step ' + ((node.column - 1) / 2 + 1) + '</small>';
+            const hasColumn = typeof node.column === 'number' && Number.isFinite(node.column);
+            const stepLabel = hasColumn ? ('Step ' + (((node.column - 1) / 2) + 1)) : 'Workflow Step';
+            output += '<small>' + stepLabel + '</small>';
         } else {
             var nodeType = node.nodeType;
             nodeType = nodeType.charAt(0).toUpperCase() + nodeType.slice(1);
@@ -72,7 +75,7 @@ export class DefaultNodeElement extends React.PureComponent {
     render(){
         const { node, title, columnWidth } = this.props;
         const style = node.nodeType === 'input' || node.nodeType === 'output' ?
-            { width : (columnWidth || 100) }
+            { width : columnWidth || 100 }
             : null;
         return (
             <div
@@ -96,6 +99,10 @@ export default class Node extends React.Component {
     static isSelected(currentNode, selectedNode){
         if (!selectedNode) return false;
         if (selectedNode === currentNode) return true;
+        const selectedCompacted = Array.isArray(selectedNode._compactedNodes) ? selectedNode._compactedNodes : [];
+        if (selectedCompacted.indexOf(currentNode) > -1) return true;
+        const currentCompacted = Array.isArray(currentNode._compactedNodes) ? currentNode._compactedNodes : [];
+        if (currentCompacted.indexOf(selectedNode) > -1) return true;
 
         return false;
     }
@@ -145,9 +152,17 @@ export default class Node extends React.Component {
     static isRelated(currentNode, selectedNode) {
 
         if (!selectedNode) return false;
+        const selectedNameSet = new Set(
+            [selectedNode]
+                .concat(Array.isArray(selectedNode._compactedNodes) ? selectedNode._compactedNodes : [])
+                .map(function(n){ return n && n.name; })
+                .filter(function(n){ return typeof n === 'string' && n.length > 0; })
+        );
+        const hasMatchingName = selectedNameSet.has(currentNode.name)
+            || _.any((currentNode._source || []).concat(currentNode._target || []), function(s){ return selectedNameSet.has(s && s.name); });
 
         // Ensure that an argument name (as appears on a step input/output arg) matches selectedNode name.
-        if (selectedNode.name === currentNode.name || _.any((currentNode._source || []).concat(currentNode._target || []), function(s){ return s.name === selectedNode.name; })) {
+        if (hasMatchingName) {
             if (currentNode.nodeType === 'input' || currentNode.nodeType === 'output') { // An output node may be an input of another node.
                 return Node.isInputOfSameStep(currentNode, selectedNode);
             }
@@ -187,9 +202,12 @@ export default class Node extends React.Component {
     componentDidMount(){
         const {
             countInActiveContext, lastActiveContextNode,
-            node, scrollContainerWrapperElement, columnWidth, columnSpacing
+            node, scrollContainerWrapperElement, scale = 1, columnWidth: propColumnWidth, columnSpacing: propColumnSpacing
         } = this.props;
         const sw = scrollContainerWrapperElement;
+
+        const columnWidth = roundScaled(propColumnWidth, scale);
+        const columnSpacing = roundScaled(propColumnSpacing, scale);
 
         if (
             node.isCurrentContext && sw &&
@@ -215,21 +233,25 @@ export default class Node extends React.Component {
         return false;
     }
 
-    render(){
-        var { node, isNodeDisabled, className, columnWidth, renderNodeElement, selectedNode, forwardedRef } = this.props,
-            disabled         = typeof node.disabled !== 'undefined' ? node.disabled : this.isDisabled(node, isNodeDisabled),
-            isCurrentContext = typeof node.isCurrentContext !== 'undefined' ? node.isCurrentContext : null,
-            classNameList    = ["node", "node-type-" + node.nodeType],
-            selected         = (!disabled && Node.isSelected(node, selectedNode)) || false,
-            related          = (!disabled && this.isRelated(node, selectedNode)) || false,
-            inSelectionPath  = selected || (!disabled && this.isInSelectionPath(node, selectedNode)) || false;
+    render() {
+        const {
+            node, isNodeDisabled, className, columnWidth, renderNodeElement,
+            selectedNode, hoveredNode, forwardedRef, scale = 1
+        } = this.props;
+        const disabled = typeof node.disabled !== 'undefined' ? node.disabled : this.isDisabled(node, isNodeDisabled);
+        const isCurrentContext = typeof node.isCurrentContext !== 'undefined' ? node.isCurrentContext : null;
+        const classNameList = ["node", "node-type-" + node.nodeType];
+        const activeNode = hoveredNode || selectedNode;
+        const selected = (!disabled && Node.isSelected(node, activeNode)) || false;
+        const related = (!disabled && this.isRelated(node, activeNode)) || false;
+        const inSelectionPath = selected || (!disabled && this.isInSelectionPath(node, activeNode)) || false;
 
-        if      (disabled)                        classNameList.push('disabled');
-        if      (isCurrentContext)                classNameList.push('current-context');
-        if      (typeof className === 'function') classNameList.push(className(node));
-        else if (typeof className === 'string'  ) classNameList.push(className);
+        if (disabled) classNameList.push('disabled');
+        if (isCurrentContext) classNameList.push('current-context');
+        if (typeof className === 'function') classNameList.push(className(node));
+        else if (typeof className === 'string') classNameList.push(className);
 
-        var visibleNodeProps = _.extend(
+        const visibleNodeProps = _.extend(
             _.omit(this.props, 'children', 'onMouseEnter', 'onMouseLeave', 'onClick', 'className', 'nodeElement'),
             { disabled, selected, related, isCurrentContext, inSelectionPath }
         );
@@ -240,13 +262,15 @@ export default class Node extends React.Component {
                 data-node-selected={selected} data-node-in-selection-path={inSelectionPath}
                 data-node-related={related} data-node-type-detail={node.ioType && node.ioType.toLowerCase()}
                 data-node-column={node.column} style={{
-                    'top'       : node.y,
-                    'left'      : node.x,
-                    'width'     : columnWidth || 100,
-                    'zIndex'    : 2 + (node.indexInColumn || 0)
+                    top: node.y,
+                    left: node.x + ((scale - 1) * columnWidth) / 2,
+                    width: columnWidth || 100,
+                    zIndex: 2 + (node.indexInColumn || 0),
+                    transform: `scale(${scale})`
                 }} ref={forwardedRef}>
                 <div className="inner" children={renderNodeElement(node, visibleNodeProps)}
-                    {..._.pick(this.props, 'onMouseEnter', 'onMouseLeave')} onClick={disabled ? null : this.props.onClick} />
+                    {..._.pick(this.props, 'onMouseEnter', 'onMouseLeave')}
+                    onClick={disabled ? null : this.props.onClick} />
             </div>
         );
     }
